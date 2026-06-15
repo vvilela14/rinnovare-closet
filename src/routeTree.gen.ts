@@ -17,7 +17,9 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedFavoritosRouteImport } from './routes/_authenticated/favoritos'
 import { Route as AuthenticatedCarrinhoRouteImport } from './routes/_authenticated/carrinho'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPerfilIndexRouteImport } from './routes/_authenticated/perfil.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedPerfilEventosRouteImport } from './routes/_authenticated/perfil.eventos'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
 import { Route as AuthenticatedAdminFavoritosRouteImport } from './routes/_authenticated/admin.favoritos'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
@@ -63,11 +65,23 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPerfilIndexRoute =
+  AuthenticatedPerfilIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPerfilRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedPerfilEventosRoute =
+  AuthenticatedPerfilEventosRouteImport.update({
+    id: '/eventos',
+    path: '/eventos',
+    getParentRoute: () => AuthenticatedPerfilRoute,
+  } as any)
 const AuthenticatedAdminPedidosRoute =
   AuthenticatedAdminPedidosRouteImport.update({
     id: '/pedidos',
@@ -105,28 +119,31 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/carrinho': typeof AuthenticatedCarrinhoRoute
   '/favoritos': typeof AuthenticatedFavoritosRoute
-  '/perfil': typeof AuthenticatedPerfilRoute
+  '/perfil': typeof AuthenticatedPerfilRouteWithChildren
   '/produto/$id': typeof ProdutoIdRoute
   '/admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
+  '/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/perfil/': typeof AuthenticatedPerfilIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/carrinho': typeof AuthenticatedCarrinhoRoute
   '/favoritos': typeof AuthenticatedFavoritosRoute
-  '/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
+  '/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/perfil': typeof AuthenticatedPerfilIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -136,14 +153,16 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/carrinho': typeof AuthenticatedCarrinhoRoute
   '/_authenticated/favoritos': typeof AuthenticatedFavoritosRoute
-  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRouteWithChildren
   '/produto/$id': typeof ProdutoIdRoute
   '/_authenticated/admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/_authenticated/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
+  '/_authenticated/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/perfil/': typeof AuthenticatedPerfilIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -160,21 +179,24 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/favoritos'
     | '/admin/pedidos'
+    | '/perfil/eventos'
     | '/admin/'
+    | '/perfil/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/carrinho'
     | '/favoritos'
-    | '/perfil'
     | '/produto/$id'
     | '/admin/calendario'
     | '/admin/catalogo'
     | '/admin/clientes'
     | '/admin/favoritos'
     | '/admin/pedidos'
+    | '/perfil/eventos'
     | '/admin'
+    | '/perfil'
   id:
     | '__root__'
     | '/'
@@ -190,7 +212,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/favoritos'
     | '/_authenticated/admin/pedidos'
+    | '/_authenticated/perfil/eventos'
     | '/_authenticated/admin/'
+    | '/_authenticated/perfil/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -258,12 +282,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/perfil/': {
+      id: '/_authenticated/perfil/'
+      path: '/'
+      fullPath: '/perfil/'
+      preLoaderRoute: typeof AuthenticatedPerfilIndexRouteImport
+      parentRoute: typeof AuthenticatedPerfilRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/perfil/eventos': {
+      id: '/_authenticated/perfil/eventos'
+      path: '/eventos'
+      fullPath: '/perfil/eventos'
+      preLoaderRoute: typeof AuthenticatedPerfilEventosRouteImport
+      parentRoute: typeof AuthenticatedPerfilRoute
     }
     '/_authenticated/admin/pedidos': {
       id: '/_authenticated/admin/pedidos'
@@ -324,18 +362,31 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedPerfilRouteChildren {
+  AuthenticatedPerfilEventosRoute: typeof AuthenticatedPerfilEventosRoute
+  AuthenticatedPerfilIndexRoute: typeof AuthenticatedPerfilIndexRoute
+}
+
+const AuthenticatedPerfilRouteChildren: AuthenticatedPerfilRouteChildren = {
+  AuthenticatedPerfilEventosRoute: AuthenticatedPerfilEventosRoute,
+  AuthenticatedPerfilIndexRoute: AuthenticatedPerfilIndexRoute,
+}
+
+const AuthenticatedPerfilRouteWithChildren =
+  AuthenticatedPerfilRoute._addFileChildren(AuthenticatedPerfilRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCarrinhoRoute: typeof AuthenticatedCarrinhoRoute
   AuthenticatedFavoritosRoute: typeof AuthenticatedFavoritosRoute
-  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCarrinhoRoute: AuthenticatedCarrinhoRoute,
   AuthenticatedFavoritosRoute: AuthenticatedFavoritosRoute,
-  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
