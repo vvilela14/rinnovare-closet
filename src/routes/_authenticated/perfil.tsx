@@ -43,10 +43,22 @@ function PerfilPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profile_events")
-        .select("id, title, event_date, category")
+        .select("id, title, event_date, category, product_id, products:product_id(id, name, image_url, images)")
         .eq("user_id", user!.id)
         .order("event_date", { ascending: true });
       return data ?? [];
+    },
+  });
+
+  const { data: favorites = [] } = useQuery({
+    queryKey: ["favorites-for-events", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("favorites")
+        .select("product_id, products:product_id(id, name, image_url, images)")
+        .eq("user_id", user!.id);
+      return (data ?? []).filter((f: any) => f.products);
     },
   });
 
