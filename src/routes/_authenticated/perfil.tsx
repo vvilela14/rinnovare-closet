@@ -14,6 +14,27 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const EVENT_CATEGORIES = [
+  "Casamento à noite",
+  "Casamento na praia",
+  "Casamento no campo",
+  "Festa de formatura",
+  "Aniversário",
+  "Outro",
+];
+
+const COLOR_PALETTE: { name: string; hex: string; border?: boolean }[] = [
+  { name: "Amarelo", hex: "#FFF24D" },
+  { name: "Azul", hex: "#2A1FE0" },
+  { name: "Bege", hex: "#D2B48C" },
+  { name: "Branco", hex: "#FFFFFF", border: true },
+  { name: "Cinza", hex: "#8A8A8A" },
+  { name: "Marrom", hex: "#7B3F00" },
+  { name: "Multicor", hex: "conic-gradient(from 0deg, #ec4899, #3b82f6, #f59e0b, #10b981, #ec4899)" },
+  { name: "Preto", hex: "#000000" },
+];
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({ meta: [{ title: "Meu perfil — Rinnovare" }] }),
