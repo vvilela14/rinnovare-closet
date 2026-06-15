@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } fro
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { LayoutDashboard, Package, Users, ShoppingBag, LogOut, ArrowLeft } from "lucide-react";
-import logoAsset from "@/assets/rinnovare-logo.png.asset.json";
+import logoAsset from "@/assets/rinnovare-logo-admin.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Painel Administrativo — Rinnovare" }] }),
