@@ -222,3 +222,37 @@ function ProductPage() {
     </div>
   );
 }
+
+function ZoomImage({ src }: { src: string }) {
+  const [zoomed, setZoomed] = useState(false);
+  const [origin, setOrigin] = useState({ x: 50, y: 50 });
+
+  function handleMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!zoomed) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setOrigin({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+  }
+
+  return (
+    <div
+      onClick={(e) => { e.stopPropagation(); setZoomed((z) => !z); }}
+      onMouseMove={handleMove}
+      onMouseLeave={() => setOrigin({ x: 50, y: 50 })}
+      className={`relative flex max-h-[92vh] max-w-[92vw] items-center justify-center overflow-hidden ${zoomed ? "cursor-zoom-out" : "cursor-zoom-in"}`}
+      style={{ touchAction: "none" }}
+    >
+      <img
+        src={src}
+        alt="Vestido ampliado"
+        draggable={false}
+        className="max-h-[92vh] max-w-[92vw] object-contain animate-scale-in transition-transform duration-200 ease-out select-none"
+        style={{
+          transform: zoomed ? "scale(2.6)" : "scale(1)",
+          transformOrigin: `${origin.x}% ${origin.y}%`,
+        }}
+      />
+    </div>
+  );
+}
