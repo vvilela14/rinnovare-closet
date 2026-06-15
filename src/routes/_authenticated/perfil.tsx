@@ -101,6 +101,7 @@ function PerfilPage() {
   const [eventTitle, setEventTitle] = useState("");
   const [eventCategory, setEventCategory] = useState("");
   const [eventDate, setEventDate] = useState<Date | undefined>();
+  const [eventProductId, setEventProductId] = useState<string>("");
 
   const addEvent = useMutation({
     mutationFn: async () => {
@@ -110,6 +111,7 @@ function PerfilPage() {
         title: eventTitle.trim(),
         category: eventCategory.trim() || null,
         event_date: format(eventDate, "yyyy-MM-dd"),
+        product_id: eventProductId || null,
       });
       if (error) throw error;
     },
@@ -117,6 +119,7 @@ function PerfilPage() {
       setEventTitle("");
       setEventCategory("");
       setEventDate(undefined);
+      setEventProductId("");
       qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
     },
     onError: (e: any) => toast.error(e.message),
