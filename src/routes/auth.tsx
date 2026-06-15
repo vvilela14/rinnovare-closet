@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
+import { Eye, EyeOff } from "lucide-react";
 import logoAsset from "@/assets/rinnovare-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
