@@ -42,10 +42,10 @@ function AdminDashboard() {
   });
 
   const cards = [
-    { label: "Vestidos no catálogo", value: stats?.products ?? "—", sub: `${stats?.activeProducts ?? 0} ativos`, icon: Package, color: "#260d58" },
-    { label: "Itens no carrinho", value: stats?.cart ?? "—", sub: "todos os clientes", icon: ShoppingBag, color: "#be9ffc" },
-    { label: "Favoritos salvos", value: stats?.favorites ?? "—", sub: "clientes apaixonados", icon: Heart, color: "#be9ffc" },
-    { label: "Clientes cadastradas", value: stats?.clients ?? "—", sub: "contas ativas", icon: Users, color: "#260d58" },
+    { label: "Vestidos no catálogo", value: stats?.products ?? "—", sub: `${stats?.activeProducts ?? 0} ativos`, icon: Package, color: "#260d58", to: "/admin/catalogo" as const },
+    { label: "Itens no carrinho", value: stats?.cart ?? "—", sub: "todos os clientes", icon: ShoppingBag, color: "#be9ffc", to: "/admin/pedidos" as const },
+    { label: "Favoritos salvos", value: stats?.favorites ?? "—", sub: "clientes apaixonados", icon: Heart, color: "#be9ffc", to: "/admin/favoritos" as const },
+    { label: "Clientes cadastradas", value: stats?.clients ?? "—", sub: "contas ativas", icon: Users, color: "#260d58", to: "/admin/clientes" as const },
   ];
 
   return (
@@ -68,7 +68,11 @@ function AdminDashboard() {
         {cards.map((c) => {
           const Icon = c.icon;
           return (
-            <div key={c.label} className="rounded-2xl border border-border bg-white p-5">
+            <Link
+              key={c.label}
+              to={c.to}
+              className="group rounded-2xl border border-border bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-[#260d58]/40 hover:shadow-[0_12px_30px_-18px_rgba(38,13,88,0.5)]"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-xs uppercase tracking-widest text-muted-foreground">{c.label}</span>
                 <span className="rounded-full p-2" style={{ background: `${c.color}15` }}>
@@ -76,8 +80,11 @@ function AdminDashboard() {
                 </span>
               </div>
               <div className="mt-4 text-3xl font-medium">{c.value}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{c.sub}</div>
-            </div>
+              <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+                <span>{c.sub}</span>
+                <ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition group-hover:opacity-100" />
+              </div>
+            </Link>
           );
         })}
       </div>
