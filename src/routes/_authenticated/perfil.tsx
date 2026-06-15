@@ -87,6 +87,7 @@ function PerfilPage() {
 
   // Events
   const [eventTitle, setEventTitle] = useState("");
+  const [eventCategory, setEventCategory] = useState("");
   const [eventDate, setEventDate] = useState<Date | undefined>();
 
   const addEvent = useMutation({
@@ -95,12 +96,14 @@ function PerfilPage() {
       const { error } = await supabase.from("profile_events").insert({
         user_id: user!.id,
         title: eventTitle.trim(),
+        category: eventCategory.trim() || null,
         event_date: format(eventDate, "yyyy-MM-dd"),
       });
       if (error) throw error;
     },
     onSuccess: () => {
       setEventTitle("");
+      setEventCategory("");
       setEventDate(undefined);
       qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
     },
