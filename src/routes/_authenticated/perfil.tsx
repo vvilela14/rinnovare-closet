@@ -292,22 +292,30 @@ function PerfilPage() {
             <p className="mt-4 text-sm text-muted-foreground">Nenhum evento marcado ainda.</p>
           ) : (
             <ul className="mt-4 divide-y divide-border">
-              {events.map((ev: any) => (
-                <li key={ev.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <div className="font-medium">{ev.title}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {ev.category ? <span className="mr-2 rounded-full bg-muted px-2 py-0.5">{ev.category}</span> : null}
-                      {format(new Date(ev.event_date + "T00:00:00"), "PPP", { locale: ptBR })}
+              {events.map((ev: any) => {
+                const p = ev.products;
+                const img = p?.image_url || p?.images?.[0];
+                return (
+                  <li key={ev.id} className="flex items-center justify-between gap-3 py-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {img && <img src={img} alt="" className="h-12 w-12 rounded-lg object-cover flex-shrink-0" />}
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{ev.title}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {ev.category ? <span className="mr-2 rounded-full bg-muted px-2 py-0.5">{ev.category}</span> : null}
+                          {format(new Date(ev.event_date + "T00:00:00"), "PPP", { locale: ptBR })}
+                        </div>
+                        {p && <div className="text-xs text-muted-foreground mt-0.5 truncate">Vestido: {p.name}</div>}
+                      </div>
                     </div>
-                  </div>
-                  <button onClick={() => removeEvent.mutate(ev.id)}
-                    className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
-                    aria-label="Remover">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </li>
-              ))}
+                    <button onClick={() => removeEvent.mutate(ev.id)}
+                      className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground flex-shrink-0"
+                      aria-label="Remover">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
