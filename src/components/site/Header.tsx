@@ -37,7 +37,7 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-10 text-sm tracking-wide text-foreground/80 md:flex">
-          <Link to="/" className="hover:text-foreground transition-colors">Vitrine</Link>
+          <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
           <Link to="/" hash="categorias" className="hover:text-foreground transition-colors">Categorias</Link>
           <Link to="/" hash="sobre" className="hover:text-foreground transition-colors">Sobre</Link>
         </nav>

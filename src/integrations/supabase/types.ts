@@ -78,13 +78,16 @@ export type Database = {
       products: {
         Row: {
           category: string | null
+          color: string | null
           created_at: string
           delivery_days: number
           description: string | null
           id: string
           image_url: string | null
+          images: string[]
           is_active: boolean
           name: string
+          parent_product_id: string | null
           payment_terms: string
           price: number
           size: string
@@ -92,13 +95,16 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          color?: string | null
           created_at?: string
           delivery_days?: number
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           is_active?: boolean
           name: string
+          parent_product_id?: string | null
           payment_terms?: string
           price: number
           size: string
@@ -106,19 +112,30 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          color?: string | null
           created_at?: string
           delivery_days?: number
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           is_active?: boolean
           name?: string
+          parent_product_id?: string | null
           payment_terms?: string
           price?: number
           size?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_parent_product_id_fkey"
+            columns: ["parent_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

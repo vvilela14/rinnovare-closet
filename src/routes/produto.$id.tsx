@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, ShoppingBag, ArrowLeft, Truck, Ruler, CreditCard } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Heart, ShoppingBag, ArrowLeft, Truck, Ruler, CreditCard, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { useAuth } from "@/lib/auth";
@@ -22,6 +23,8 @@ function ProductPage() {
   const { id } = useParams({ from: "/produto/$id" });
   const { user } = useAuth();
   const qc = useQueryClient();
+  const [active, setActive] = useState(0);
+  const [zoomIndex, setZoomIndex] = useState<number | null>(null);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -31,6 +34,26 @@ function ProductPage() {
       return data;
     },
   });
+
+  const gallery = useMemo<string[]>(() => {
+    if (!product) return [];
+    const extra = ((product as any).images as string[] | null) ?? [];
+    const all = [product.image_url, ...extra].filter((v): v is string => !!v && v.trim().length > 0);
+    return Array.from(new Set(all));
+  }, [product]);
+
+  useEffect(() => { setActive(0); }, [id]);
+
+  useEffect(() => {
+    if (zoomIndex === null) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setZoomIndex(null);
+      if (e.key === "ArrowRight") setZoomIndex((i) => (i === null ? null : (i + 1) % gallery.length));
+      if (e.key === "ArrowLeft") setZoomIndex((i) => (i === null ? null : (i - 1 + gallery.length) % gallery.length));
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoomIndex, gallery.length]);
 
   const { data: isFavorite = false } = useQuery({
     queryKey: ["favorite", user?.id, id],
@@ -86,9 +109,35 @@ function ProductPage() {
           <div className="py-32 text-center text-muted-foreground">Carregando...</div>
         ) : (
           <div className="mt-8 grid gap-12 lg:grid-cols-2">
-            <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-              {product.image_url && (
-                <img src={product.image_url} alt={`Alugar vestido ${product.name}`} className="h-full w-full object-cover" />
+            <div>
+              <button
+                type="button"
+                onClick={() => gallery.length > 0 && setZoomIndex(active)}
+                className="group relative block aspect-[3/4] w-full overflow-hidden bg-muted cursor-zoom-in"
+                aria-label="Ampliar foto"
+              >
+                {gallery[active] && (
+                  <img src={gallery[active]} alt={`Alugar vestido ${product.name}`} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                )}
+                <span className="absolute bottom-3 right-3 rounded-full bg-background/85 px-3 py-1 text-[10px] uppercase tracking-widest text-foreground opacity-0 transition group-hover:opacity-100">
+                  Clique para ampliar
+                </span>
+              </button>
+
+              {gallery.length > 1 && (
+                <div className="mt-4 grid grid-cols-5 gap-2">
+                  {gallery.map((src, i) => (
+                    <button
+                      key={src + i}
+                      type="button"
+                      onClick={() => setActive(i)}
+                      className={`relative aspect-square overflow-hidden border transition ${i === active ? "border-primary" : "border-border hover:border-foreground/40"}`}
+                      aria-label={`Foto ${i + 1}`}
+                    >
+                      <img src={src} alt="" className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -130,6 +179,48 @@ function ProductPage() {
           </div>
         )}
       </div>
+
+      {zoomIndex !== null && gallery[zoomIndex] && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-4 animate-fade-in"
+          onClick={() => setZoomIndex(null)}
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setZoomIndex(null); }}
+            className="absolute right-5 top-5 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20"
+            aria-label="Fechar"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          {gallery.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setZoomIndex((i) => (i === null ? null : (i - 1 + gallery.length) % gallery.length)); }}
+                className="absolute left-5 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20"
+                aria-label="Foto anterior"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setZoomIndex((i) => (i === null ? null : (i + 1) % gallery.length)); }}
+                className="absolute right-5 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20"
+                aria-label="Próxima foto"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </>
+          )}
+          <img
+            src={gallery[zoomIndex]}
+            alt="Vestido ampliado"
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[92vh] max-w-[92vw] object-contain animate-scale-in"
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -21,6 +21,9 @@ type ProductRow = {
   image_url: string | null;
   category: string | null;
   is_active: boolean;
+  images: string[] | null;
+  color: string | null;
+  parent_product_id: string | null;
 };
 
 function AdminCatalogo() {
@@ -140,12 +143,67 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
     description: initial?.description ?? "",
     category: initial?.category ?? "",
     image_url: initial?.image_url ?? "",
+    images: (initial?.images ?? []).join("\n"),
+    color: initial?.color ?? "",
+    parent_product_id: initial?.parent_product_id ?? "",
     is_active: initial?.is_active ?? true,
   });
 
+  const { data: catalog = [] } = useQuery<ProductRow[]>({
+    queryKey: ["admin-products-options"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id,name,size,color,price,payment_terms,delivery_days,description,category,image_url,images,parent_product_id,is_active")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as ProductRow[];
+    },
+  });
+
+  // Only top-level dresses (not themselves variants) can be the parent
+  const parentOptions = catalog.filter((p) => !p.parent_product_id && (!initial || p.id !== initial.id));
+
+  function linkToParent(parentId: string) {
+    setForm((f) => ({ ...f, parent_product_id: parentId }));
+    if (!parentId) return;
+    const parent = catalog.find((p) => p.id === parentId);
+    if (!parent) return;
+    setForm((f) => ({
+      ...f,
+      parent_product_id: parentId,
+      name: parent.name,
+      description: parent.description ?? "",
+      category: parent.category ?? "",
+      price: parent.price,
+      payment_terms: parent.payment_terms,
+      delivery_days: parent.delivery_days,
+      image_url: parent.image_url ?? "",
+      images: (parent.images ?? []).join("\n"),
+      // keep current color/size so admin can override
+    }));
+  }
+
   const save = useMutation({
     mutationFn: async () => {
-      const payload = { ...form, price: Number(form.price), delivery_days: Number(form.delivery_days) };
+      const imagesArr = form.images
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const payload = {
+        name: form.name,
+        size: form.size,
+        delivery_days: Number(form.delivery_days),
+        price: Number(form.price),
+        payment_terms: form.payment_terms,
+        description: form.description || null,
+        category: form.category || null,
+        image_url: form.image_url || null,
+        images: imagesArr,
+        color: form.color || null,
+        parent_product_id: form.parent_product_id || null,
+        is_active: form.is_active,
+      };
       if (initial) {
         const { error } = await supabase.from("products").update(payload).eq("id", initial.id);
         if (error) throw error;
@@ -156,6 +214,7 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-products"] });
+      qc.invalidateQueries({ queryKey: ["admin-products-options"] });
       qc.invalidateQueries({ queryKey: ["products"] });
       toast.success(initial ? "Vestido atualizado" : "Vestido adicionado");
       onClose();
@@ -178,8 +237,29 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
           onSubmit={(e) => { e.preventDefault(); save.mutate(); }}
           className="mt-6 grid gap-4 sm:grid-cols-2"
         >
+          <AdminField label="Vincular como variação de outro vestido (opcional)" className="sm:col-span-2">
+            <select
+              value={form.parent_product_id}
+              onChange={(e) => linkToParent(e.target.value)}
+              className="admin-input"
+            >
+              <option value="">— Não vincular (vestido independente) —</option>
+              {parentOptions.map((p) => (
+                <option key={p.id} value={p.id}>{p.name} {p.color ? `· ${p.color}` : ""} · Tam. {p.size}</option>
+              ))}
+            </select>
+            {form.parent_product_id && (
+              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                Os campos foram pré-preenchidos a partir do vestido principal. Ajuste apenas a cor e/ou o tamanho desta variação.
+              </p>
+            )}
+          </AdminField>
+
           <AdminField label="Nome" className="sm:col-span-2">
             <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="admin-input" />
+          </AdminField>
+          <AdminField label="Cor">
+            <input value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="admin-input" placeholder="Lilás, Preto, Vinho..." />
           </AdminField>
           <AdminField label="Tamanho">
             <input required value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} className="admin-input" placeholder="PP, P, M, G, GG..." />
@@ -196,8 +276,17 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
           <AdminField label="Categoria">
             <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="admin-input" placeholder="Casamento, Madrinha, Festa..." />
           </AdminField>
-          <AdminField label="URL da imagem">
+          <AdminField label="Foto principal (URL)" className="sm:col-span-2">
             <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className="admin-input" placeholder="https://..." />
+          </AdminField>
+          <AdminField label="Fotos adicionais (uma URL por linha)" className="sm:col-span-2">
+            <textarea
+              rows={4}
+              value={form.images}
+              onChange={(e) => setForm({ ...form, images: e.target.value })}
+              className="admin-input"
+              placeholder={"https://...foto-2.jpg\nhttps://...foto-3.jpg"}
+            />
           </AdminField>
           <AdminField label="Descrição" className="sm:col-span-2">
             <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="admin-input" />
