@@ -274,7 +274,11 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
             <input required value={form.payment_terms} onChange={(e) => setForm({ ...form, payment_terms: e.target.value })} className="admin-input" placeholder="12x sem juros" />
           </AdminField>
           <AdminField label="Categoria">
-            <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="admin-input" placeholder="Casamento, Madrinha, Festa..." />
+            <CategorySelect
+              catalog={catalog}
+              value={form.category}
+              onChange={(v) => setForm({ ...form, category: v })}
+            />
           </AdminField>
           <AdminField label="Foto principal (URL)" className="sm:col-span-2">
             <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className="admin-input" placeholder="https://..." />
