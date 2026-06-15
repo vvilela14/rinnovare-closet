@@ -26,6 +26,7 @@ const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/pedidos", label: "Carrinhos", icon: ShoppingBag },
   { to: "/admin/favoritos", label: "Favoritos", icon: Heart },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
+  { to: "/admin/calendario", label: "Calendário", icon: CalendarDays },
 ];
 
 function AdminLayout() {
