@@ -90,7 +90,7 @@ function PerfilPage() {
     size: "",
     favorite_colors: [] as string[],
   });
-  const [colorInput, setColorInput] = useState("");
+  const [customCategoryOpen, setCustomCategoryOpen] = useState(false);
 
   useEffect(() => {
     if (profile) {
