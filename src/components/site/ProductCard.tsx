@@ -119,7 +119,7 @@ export function ProductCard({ product }: { product: Product }) {
         <button
           type="button"
           onClick={() => addToCart.mutate()}
-          className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground transition hover:opacity-90"
+          className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.94] active:shadow-inner active:opacity-80"
         >
           <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
         </button>

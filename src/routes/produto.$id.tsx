@@ -162,7 +162,7 @@ function ProductPage() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   onClick={() => addToCart.mutate()}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-xs uppercase tracking-[0.2em] text-primary-foreground transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.96] active:shadow-inner active:opacity-80"
                 >
                   <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
                 </button>
