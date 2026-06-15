@@ -274,7 +274,11 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
             <input required value={form.payment_terms} onChange={(e) => setForm({ ...form, payment_terms: e.target.value })} className="admin-input" placeholder="12x sem juros" />
           </AdminField>
           <AdminField label="Categoria">
-            <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="admin-input" placeholder="Casamento, Madrinha, Festa..." />
+            <CategorySelect
+              catalog={catalog}
+              value={form.category}
+              onChange={(v) => setForm({ ...form, category: v })}
+            />
           </AdminField>
           <AdminField label="Foto principal (URL)" className="sm:col-span-2">
             <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className="admin-input" placeholder="https://..." />
@@ -319,5 +323,61 @@ function AdminField({ label, children, className = "" }: { label: string; childr
       <span className="mb-1.5 block text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
       {children}
     </label>
+  );
+}
+
+function CategorySelect({
+  catalog,
+  value,
+  onChange,
+}: {
+  catalog: ProductRow[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const options = Array.from(
+    new Set(catalog.map((p) => (p.category ?? "").trim()).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+  const isNew = value !== "" && !options.includes(value);
+  const [mode, setMode] = useState<"select" | "new">(isNew ? "new" : "select");
+
+  if (mode === "new") {
+    return (
+      <div className="flex gap-2">
+        <input
+          autoFocus
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="admin-input"
+          placeholder="Nome da nova categoria"
+        />
+        <button
+          type="button"
+          onClick={() => { onChange(""); setMode("select"); }}
+          className="rounded-full border border-border px-3 text-[11px] uppercase tracking-widest hover:bg-muted"
+        >
+          Cancelar
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <select
+      value={value}
+      onChange={(e) => {
+        const v = e.target.value;
+        if (v === "__new__") { onChange(""); setMode("new"); return; }
+        onChange(v);
+      }}
+      className="admin-input"
+    >
+      <option value="">— Selecione uma categoria —</option>
+      {options.map((c) => (
+        <option key={c} value={c}>{c}</option>
+      ))}
+      <option value="__new__">+ Criar nova categoria…</option>
+    </select>
   );
 }
