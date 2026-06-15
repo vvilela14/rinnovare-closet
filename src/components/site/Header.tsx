@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, ShoppingBag, User as UserIcon, LogOut, LayoutGrid } from "lucide-react";
+import { Heart, ShoppingBag, User as UserIcon, LogOut, LayoutGrid, UserCog } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

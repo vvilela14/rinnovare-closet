@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedFavoritosRouteImport } from './routes/_authenticated/favoritos'
 import { Route as AuthenticatedCarrinhoRouteImport } from './routes/_authenticated/carrinho'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -40,6 +41,11 @@ const ProdutoIdRoute = ProdutoIdRouteImport.update({
   id: '/produto/$id',
   path: '/produto/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFavoritosRoute = AuthenticatedFavoritosRouteImport.update({
   id: '/favoritos',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/carrinho': typeof AuthenticatedCarrinhoRoute
   '/favoritos': typeof AuthenticatedFavoritosRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/carrinho': typeof AuthenticatedCarrinhoRoute
   '/favoritos': typeof AuthenticatedFavoritosRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/carrinho': typeof AuthenticatedCarrinhoRoute
   '/_authenticated/favoritos': typeof AuthenticatedFavoritosRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/_authenticated/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/carrinho'
     | '/favoritos'
+    | '/perfil'
     | '/produto/$id'
     | '/admin/catalogo'
     | '/admin/clientes'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/carrinho'
     | '/favoritos'
+    | '/perfil'
     | '/produto/$id'
     | '/admin/catalogo'
     | '/admin/clientes'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/carrinho'
     | '/_authenticated/favoritos'
+    | '/_authenticated/perfil'
     | '/produto/$id'
     | '/_authenticated/admin/catalogo'
     | '/_authenticated/admin/clientes'
@@ -204,6 +216,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/produto/$id'
       preLoaderRoute: typeof ProdutoIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/favoritos': {
       id: '/_authenticated/favoritos'
@@ -287,12 +306,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCarrinhoRoute: typeof AuthenticatedCarrinhoRoute
   AuthenticatedFavoritosRoute: typeof AuthenticatedFavoritosRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCarrinhoRoute: AuthenticatedCarrinhoRoute,
   AuthenticatedFavoritosRoute: AuthenticatedFavoritosRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
