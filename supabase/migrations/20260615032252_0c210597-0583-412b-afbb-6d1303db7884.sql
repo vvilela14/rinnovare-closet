@@ -1,0 +1,1 @@
+ALTER TABLE public.profile_events ADD COLUMN IF NOT EXISTS category text;
