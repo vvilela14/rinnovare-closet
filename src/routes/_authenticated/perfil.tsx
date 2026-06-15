@@ -154,12 +154,13 @@ function PerfilPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["profile-events", user?.id] }),
   });
 
-  function addColor() {
-    const v = colorInput.trim();
-    if (!v) return;
-    if (form.favorite_colors.includes(v)) return;
-    setForm({ ...form, favorite_colors: [...form.favorite_colors, v] });
-    setColorInput("");
+  function toggleColor(name: string) {
+    setForm((f) => ({
+      ...f,
+      favorite_colors: f.favorite_colors.includes(name)
+        ? f.favorite_colors.filter((x) => x !== name)
+        : [...f.favorite_colors, name],
+    }));
   }
 
   return (
