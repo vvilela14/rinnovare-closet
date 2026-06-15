@@ -213,12 +213,10 @@ function ProductPage() {
               </button>
             </>
           )}
-          <img
-            src={gallery[zoomIndex]}
-            alt="Vestido ampliado"
-            onClick={(e) => e.stopPropagation()}
-            className="max-h-[92vh] max-w-[92vw] object-contain animate-scale-in"
-          />
+          <ZoomImage src={gallery[zoomIndex]} />
+          <p className="pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-[10px] uppercase tracking-widest text-white/80">
+            Clique na foto para ampliar o tecido · mova o mouse para explorar
+          </p>
         </div>
       )}
     </div>
