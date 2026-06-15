@@ -1,29 +1,181 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, Sparkles, Truck, ShieldCheck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Header } from "@/components/site/Header";
+import { ProductCard, type Product } from "@/components/site/ProductCard";
+import heroImage from "@/assets/hero-dress.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Rinnovare Closet — Aluguel de Vestidos para Festas, Casamentos e Madrinhas" },
+      { name: "description", content: "Alugue vestidos exclusivos para casamentos, madrinhas, formaturas e festas. Curadoria de moda, entrega rápida e parcelamento em até 12x sem juros." },
+      { property: "og:title", content: "Rinnovare Closet — Aluguel de Vestidos" },
+      { property: "og:description", content: "Vestidos de festa para alugar com curadoria, entrega rápida e parcelamento facilitado." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
+  const { data: products = [] } = useQuery<Product[]>({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Product[];
+    },
+  });
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+
+      {/* HERO */}
+      <section className="relative overflow-hidden border-b border-border/60">
+        <div className="mx-auto grid max-w-7xl items-stretch gap-12 px-6 py-16 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:py-24">
+          <div className="flex flex-col justify-center">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border px-4 py-1.5 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+              <Sparkles className="h-3 w-3" style={{ color: "var(--lilac)" }} />
+              Para todas as ocasiões
+            </div>
+
+            <h1 className="mt-8 text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+              Seja para <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>casamentos</em>,
+              festas ou qualquer ocasião especial
+            </h1>
+
+            <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground">
+              Alugue vestidos de festa exclusivos, com curadoria de moda assinada pela Rinnovare Closet.
+              Da madrinha à noiva, do jantar à formatura — encontre a peça perfeita, com entrega rápida
+              e parcelamento em até 12x sem juros.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <a
+                href="#vitrine"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
+              >
+                Ver vitrine <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="#categorias"
+                className="inline-flex items-center gap-2 rounded-full border border-foreground px-7 py-3.5 text-xs uppercase tracking-[0.2em] text-foreground transition hover:bg-foreground hover:text-background"
+              >
+                Categorias
+              </a>
+            </div>
+
+            <dl className="mt-14 grid grid-cols-3 gap-6 border-t border-border pt-8 text-xs">
+              <div>
+                <dt className="text-muted-foreground uppercase tracking-widest">Curadoria</dt>
+                <dd className="mt-1 text-sm">+200 peças</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground uppercase tracking-widest">Entrega</dt>
+                <dd className="mt-1 text-sm">Em até 3 dias</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground uppercase tracking-widest">Pagamento</dt>
+                <dd className="mt-1 text-sm">12x sem juros</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -left-8 top-10 hidden h-32 w-32 rounded-full lg:block" style={{ backgroundColor: "var(--lilac)", opacity: 0.35, filter: "blur(40px)" }} />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-sm">
+              <img
+                src={heroImage}
+                alt="Mulher com vestido longo lilás — aluguel de vestidos Rinnovare"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="absolute -bottom-6 -left-6 hidden max-w-[220px] border border-border bg-background p-5 shadow-[var(--shadow-soft)] lg:block">
+              <p className="font-script text-2xl" style={{ color: "var(--lilac)" }}>Closet</p>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                Vista a sua ocasião especial sem comprar. Renove o guarda-roupa a cada festa.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BENEFITS */}
+      <section className="border-b border-border/60">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 sm:grid-cols-3 lg:px-10">
+          {[
+            { icon: Sparkles, title: "Curadoria de moda", text: "Peças selecionadas para cada tipo de ocasião." },
+            { icon: Truck, title: "Entrega rápida", text: "Receba seu vestido em até 3 dias úteis." },
+            { icon: ShieldCheck, title: "Higienização garantida", text: "Todas as peças higienizadas e prontas para usar." },
+          ].map(({ icon: Icon, title, text }) => (
+            <div key={title} className="flex items-start gap-4">
+              <div className="rounded-full border border-border p-3">
+                <Icon className="h-5 w-5" style={{ color: "var(--lilac)" }} />
+              </div>
+              <div>
+                <h3 className="text-lg">{title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* VITRINE */}
+      <section id="vitrine" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+        <div className="flex flex-col items-end justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Vitrine</span>
+            <h2 className="mt-2 text-4xl sm:text-5xl">Vestidos em destaque</h2>
+          </div>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            Os vestidos mais desejados da temporada — para alugar, encantar e devolver.
+          </p>
+        </div>
+
+        <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+          {products.length === 0 && (
+            <p className="col-span-full text-center text-muted-foreground">Nenhum vestido disponível no momento.</p>
+          )}
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="sobre" className="border-t border-border/60 bg-muted/30">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-2 lg:px-10">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Sobre</span>
+            <h2 className="mt-3 text-4xl sm:text-5xl">
+              Renove seu <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>closet</em> a cada festa
+            </h2>
+          </div>
+          <p className="text-base leading-relaxed text-muted-foreground">
+            A <strong className="text-foreground">Rinnovare Closet</strong> nasceu para transformar a forma como
+            mulheres se vestem para ocasiões especiais. Aluguel de vestidos com curadoria, qualidade premium e
+            preços acessíveis — porque cada momento merece um look exclusivo, sem o peso de comprar uma peça
+            para usar uma única vez.
+          </p>
+        </div>
+      </section>
+
+      <footer className="border-t border-border bg-background">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-10 text-xs text-muted-foreground sm:flex-row lg:px-10">
+          <p className="wordmark text-sm text-foreground">RINNOVARE</p>
+          <p>© {new Date().getFullYear()} Rinnovare Closet — Aluguel de vestidos para todas as ocasiões.</p>
+        </div>
+      </footer>
     </div>
   );
 }
