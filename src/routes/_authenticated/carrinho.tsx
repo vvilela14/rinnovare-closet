@@ -18,6 +18,9 @@ type CartRow = { id: string; quantity: number; product: any };
 function CartPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const [periods, setPeriods] = useState<Record<string, number>>({});
+
+
 
   const { data: items = [], isLoading } = useQuery<CartRow[]>({
     queryKey: ["cart", user?.id],
