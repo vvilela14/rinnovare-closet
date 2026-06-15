@@ -249,9 +249,33 @@ function PerfilPage() {
                 onChange={(e) => setEventTitle(e.target.value)} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="event-category">Categoria</Label>
-              <Input id="event-category" placeholder="Ex.: Casamento, Formatura, Aniversário" value={eventCategory}
-                onChange={(e) => setEventCategory(e.target.value)} />
+              <Label>Categoria</Label>
+              <Select
+                value={customCategoryOpen ? "Outro" : (EVENT_CATEGORIES.includes(eventCategory) ? eventCategory : "")}
+                onValueChange={(v) => {
+                  if (v === "Outro") {
+                    setCustomCategoryOpen(true);
+                    setEventCategory("");
+                  } else {
+                    setCustomCategoryOpen(false);
+                    setEventCategory(v);
+                  }
+                }}
+              >
+                <SelectTrigger><SelectValue placeholder="Selecione a categoria" /></SelectTrigger>
+                <SelectContent>
+                  {EVENT_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {customCategoryOpen && (
+                <Input
+                  placeholder="Descreva a categoria"
+                  value={eventCategory}
+                  onChange={(e) => setEventCategory(e.target.value)}
+                />
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Data</Label>
