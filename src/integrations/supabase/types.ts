@@ -139,6 +139,7 @@ export type Database = {
       }
       profile_events: {
         Row: {
+          category: string | null
           created_at: string
           event_date: string
           id: string
@@ -146,6 +147,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           event_date: string
           id?: string
@@ -153,6 +155,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           event_date?: string
           id?: string
