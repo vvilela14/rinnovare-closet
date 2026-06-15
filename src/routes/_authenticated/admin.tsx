@@ -89,7 +89,7 @@ function AdminLayout() {
         <main className="flex-1 overflow-x-auto bg-[#f6f4fb] text-foreground">
           {/* mobile top bar */}
           <div className="flex items-center justify-between border-b border-border bg-[#0a0716] px-5 py-3 text-white md:hidden">
-            <img src={logoAsset.url} alt="Rinnovare" className="h-7 w-auto brightness-0 invert" />
+            <img src={logoAsset.url} alt="Rinnovare Closet" className="h-9 w-auto" />
             <div className="flex gap-2 text-[10px] uppercase tracking-widest">
               {NAV.map((n) => (
                 <Link key={n.to} to={n.to} className="rounded-full border border-white/15 px-2.5 py-1">
