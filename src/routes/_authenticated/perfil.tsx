@@ -43,7 +43,7 @@ function PerfilPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profile_events")
-        .select("id, title, event_date")
+        .select("id, title, event_date, category")
         .eq("user_id", user!.id)
         .order("event_date", { ascending: true });
       return data ?? [];
