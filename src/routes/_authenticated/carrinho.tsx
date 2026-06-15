@@ -82,6 +82,18 @@ function CartPage() {
                     <Link to="/produto/$id" params={{ id: row.product.id }} className="text-lg leading-tight">{row.product?.name}</Link>
                     <p className="mt-1 text-xs text-muted-foreground">Tam. {row.product?.size} · Entrega em {row.product?.delivery_days} dias</p>
                     <p className="mt-1 text-xs text-muted-foreground">{row.product?.payment_terms}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <label className="text-xs text-muted-foreground">Período de Locação:</label>
+                      <select
+                        value={periods[row.id] ?? 4}
+                        onChange={(e) => setPeriods((p) => ({ ...p, [row.id]: Number(e.target.value) }))}
+                        className="rounded-full border border-border bg-transparent px-3 py-1 text-xs"
+                      >
+                        {RENTAL_PERIODS.map((d) => (
+                          <option key={d} value={d}>{d} dias</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="mt-auto flex items-center justify-between">
                       <div className="inline-flex items-center gap-3 rounded-full border border-border px-3 py-1">
                         <button onClick={() => updateQty.mutate({ id: row.id, quantity: row.quantity - 1 })}><Minus className="h-3 w-3" /></button>
@@ -95,6 +107,7 @@ function CartPage() {
                         </button>
                       </div>
                     </div>
+
                   </div>
                 </li>
               ))}
