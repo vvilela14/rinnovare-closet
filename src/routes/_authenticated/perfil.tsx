@@ -211,14 +211,14 @@ function PerfilPage() {
               onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
           </div>
           <div className="grid gap-2 md:col-span-2">
-            <Label htmlFor="address">Endereço (rua, bairro, cidade)</Label>
-            <Input id="address" placeholder="Rua, bairro, cidade" value={form.address}
+            <Label htmlFor="address">Endereço</Label>
+            <Input id="address" placeholder="Rua" value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="address_number">Número</Label>
-            <Input id="address_number" placeholder="Ex.: 123" value={form.address_number}
-              onChange={(e) => setForm({ ...form, address_number: e.target.value })} />
+            <Input id="address_number" inputMode="numeric" pattern="[0-9]*" placeholder="Ex.: 123" value={form.address_number}
+              onChange={(e) => setForm({ ...form, address_number: e.target.value.replace(/\D/g, "") })} />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="address_complement">Complemento</Label>
@@ -227,8 +227,8 @@ function PerfilPage() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="postal_code">CEP</Label>
-            <Input id="postal_code" placeholder="00000-000" value={form.postal_code}
-              onChange={(e) => setForm({ ...form, postal_code: e.target.value })} />
+            <Input id="postal_code" inputMode="numeric" pattern="[0-9]*" maxLength={8} placeholder="00000000" value={form.postal_code}
+              onChange={(e) => setForm({ ...form, postal_code: e.target.value.replace(/\D/g, "").slice(0, 8) })} />
           </div>
           <div className="grid gap-2">
             <Label>Tamanho <span className="text-xs text-muted-foreground">(opcional)</span></Label>

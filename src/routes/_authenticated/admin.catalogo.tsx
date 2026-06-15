@@ -264,8 +264,17 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
           <AdminField label="Tamanho">
             <input required value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} className="admin-input" placeholder="PP, P, M, G, GG..." />
           </AdminField>
-          <AdminField label="Previsão de entrega (dias)">
-            <input type="number" min={1} required value={form.delivery_days} onChange={(e) => setForm({ ...form, delivery_days: Number(e.target.value) })} className="admin-input" />
+          <AdminField label="Período de Locação">
+            <select
+              required
+              value={form.delivery_days}
+              onChange={(e) => setForm({ ...form, delivery_days: Number(e.target.value) })}
+              className="admin-input"
+            >
+              {[4, 7, 12].map((d) => (
+                <option key={d} value={d}>{d} dias</option>
+              ))}
+            </select>
           </AdminField>
           <AdminField label="Valor (R$)">
             <input type="number" step="0.01" min={0} required value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} className="admin-input" />
