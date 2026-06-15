@@ -178,30 +178,39 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          address_complement: string | null
+          address_number: string | null
           created_at: string
           favorite_colors: string[]
           full_name: string | null
           id: string
+          postal_code: string | null
           size: string | null
           updated_at: string
           whatsapp: string | null
         }
         Insert: {
           address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
           created_at?: string
           favorite_colors?: string[]
           full_name?: string | null
           id: string
+          postal_code?: string | null
           size?: string | null
           updated_at?: string
           whatsapp?: string | null
         }
         Update: {
           address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
           created_at?: string
           favorite_colors?: string[]
           full_name?: string | null
           id?: string
+          postal_code?: string | null
           size?: string | null
           updated_at?: string
           whatsapp?: string | null

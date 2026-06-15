@@ -28,13 +28,31 @@ const EVENT_CATEGORIES = [
 const COLOR_PALETTE: { name: string; hex: string; border?: boolean }[] = [
   { name: "Amarelo", hex: "#FFF24D" },
   { name: "Azul", hex: "#2A1FE0" },
+  { name: "Azul claro", hex: "#7EC8E3" },
+  { name: "Azul marinho", hex: "#0B1F4D" },
   { name: "Bege", hex: "#D2B48C" },
   { name: "Branco", hex: "#FFFFFF", border: true },
   { name: "Cinza", hex: "#8A8A8A" },
+  { name: "Dourado", hex: "#D4AF37" },
+  { name: "Laranja", hex: "#F97316" },
+  { name: "Lilás", hex: "#C8A2C8" },
   { name: "Marrom", hex: "#7B3F00" },
   { name: "Multicor", hex: "conic-gradient(from 0deg, #ec4899, #3b82f6, #f59e0b, #10b981, #ec4899)" },
+  { name: "Nude", hex: "#E6BFA5" },
+  { name: "Off white", hex: "#F5F1E6", border: true },
+  { name: "Prata", hex: "#C0C0C0" },
   { name: "Preto", hex: "#000000" },
+  { name: "Rosa", hex: "#F4A6C0" },
+  { name: "Rosa choque", hex: "#E91E63" },
+  { name: "Roxo", hex: "#6B21A8" },
+  { name: "Verde", hex: "#16A34A" },
+  { name: "Verde esmeralda", hex: "#047857" },
+  { name: "Verde menta", hex: "#A8E6CF" },
+  { name: "Vermelho", hex: "#DC2626" },
+  { name: "Vinho", hex: "#7B1E2B" },
 ];
+
+const SIZE_OPTIONS = ["34-36", "36-38", "38-40", "40-42", "42-44", "44-46", "46-48"];
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({ meta: [{ title: "Meu perfil — Rinnovare" }] }),
@@ -51,7 +69,7 @@ function PerfilPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, whatsapp, address, favorite_colors, size")
+        .select("id, full_name, whatsapp, address, address_number, address_complement, postal_code, favorite_colors, size")
         .eq("id", user!.id)
         .maybeSingle();
       return data;
@@ -87,6 +105,9 @@ function PerfilPage() {
     full_name: "",
     whatsapp: "",
     address: "",
+    address_number: "",
+    address_complement: "",
+    postal_code: "",
     size: "",
     favorite_colors: [] as string[],
   });
@@ -98,6 +119,9 @@ function PerfilPage() {
         full_name: profile.full_name ?? "",
         whatsapp: (profile as any).whatsapp ?? "",
         address: (profile as any).address ?? "",
+        address_number: (profile as any).address_number ?? "",
+        address_complement: (profile as any).address_complement ?? "",
+        postal_code: (profile as any).postal_code ?? "",
         size: (profile as any).size ?? "",
         favorite_colors: (profile as any).favorite_colors ?? [],
       });
@@ -187,14 +211,35 @@ function PerfilPage() {
               onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
           </div>
           <div className="grid gap-2 md:col-span-2">
-            <Label htmlFor="address">Endereço</Label>
-            <Input id="address" placeholder="Rua, número, bairro, cidade" value={form.address}
+            <Label htmlFor="address">Endereço (rua, bairro, cidade)</Label>
+            <Input id="address" placeholder="Rua, bairro, cidade" value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="size">Tamanho <span className="text-xs text-muted-foreground">(opcional)</span></Label>
-            <Input id="size" placeholder="P, M, G, 38, 40..." value={form.size}
-              onChange={(e) => setForm({ ...form, size: e.target.value })} />
+            <Label htmlFor="address_number">Número</Label>
+            <Input id="address_number" placeholder="Ex.: 123" value={form.address_number}
+              onChange={(e) => setForm({ ...form, address_number: e.target.value })} />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="address_complement">Complemento</Label>
+            <Input id="address_complement" placeholder="Apto, bloco, referência" value={form.address_complement}
+              onChange={(e) => setForm({ ...form, address_complement: e.target.value })} />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="postal_code">CEP</Label>
+            <Input id="postal_code" placeholder="00000-000" value={form.postal_code}
+              onChange={(e) => setForm({ ...form, postal_code: e.target.value })} />
+          </div>
+          <div className="grid gap-2">
+            <Label>Tamanho <span className="text-xs text-muted-foreground">(opcional)</span></Label>
+            <Select value={form.size} onValueChange={(v) => setForm({ ...form, size: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione o tamanho" /></SelectTrigger>
+              <SelectContent>
+                {SIZE_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-2 md:col-span-2">
             <Label>Cores favoritas <span className="text-xs text-muted-foreground">(opcional — clique para selecionar)</span></Label>
