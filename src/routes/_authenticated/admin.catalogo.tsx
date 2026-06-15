@@ -21,6 +21,9 @@ type ProductRow = {
   image_url: string | null;
   category: string | null;
   is_active: boolean;
+  images: string[] | null;
+  color: string | null;
+  parent_product_id: string | null;
 };
 
 function AdminCatalogo() {
