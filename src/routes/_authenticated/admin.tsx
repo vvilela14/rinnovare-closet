@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Package, Users, ShoppingBag, Heart, LogOut, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, Users, ShoppingBag, Heart, CalendarDays, LogOut, ArrowLeft } from "lucide-react";
 import logoAsset from "@/assets/rinnovare-logo-admin.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({
