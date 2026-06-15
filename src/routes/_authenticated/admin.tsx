@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } fro
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { LayoutDashboard, Package, Users, ShoppingBag, LogOut, ArrowLeft } from "lucide-react";
-import logoAsset from "@/assets/rinnovare-logo.png.asset.json";
+import logoAsset from "@/assets/rinnovare-logo-admin.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Painel Administrativo — Rinnovare" }] }),
@@ -44,7 +44,7 @@ function AdminLayout() {
       <div className="flex min-h-screen">
         <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-[#0a0716] p-6 md:flex">
           <Link to="/" className="mb-10 flex items-center gap-2">
-            <img src={logoAsset.url} alt="Rinnovare" className="h-9 w-auto brightness-0 invert" />
+            <img src={logoAsset.url} alt="Rinnovare Closet" className="h-12 w-auto" />
           </Link>
           <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-white/40">Administração</div>
           <nav className="flex flex-col gap-1">
@@ -89,7 +89,7 @@ function AdminLayout() {
         <main className="flex-1 overflow-x-auto bg-[#f6f4fb] text-foreground">
           {/* mobile top bar */}
           <div className="flex items-center justify-between border-b border-border bg-[#0a0716] px-5 py-3 text-white md:hidden">
-            <img src={logoAsset.url} alt="Rinnovare" className="h-7 w-auto brightness-0 invert" />
+            <img src={logoAsset.url} alt="Rinnovare Closet" className="h-9 w-auto" />
             <div className="flex gap-2 text-[10px] uppercase tracking-widest">
               {NAV.map((n) => (
                 <Link key={n.to} to={n.to} className="rounded-full border border-white/15 px-2.5 py-1">
