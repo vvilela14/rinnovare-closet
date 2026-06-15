@@ -14,6 +14,27 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const EVENT_CATEGORIES = [
+  "Casamento à noite",
+  "Casamento na praia",
+  "Casamento no campo",
+  "Festa de formatura",
+  "Aniversário",
+  "Outro",
+];
+
+const COLOR_PALETTE: { name: string; hex: string; border?: boolean }[] = [
+  { name: "Amarelo", hex: "#FFF24D" },
+  { name: "Azul", hex: "#2A1FE0" },
+  { name: "Bege", hex: "#D2B48C" },
+  { name: "Branco", hex: "#FFFFFF", border: true },
+  { name: "Cinza", hex: "#8A8A8A" },
+  { name: "Marrom", hex: "#7B3F00" },
+  { name: "Multicor", hex: "conic-gradient(from 0deg, #ec4899, #3b82f6, #f59e0b, #10b981, #ec4899)" },
+  { name: "Preto", hex: "#000000" },
+];
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({ meta: [{ title: "Meu perfil — Rinnovare" }] }),
@@ -69,7 +90,7 @@ function PerfilPage() {
     size: "",
     favorite_colors: [] as string[],
   });
-  const [colorInput, setColorInput] = useState("");
+  const [customCategoryOpen, setCustomCategoryOpen] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -133,12 +154,13 @@ function PerfilPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["profile-events", user?.id] }),
   });
 
-  function addColor() {
-    const v = colorInput.trim();
-    if (!v) return;
-    if (form.favorite_colors.includes(v)) return;
-    setForm({ ...form, favorite_colors: [...form.favorite_colors, v] });
-    setColorInput("");
+  function toggleColor(name: string) {
+    setForm((f) => ({
+      ...f,
+      favorite_colors: f.favorite_colors.includes(name)
+        ? f.favorite_colors.filter((x) => x !== name)
+        : [...f.favorite_colors, name],
+    }));
   }
 
   return (
@@ -174,28 +196,35 @@ function PerfilPage() {
             <Input id="size" placeholder="P, M, G, 38, 40..." value={form.size}
               onChange={(e) => setForm({ ...form, size: e.target.value })} />
           </div>
-          <div className="grid gap-2">
-            <Label>Cores favoritas <span className="text-xs text-muted-foreground">(opcional)</span></Label>
-            <div className="flex gap-2">
-              <Input placeholder="Ex.: Rosa" value={colorInput}
-                onChange={(e) => setColorInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addColor(); } }} />
-              <Button type="button" variant="outline" onClick={addColor}>Adicionar</Button>
+          <div className="grid gap-2 md:col-span-2">
+            <Label>Cores favoritas <span className="text-xs text-muted-foreground">(opcional — clique para selecionar)</span></Label>
+            <div className="flex flex-wrap gap-4 pt-1">
+              {COLOR_PALETTE.map((c) => {
+                const selected = form.favorite_colors.includes(c.name);
+                const isGradient = c.hex.startsWith("conic") || c.hex.startsWith("linear");
+                return (
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => toggleColor(c.name)}
+                    className="flex flex-col items-center gap-1 group"
+                    aria-pressed={selected}
+                  >
+                    <span
+                      className={cn(
+                        "h-10 w-10 rounded-full border-2 transition",
+                        selected ? "border-primary ring-2 ring-primary/30" : "border-border group-hover:border-foreground/40",
+                        c.border && !selected && "border-border"
+                      )}
+                      style={isGradient ? { backgroundImage: c.hex } : { backgroundColor: c.hex }}
+                    />
+                    <span className={cn("text-xs", selected ? "text-foreground font-medium" : "text-muted-foreground")}>
+                      {c.name}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            {form.favorite_colors.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {form.favorite_colors.map((c) => (
-                  <Badge key={c} variant="secondary" className="gap-1">
-                    {c}
-                    <button type="button"
-                      onClick={() => setForm({ ...form, favorite_colors: form.favorite_colors.filter((x) => x !== c) })}
-                      className="ml-1 rounded-full hover:bg-muted-foreground/20">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -220,9 +249,33 @@ function PerfilPage() {
                 onChange={(e) => setEventTitle(e.target.value)} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="event-category">Categoria</Label>
-              <Input id="event-category" placeholder="Ex.: Casamento, Formatura, Aniversário" value={eventCategory}
-                onChange={(e) => setEventCategory(e.target.value)} />
+              <Label>Categoria</Label>
+              <Select
+                value={customCategoryOpen ? "Outro" : (EVENT_CATEGORIES.includes(eventCategory) ? eventCategory : "")}
+                onValueChange={(v) => {
+                  if (v === "Outro") {
+                    setCustomCategoryOpen(true);
+                    setEventCategory("");
+                  } else {
+                    setCustomCategoryOpen(false);
+                    setEventCategory(v);
+                  }
+                }}
+              >
+                <SelectTrigger><SelectValue placeholder="Selecione a categoria" /></SelectTrigger>
+                <SelectContent>
+                  {EVENT_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {customCategoryOpen && (
+                <Input
+                  placeholder="Descreva a categoria"
+                  value={eventCategory}
+                  onChange={(e) => setEventCategory(e.target.value)}
+                />
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Data</Label>
