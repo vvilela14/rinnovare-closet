@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminFavoritosRouteImport } from './routes/_authenticated/admin.favoritos'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCatalogoRouteImport } from './routes/_authenticated/admin.catalogo'
+import { Route as AuthenticatedAdminCalendarioRouteImport } from './routes/_authenticated/admin.calendario'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -91,6 +92,12 @@ const AuthenticatedAdminCatalogoRoute =
     path: '/catalogo',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCalendarioRoute =
+  AuthenticatedAdminCalendarioRouteImport.update({
+    id: '/calendario',
+    path: '/calendario',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/favoritos': typeof AuthenticatedFavoritosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
@@ -113,6 +121,7 @@ export interface FileRoutesByTo {
   '/favoritos': typeof AuthenticatedFavoritosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
@@ -129,6 +138,7 @@ export interface FileRoutesById {
   '/_authenticated/favoritos': typeof AuthenticatedFavoritosRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/_authenticated/admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/_authenticated/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/favoritos'
     | '/perfil'
     | '/produto/$id'
+    | '/admin/calendario'
     | '/admin/catalogo'
     | '/admin/clientes'
     | '/admin/favoritos'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/favoritos'
     | '/perfil'
     | '/produto/$id'
+    | '/admin/calendario'
     | '/admin/catalogo'
     | '/admin/clientes'
     | '/admin/favoritos'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/favoritos'
     | '/_authenticated/perfil'
     | '/produto/$id'
+    | '/_authenticated/admin/calendario'
     | '/_authenticated/admin/catalogo'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/favoritos'
@@ -280,10 +293,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCatalogoRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/calendario': {
+      id: '/_authenticated/admin/calendario'
+      path: '/calendario'
+      fullPath: '/admin/calendario'
+      preLoaderRoute: typeof AuthenticatedAdminCalendarioRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCalendarioRoute: typeof AuthenticatedAdminCalendarioRoute
   AuthenticatedAdminCatalogoRoute: typeof AuthenticatedAdminCatalogoRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminFavoritosRoute: typeof AuthenticatedAdminFavoritosRoute
@@ -292,6 +313,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCalendarioRoute: AuthenticatedAdminCalendarioRoute,
   AuthenticatedAdminCatalogoRoute: AuthenticatedAdminCatalogoRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminFavoritosRoute: AuthenticatedAdminFavoritosRoute,
