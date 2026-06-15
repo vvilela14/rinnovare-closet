@@ -205,6 +205,11 @@ function PerfilPage() {
                 onChange={(e) => setEventTitle(e.target.value)} />
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="event-category">Categoria</Label>
+              <Input id="event-category" placeholder="Ex.: Casamento, Formatura, Aniversário" value={eventCategory}
+                onChange={(e) => setEventCategory(e.target.value)} />
+            </div>
+            <div className="grid gap-2">
               <Label>Data</Label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -236,6 +241,7 @@ function PerfilPage() {
                   <div>
                     <div className="font-medium">{ev.title}</div>
                     <div className="text-xs text-muted-foreground">
+                      {ev.category ? <span className="mr-2 rounded-full bg-muted px-2 py-0.5">{ev.category}</span> : null}
                       {format(new Date(ev.event_date + "T00:00:00"), "PPP", { locale: ptBR })}
                     </div>
                   </div>
