@@ -105,6 +105,9 @@ function PerfilPage() {
     full_name: "",
     whatsapp: "",
     address: "",
+    address_number: "",
+    address_complement: "",
+    postal_code: "",
     size: "",
     favorite_colors: [] as string[],
   });
@@ -116,6 +119,9 @@ function PerfilPage() {
         full_name: profile.full_name ?? "",
         whatsapp: (profile as any).whatsapp ?? "",
         address: (profile as any).address ?? "",
+        address_number: (profile as any).address_number ?? "",
+        address_complement: (profile as any).address_complement ?? "",
+        postal_code: (profile as any).postal_code ?? "",
         size: (profile as any).size ?? "",
         favorite_colors: (profile as any).favorite_colors ?? [],
       });
