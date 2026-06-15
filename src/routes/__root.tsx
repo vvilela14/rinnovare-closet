@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 
 function NotFoundComponent() {
   return (
@@ -119,6 +120,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <WhatsAppButton />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
