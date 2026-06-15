@@ -93,3 +93,17 @@
     font-weight: 300;
   }
 }
+
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-10px) rotate(1.5deg); }
+}
+.animate-float-card {
+  animation: floatCard 4s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes shimmerText {
+  0%, 100% { text-shadow: 0 0 0 transparent; opacity: 1; }
+  50%      { text-shadow: 0 0 18px color-mix(in oklab, var(--lilac) 70%, transparent); opacity: 0.92; }
+}
+.animate-shimmer-text { animation: shimmerText 2.6s ease-in-out infinite; }
