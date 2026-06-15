@@ -59,7 +59,7 @@ export function Header() {
             </Link>
           )}
           {isAdmin && (
-            <Link to="/admin/catalogo" className="ml-1 hidden items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-widest hover:bg-muted md:inline-flex">
+            <Link to="/admin" className="ml-1 hidden items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-widest hover:bg-muted md:inline-flex">
               <LayoutGrid className="h-3.5 w-3.5" /> Admin
             </Link>
           )}

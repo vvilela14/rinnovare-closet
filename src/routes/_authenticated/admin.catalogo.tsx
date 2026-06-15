@@ -1,19 +1,12 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Header } from "@/components/site/Header";
 import { toast } from "sonner";
 import { Plus, Trash2, Pencil, X, LayoutGrid } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/catalogo")({
   head: () => ({ meta: [{ title: "Catálogo — Admin Rinnovare" }] }),
-  beforeLoad: async ({ context }: any) => {
-    const userId = context.user?.id;
-    if (!userId) throw redirect({ to: "/auth" });
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
-    if (!data) throw redirect({ to: "/" });
-  },
   component: AdminCatalogo,
 });
 
@@ -67,9 +60,8 @@ function AdminCatalogo() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+    <div className="px-6 py-10 lg:px-12">
+      <div>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
