@@ -26,6 +26,20 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  async function handleGoogle() {
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+      if (result.error) { toast.error("Não foi possível entrar com Google"); setBusy(false); return; }
+      if (result.redirected) return;
+      navigate({ to: "/" });
+    } catch {
+      toast.error("Erro ao entrar com Google");
+      setBusy(false);
+    }
+  }
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/" });
