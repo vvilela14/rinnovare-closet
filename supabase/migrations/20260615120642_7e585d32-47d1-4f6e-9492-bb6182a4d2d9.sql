@@ -1,0 +1,2 @@
+ALTER TABLE public.profile_events ADD COLUMN IF NOT EXISTS product_id uuid REFERENCES public.products(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_profile_events_product_id ON public.profile_events(product_id);

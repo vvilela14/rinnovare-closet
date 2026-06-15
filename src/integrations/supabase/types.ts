@@ -143,6 +143,7 @@ export type Database = {
           created_at: string
           event_date: string
           id: string
+          product_id: string | null
           title: string
           user_id: string
         }
@@ -151,6 +152,7 @@ export type Database = {
           created_at?: string
           event_date: string
           id?: string
+          product_id?: string | null
           title: string
           user_id: string
         }
@@ -159,10 +161,19 @@ export type Database = {
           created_at?: string
           event_date?: string
           id?: string
+          product_id?: string | null
           title?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profile_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
