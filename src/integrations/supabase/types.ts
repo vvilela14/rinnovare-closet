@@ -137,21 +137,60 @@ export type Database = {
           },
         ]
       }
-      profiles: {
+      profile_events: {
         Row: {
           created_at: string
-          full_name: string | null
+          event_date: string
           id: string
+          title: string
+          user_id: string
         }
         Insert: {
           created_at?: string
-          full_name?: string | null
-          id: string
+          event_date: string
+          id?: string
+          title: string
+          user_id: string
         }
         Update: {
           created_at?: string
+          event_date?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          favorite_colors: string[]
+          full_name: string | null
+          id: string
+          size: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          favorite_colors?: string[]
+          full_name?: string | null
+          id: string
+          size?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          favorite_colors?: string[]
           full_name?: string | null
           id?: string
+          size?: string | null
+          updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
