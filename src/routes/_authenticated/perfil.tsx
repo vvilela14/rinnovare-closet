@@ -239,6 +239,47 @@ function PerfilPage() {
                 </PopoverContent>
               </Popover>
             </div>
+            <div className="grid gap-2">
+              <Label>Vestido escolhido <span className="text-xs text-muted-foreground">(opcional — dos seus favoritos)</span></Label>
+              {favorites.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Você ainda não tem favoritos. Salve vestidos no catálogo para poder escolher aqui.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEventProductId("")}
+                    className={cn(
+                      "rounded-full border px-3 py-1 text-xs transition",
+                      eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
+                    )}
+                  >
+                    Nenhum
+                  </button>
+                  {favorites.map((f: any) => {
+                    const p = f.products;
+                    const img = p.image_url || p.images?.[0];
+                    const selected = eventProductId === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setEventProductId(p.id)}
+                        className={cn(
+                          "flex items-center gap-2 rounded-full border px-2 py-1 text-xs transition",
+                          selected ? "border-primary bg-primary/10" : "border-border hover:bg-muted"
+                        )}
+                        title={p.name}
+                      >
+                        {img && <img src={img} alt="" className="h-6 w-6 rounded-full object-cover" />}
+                        <span className="max-w-[140px] truncate">{p.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
             <Button type="button" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
               <Plus className="mr-2 h-4 w-4" /> Adicionar evento
             </Button>
