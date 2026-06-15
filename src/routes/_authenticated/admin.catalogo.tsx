@@ -325,3 +325,59 @@ function AdminField({ label, children, className = "" }: { label: string; childr
     </label>
   );
 }
+
+function CategorySelect({
+  catalog,
+  value,
+  onChange,
+}: {
+  catalog: ProductRow[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const options = Array.from(
+    new Set(catalog.map((p) => (p.category ?? "").trim()).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+  const isNew = value !== "" && !options.includes(value);
+  const [mode, setMode] = useState<"select" | "new">(isNew ? "new" : "select");
+
+  if (mode === "new") {
+    return (
+      <div className="flex gap-2">
+        <input
+          autoFocus
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="admin-input"
+          placeholder="Nome da nova categoria"
+        />
+        <button
+          type="button"
+          onClick={() => { onChange(""); setMode("select"); }}
+          className="rounded-full border border-border px-3 text-[11px] uppercase tracking-widest hover:bg-muted"
+        >
+          Cancelar
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <select
+      value={value}
+      onChange={(e) => {
+        const v = e.target.value;
+        if (v === "__new__") { onChange(""); setMode("new"); return; }
+        onChange(v);
+      }}
+      className="admin-input"
+    >
+      <option value="">— Selecione uma categoria —</option>
+      {options.map((c) => (
+        <option key={c} value={c}>{c}</option>
+      ))}
+      <option value="__new__">+ Criar nova categoria…</option>
+    </select>
+  );
+}
