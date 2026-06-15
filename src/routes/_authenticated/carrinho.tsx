@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/site/Header";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
+
+const RENTAL_PERIODS = [4, 7, 12] as const;
 
 export const Route = createFileRoute("/_authenticated/carrinho")({
   head: () => ({ meta: [{ title: "Meu carrinho — Rinnovare Closet" }] }),
