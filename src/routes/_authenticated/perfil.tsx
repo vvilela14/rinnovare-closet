@@ -196,28 +196,35 @@ function PerfilPage() {
             <Input id="size" placeholder="P, M, G, 38, 40..." value={form.size}
               onChange={(e) => setForm({ ...form, size: e.target.value })} />
           </div>
-          <div className="grid gap-2">
-            <Label>Cores favoritas <span className="text-xs text-muted-foreground">(opcional)</span></Label>
-            <div className="flex gap-2">
-              <Input placeholder="Ex.: Rosa" value={colorInput}
-                onChange={(e) => setColorInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addColor(); } }} />
-              <Button type="button" variant="outline" onClick={addColor}>Adicionar</Button>
+          <div className="grid gap-2 md:col-span-2">
+            <Label>Cores favoritas <span className="text-xs text-muted-foreground">(opcional — clique para selecionar)</span></Label>
+            <div className="flex flex-wrap gap-4 pt-1">
+              {COLOR_PALETTE.map((c) => {
+                const selected = form.favorite_colors.includes(c.name);
+                const isGradient = c.hex.startsWith("conic") || c.hex.startsWith("linear");
+                return (
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => toggleColor(c.name)}
+                    className="flex flex-col items-center gap-1 group"
+                    aria-pressed={selected}
+                  >
+                    <span
+                      className={cn(
+                        "h-10 w-10 rounded-full border-2 transition",
+                        selected ? "border-primary ring-2 ring-primary/30" : "border-border group-hover:border-foreground/40",
+                        c.border && !selected && "border-border"
+                      )}
+                      style={isGradient ? { backgroundImage: c.hex } : { backgroundColor: c.hex }}
+                    />
+                    <span className={cn("text-xs", selected ? "text-foreground font-medium" : "text-muted-foreground")}>
+                      {c.name}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            {form.favorite_colors.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {form.favorite_colors.map((c) => (
-                  <Badge key={c} variant="secondary" className="gap-1">
-                    {c}
-                    <button type="button"
-                      onClick={() => setForm({ ...form, favorite_colors: form.favorite_colors.filter((x) => x !== c) })}
-                      className="ml-1 rounded-full hover:bg-muted-foreground/20">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
