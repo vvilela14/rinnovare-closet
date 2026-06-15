@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, ShoppingBag, User as UserIcon, LogOut, LayoutGrid } from "lucide-react";
+import { Heart, ShoppingBag, User as UserIcon, LogOut, LayoutGrid, UserCog } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -43,6 +43,11 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
+          {user && (
+            <Link to="/perfil" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Meu perfil">
+              <UserCog className="h-5 w-5" style={{ color: "var(--lilac)" }} />
+            </Link>
+          )}
           {user && (
             <Link to="/favoritos" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Favoritos">
               <Heart className="h-5 w-5" style={{ color: "var(--lilac)" }} />
