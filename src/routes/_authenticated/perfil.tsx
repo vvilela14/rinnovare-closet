@@ -69,7 +69,7 @@ function PerfilPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, whatsapp, address, favorite_colors, size")
+        .select("id, full_name, whatsapp, address, address_number, address_complement, postal_code, favorite_colors, size")
         .eq("id", user!.id)
         .maybeSingle();
       return data;
