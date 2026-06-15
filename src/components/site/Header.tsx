@@ -44,6 +44,11 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           {user && (
+            <Link to="/perfil" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Meu perfil">
+              <UserCog className="h-5 w-5" style={{ color: "var(--lilac)" }} />
+            </Link>
+          )}
+          {user && (
             <Link to="/favoritos" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Favoritos">
               <Heart className="h-5 w-5" style={{ color: "var(--lilac)" }} />
             </Link>
