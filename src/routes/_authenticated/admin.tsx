@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Package, Users, ShoppingBag, LogOut, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, Users, ShoppingBag, Heart, LogOut, ArrowLeft } from "lucide-react";
 import logoAsset from "@/assets/rinnovare-logo-admin.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -23,7 +23,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
 const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/catalogo", label: "Catálogo", icon: Package },
-  { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
+  { to: "/admin/pedidos", label: "Carrinhos", icon: ShoppingBag },
+  { to: "/admin/favoritos", label: "Favoritos", icon: Heart },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
 ];
 
