@@ -211,14 +211,35 @@ function PerfilPage() {
               onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
           </div>
           <div className="grid gap-2 md:col-span-2">
-            <Label htmlFor="address">Endereço</Label>
-            <Input id="address" placeholder="Rua, número, bairro, cidade" value={form.address}
+            <Label htmlFor="address">Endereço (rua, bairro, cidade)</Label>
+            <Input id="address" placeholder="Rua, bairro, cidade" value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="size">Tamanho <span className="text-xs text-muted-foreground">(opcional)</span></Label>
-            <Input id="size" placeholder="P, M, G, 38, 40..." value={form.size}
-              onChange={(e) => setForm({ ...form, size: e.target.value })} />
+            <Label htmlFor="address_number">Número</Label>
+            <Input id="address_number" placeholder="Ex.: 123" value={form.address_number}
+              onChange={(e) => setForm({ ...form, address_number: e.target.value })} />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="address_complement">Complemento</Label>
+            <Input id="address_complement" placeholder="Apto, bloco, referência" value={form.address_complement}
+              onChange={(e) => setForm({ ...form, address_complement: e.target.value })} />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="postal_code">CEP</Label>
+            <Input id="postal_code" placeholder="00000-000" value={form.postal_code}
+              onChange={(e) => setForm({ ...form, postal_code: e.target.value })} />
+          </div>
+          <div className="grid gap-2">
+            <Label>Tamanho <span className="text-xs text-muted-foreground">(opcional)</span></Label>
+            <Select value={form.size} onValueChange={(v) => setForm({ ...form, size: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione o tamanho" /></SelectTrigger>
+              <SelectContent>
+                {SIZE_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-2 md:col-span-2">
             <Label>Cores favoritas <span className="text-xs text-muted-foreground">(opcional — clique para selecionar)</span></Label>
