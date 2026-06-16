@@ -3,14 +3,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -113,14 +113,47 @@ function EventosPage() {
         Marque ocasiões para receber sugestões na medida.
       </p>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-[320px,1fr] md:items-start">
+      <div className="mt-8 grid gap-6 md:grid-cols-[1fr_320px] md:items-start">
+        <div className="rounded-2xl border border-border bg-white p-6">
+          <h2 className="text-xl">Calendário</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Clique em uma data para selecioná-la. Datas destacadas indicam um evento.
+          </p>
+          <div className="mt-4 overflow-x-auto">
+            <Calendar
+              mode="single"
+              numberOfMonths={2}
+              selected={eventDate}
+              onSelect={setEventDate}
+              month={calendarMonth}
+              onMonthChange={setCalendarMonth}
+              modifiers={{ hasEvent: eventDates }}
+              modifiersClassNames={{ hasEvent: "bg-primary/10 text-primary rounded-full font-semibold" }}
+              locale={ptBR}
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </div>
+          {selectedDayEvents.length > 0 && (
+            <ul className="mt-4 space-y-2">
+              {selectedDayEvents.map((ev: any) => (
+                <li key={ev.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                  <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                    {format(new Date(ev.event_date + "T00:00:00"), "dd/MM", { locale: ptBR })}
+                  </span>
+                  <span className="truncate">{ev.title}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <div className="rounded-2xl border border-border bg-white p-4">
           <h2 className="text-lg">Cadastrar evento</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Marque um novo evento na sua agenda.
+            {eventDate
+              ? `Data selecionada: ${format(eventDate, "PPP", { locale: ptBR })}`
+              : "Selecione uma data no calendário ao lado."}
           </p>
-
-
 
           <div className="mt-4 grid gap-3">
             <div className="grid gap-2">
@@ -158,25 +191,10 @@ function EventosPage() {
               )}
             </div>
             <div className="grid gap-2">
-              <Label>Data</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("justify-start text-left font-normal", !eventDate && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {eventDate ? format(eventDate, "PPP", { locale: ptBR }) : "Selecionar data"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={eventDate} onSelect={setEventDate}
-                    initialFocus className={cn("p-3 pointer-events-auto")} locale={ptBR} />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div className="grid gap-2">
-              <Label>Vestido escolhido <span className="text-xs text-muted-foreground">(opcional — dos seus favoritos)</span></Label>
+              <Label>Vestido escolhido <span className="text-xs text-muted-foreground">(opcional)</span></Label>
               {favorites.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  Você ainda não tem favoritos. Salve vestidos no catálogo para poder escolher aqui.
+                  Você ainda não tem favoritos. Salve vestidos no catálogo para escolher aqui.
                 </p>
               ) : (
                 <Carousel opts={{ align: "start", dragFree: true }} className="px-10">
@@ -186,7 +204,7 @@ function EventosPage() {
                         type="button"
                         onClick={() => setEventProductId("")}
                         className={cn(
-                          "flex h-[140px] w-[120px] items-center justify-center rounded-2xl border text-xs transition",
+                          "flex h-[120px] w-[100px] items-center justify-center rounded-2xl border text-xs transition",
                           eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
                         )}
                       >
@@ -202,13 +220,11 @@ function EventosPage() {
                           <button
                             type="button"
                             onClick={() => setEventProductId(p.id)}
-                            className={cn(
-                              "group flex w-[120px] flex-col gap-2 text-left transition",
-                            )}
+                            className="group flex w-[100px] flex-col gap-2 text-left transition"
                             title={p.name}
                           >
                             <div className={cn(
-                              "relative h-[120px] w-[120px] overflow-hidden rounded-2xl border",
+                              "relative h-[100px] w-[100px] overflow-hidden rounded-2xl border",
                               selected ? "border-primary ring-2 ring-primary/40" : "border-border group-hover:border-foreground/40"
                             )}>
                               {img ? (
@@ -220,7 +236,6 @@ function EventosPage() {
                               )}
                             </div>
                             <span className="text-xs font-medium truncate">{p.name}</span>
-
                           </button>
                         </CarouselItem>
                       );
@@ -236,38 +251,8 @@ function EventosPage() {
             </Button>
           </div>
         </div>
-
-        <div className="rounded-2xl border border-border bg-white p-6">
-          <h2 className="text-xl">Calendário</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Visualize seus eventos marcados. Datas destacadas indicam um evento.
-          </p>
-          <div className="mt-4 overflow-x-auto">
-            <Calendar
-              mode="single"
-              numberOfMonths={2}
-              month={calendarMonth}
-              onMonthChange={setCalendarMonth}
-              modifiers={{ hasEvent: eventDates }}
-              modifiersClassNames={{ hasEvent: "bg-primary text-primary-foreground rounded-full font-semibold" }}
-              locale={ptBR}
-              className={cn("p-3 pointer-events-auto")}
-            />
-          </div>
-          {selectedDayEvents.length > 0 && (
-            <ul className="mt-4 space-y-2">
-              {selectedDayEvents.map((ev: any) => (
-                <li key={ev.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2 text-sm">
-                  <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                    {format(new Date(ev.event_date + "T00:00:00"), "dd/MM", { locale: ptBR })}
-                  </span>
-                  <span className="truncate">{ev.title}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
+
 
       <div className="mt-6 rounded-2xl border border-border bg-white p-6">
         <h2 className="text-xl">Eventos marcados</h2>
