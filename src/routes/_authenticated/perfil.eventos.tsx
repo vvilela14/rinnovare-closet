@@ -64,6 +64,45 @@ function EventosPage() {
   const [eventDate, setEventDate] = useState<Date | undefined>();
   const [eventProductId, setEventProductId] = useState<string>("");
   const [customCategoryOpen, setCustomCategoryOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setEventTitle("");
+    setEventCategory("");
+    setEventDate(undefined);
+    setEventProductId("");
+    setCustomCategoryOpen(false);
+    setEditingId(null);
+  };
+
+  const startEdit = (ev: any) => {
+    setEditingId(ev.id);
+    setEventTitle(ev.title ?? "");
+    setEventCategory(ev.category ?? "");
+    setCustomCategoryOpen(!!ev.category && !EVENT_CATEGORIES.includes(ev.category));
+    setEventDate(new Date(ev.event_date + "T00:00:00"));
+    setEventProductId(ev.product_id ?? "");
+  };
+
+  const updateEvent = useMutation({
+    mutationFn: async () => {
+      if (!editingId) throw new Error("Sem evento selecionado");
+      if (!eventTitle.trim() || !eventDate) throw new Error("Preencha título e data");
+      const { error } = await supabase.from("profile_events").update({
+        title: eventTitle.trim(),
+        category: eventCategory.trim() || null,
+        event_date: format(eventDate, "yyyy-MM-dd"),
+        product_id: eventProductId || null,
+      }).eq("id", editingId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      resetForm();
+      qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
+      toast.success("Evento atualizado");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
 
   const addEvent = useMutation({
     mutationFn: async () => {
