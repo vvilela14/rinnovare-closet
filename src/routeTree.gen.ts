@@ -21,6 +21,7 @@ import { Route as AuthenticatedPerfilIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedPerfilEventosRouteImport } from './routes/_authenticated/perfil.eventos'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
+import { Route as AuthenticatedAdminLocacoesRouteImport } from './routes/_authenticated/admin.locacoes'
 import { Route as AuthenticatedAdminFavoritosRouteImport } from './routes/_authenticated/admin.favoritos'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCatalogoRouteImport } from './routes/_authenticated/admin.catalogo'
@@ -88,6 +89,12 @@ const AuthenticatedAdminPedidosRoute =
     path: '/pedidos',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLocacoesRoute =
+  AuthenticatedAdminLocacoesRouteImport.update({
+    id: '/locacoes',
+    path: '/locacoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminFavoritosRoute =
   AuthenticatedAdminFavoritosRouteImport.update({
     id: '/favoritos',
@@ -125,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
+  '/admin/locacoes': typeof AuthenticatedAdminLocacoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -140,6 +148,7 @@ export interface FileRoutesByTo {
   '/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
+  '/admin/locacoes': typeof AuthenticatedAdminLocacoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -159,6 +168,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/catalogo': typeof AuthenticatedAdminCatalogoRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/favoritos': typeof AuthenticatedAdminFavoritosRoute
+  '/_authenticated/admin/locacoes': typeof AuthenticatedAdminLocacoesRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/admin/catalogo'
     | '/admin/clientes'
     | '/admin/favoritos'
+    | '/admin/locacoes'
     | '/admin/pedidos'
     | '/perfil/eventos'
     | '/admin/'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/admin/catalogo'
     | '/admin/clientes'
     | '/admin/favoritos'
+    | '/admin/locacoes'
     | '/admin/pedidos'
     | '/perfil/eventos'
     | '/admin'
@@ -211,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/catalogo'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/favoritos'
+    | '/_authenticated/admin/locacoes'
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/perfil/eventos'
     | '/_authenticated/admin/'
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/locacoes': {
+      id: '/_authenticated/admin/locacoes'
+      path: '/locacoes'
+      fullPath: '/admin/locacoes'
+      preLoaderRoute: typeof AuthenticatedAdminLocacoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/favoritos': {
       id: '/_authenticated/admin/favoritos'
       path: '/favoritos'
@@ -346,6 +366,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCatalogoRoute: typeof AuthenticatedAdminCatalogoRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminFavoritosRoute: typeof AuthenticatedAdminFavoritosRoute
+  AuthenticatedAdminLocacoesRoute: typeof AuthenticatedAdminLocacoesRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -355,6 +376,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCatalogoRoute: AuthenticatedAdminCatalogoRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminFavoritosRoute: AuthenticatedAdminFavoritosRoute,
+  AuthenticatedAdminLocacoesRoute: AuthenticatedAdminLocacoesRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
