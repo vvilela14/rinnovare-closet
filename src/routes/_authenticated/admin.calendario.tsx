@@ -64,15 +64,15 @@ function AdminCalendario() {
     },
   });
 
-  const { data: confirmedRentals = [] } = useQuery({
+  const { data: rentalsAll = [] } = useQuery({
     queryKey: ["admin-calendar-rentals", cursor.toISOString().slice(0, 7)],
     queryFn: async () => {
       const from = format(startOfMonth(cursor), "yyyy-MM-dd");
       const to = format(endOfMonth(cursor), "yyyy-MM-dd");
       const { data } = await supabase
         .from("rental_requests")
-        .select("id, start_date, end_date, user_id, product:products(name)")
-        .eq("status", "confirmed")
+        .select("id, start_date, end_date, user_id, status, product:products(name)")
+        .in("status", ["pending", "confirmed"])
         .lte("start_date", to)
         .gte("end_date", from);
       const list = (data ?? []) as any[];
