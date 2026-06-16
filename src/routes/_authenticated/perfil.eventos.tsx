@@ -113,49 +113,11 @@ function EventosPage() {
         Marque ocasiões para receber sugestões na medida.
       </p>
 
-      <div className="mt-8 rounded-2xl border border-border bg-white p-6">
-        <h2 className="text-xl">Calendário</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Visualize seus eventos marcados. Datas destacadas indicam um evento.
-        </p>
-        <div className="mt-4 grid gap-6 md:grid-cols-[auto,1fr] md:items-start">
-          <Calendar
-            mode="single"
-            month={calendarMonth}
-            onMonthChange={setCalendarMonth}
-            modifiers={{ hasEvent: eventDates }}
-            modifiersClassNames={{ hasEvent: "bg-primary text-primary-foreground rounded-full font-semibold" }}
-            locale={ptBR}
-            className={cn("p-3 pointer-events-auto")}
-          />
-          <div className="min-w-0">
-            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              {format(calendarMonth, "MMMM yyyy", { locale: ptBR })}
-            </div>
-            {selectedDayEvents.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">Nenhum evento neste mês.</p>
-            ) : (
-              <ul className="mt-3 space-y-2">
-                {selectedDayEvents.map((ev: any) => (
-                  <li key={ev.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2 text-sm">
-                    <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                      {format(new Date(ev.event_date + "T00:00:00"), "dd/MM", { locale: ptBR })}
-                    </span>
-                    <span className="truncate">{ev.title}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-
+      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,420px),1fr]">
         <div className="rounded-2xl border border-border bg-white p-6">
-          <h2 className="text-xl">Próximos eventos</h2>
+          <h2 className="text-xl">Cadastrar evento</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Cadastre um novo evento abaixo.
+            Marque um novo evento na sua agenda.
           </p>
 
           <div className="mt-4 grid gap-3">
@@ -216,13 +178,13 @@ function EventosPage() {
                 </p>
               ) : (
                 <Carousel opts={{ align: "start", dragFree: true }} className="px-10">
-                  <CarouselContent className="-ml-2">
-                    <CarouselItem className="pl-2 basis-auto">
+                  <CarouselContent className="-ml-3">
+                    <CarouselItem className="pl-3 basis-auto">
                       <button
                         type="button"
                         onClick={() => setEventProductId("")}
                         className={cn(
-                          "flex h-[90px] w-[90px] items-center justify-center rounded-lg border text-xs transition",
+                          "flex h-[200px] w-[180px] items-center justify-center rounded-2xl border text-sm transition",
                           eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
                         )}
                       >
@@ -234,33 +196,35 @@ function EventosPage() {
                       const img = p.image_url || p.images?.[0];
                       const selected = eventProductId === p.id;
                       return (
-                        <CarouselItem key={p.id} className="pl-2 basis-auto">
+                        <CarouselItem key={p.id} className="pl-3 basis-auto">
                           <button
                             type="button"
                             onClick={() => setEventProductId(p.id)}
                             className={cn(
-                              "group relative flex h-[90px] w-[72px] flex-col overflow-hidden rounded-lg border transition",
-                              selected ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-foreground/40"
+                              "group flex w-[180px] flex-col gap-2 text-left transition",
                             )}
                             title={p.name}
                           >
-                            {img ? (
-                              <img src={img} alt={p.name} className="h-full w-full object-cover" />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center bg-muted text-[10px] text-muted-foreground px-1 text-center">
-                                {p.name}
-                              </div>
-                            )}
-                            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-1 py-1 text-[9px] text-white truncate text-left">
-                              {p.name}
-                            </span>
+                            <div className={cn(
+                              "relative h-[180px] w-[180px] overflow-hidden rounded-2xl border",
+                              selected ? "border-primary ring-2 ring-primary/40" : "border-border group-hover:border-foreground/40"
+                            )}>
+                              {img ? (
+                                <img src={img} alt={p.name} className="h-full w-full object-cover" />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground px-2 text-center">
+                                  {p.name}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-sm font-medium truncate">{p.name}</span>
                           </button>
                         </CarouselItem>
                       );
                     })}
                   </CarouselContent>
-                  <CarouselPrevious type="button" className="h-7 w-7" />
-                  <CarouselNext type="button" className="h-7 w-7" />
+                  <CarouselPrevious type="button" className="h-8 w-8" />
+                  <CarouselNext type="button" className="h-8 w-8" />
                 </Carousel>
               )}
             </div>
@@ -271,39 +235,71 @@ function EventosPage() {
         </div>
 
         <div className="rounded-2xl border border-border bg-white p-6">
-          <h2 className="text-xl">Eventos marcados</h2>
-          {events.length === 0 ? (
-            <p className="mt-4 text-sm text-muted-foreground">Nenhum evento marcado ainda.</p>
-          ) : (
-            <ul className="mt-4 divide-y divide-border">
-              {events.map((ev: any) => {
-                const p = ev.products;
-                const img = p?.image_url || p?.images?.[0];
-                return (
-                  <li key={ev.id} className="flex items-center justify-between gap-3 py-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      {img && <img src={img} alt="" className="h-12 w-12 rounded-lg object-cover flex-shrink-0" />}
-                      <div className="min-w-0">
-                        <div className="font-medium truncate">{ev.title}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {ev.category ? <span className="mr-2 rounded-full bg-muted px-2 py-0.5">{ev.category}</span> : null}
-                          {format(new Date(ev.event_date + "T00:00:00"), "PPP", { locale: ptBR })}
-                        </div>
-                        {p && <div className="text-xs text-muted-foreground mt-0.5 truncate">Vestido: {p.name}</div>}
-                      </div>
-                    </div>
-                    <button onClick={() => removeEvent.mutate(ev.id)}
-                      className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground flex-shrink-0"
-                      aria-label="Remover">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </li>
-                );
-              })}
+          <h2 className="text-xl">Calendário</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Visualize seus eventos marcados. Datas destacadas indicam um evento.
+          </p>
+          <div className="mt-4 overflow-x-auto">
+            <Calendar
+              mode="single"
+              numberOfMonths={2}
+              month={calendarMonth}
+              onMonthChange={setCalendarMonth}
+              modifiers={{ hasEvent: eventDates }}
+              modifiersClassNames={{ hasEvent: "bg-primary text-primary-foreground rounded-full font-semibold" }}
+              locale={ptBR}
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </div>
+          {selectedDayEvents.length > 0 && (
+            <ul className="mt-4 space-y-2">
+              {selectedDayEvents.map((ev: any) => (
+                <li key={ev.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                  <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                    {format(new Date(ev.event_date + "T00:00:00"), "dd/MM", { locale: ptBR })}
+                  </span>
+                  <span className="truncate">{ev.title}</span>
+                </li>
+              ))}
             </ul>
           )}
         </div>
       </div>
+
+      <div className="mt-6 rounded-2xl border border-border bg-white p-6">
+        <h2 className="text-xl">Eventos marcados</h2>
+        {events.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">Nenhum evento marcado ainda.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-border">
+            {events.map((ev: any) => {
+              const p = ev.products;
+              const img = p?.image_url || p?.images?.[0];
+              return (
+                <li key={ev.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {img && <img src={img} alt="" className="h-12 w-12 rounded-lg object-cover flex-shrink-0" />}
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{ev.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {ev.category ? <span className="mr-2 rounded-full bg-muted px-2 py-0.5">{ev.category}</span> : null}
+                        {format(new Date(ev.event_date + "T00:00:00"), "PPP", { locale: ptBR })}
+                      </div>
+                      {p && <div className="text-xs text-muted-foreground mt-0.5 truncate">Vestido: {p.name}</div>}
+                    </div>
+                  </div>
+                  <button onClick={() => removeEvent.mutate(ev.id)}
+                    className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground flex-shrink-0"
+                    aria-label="Remover">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </>
   );
 }
+
