@@ -17,7 +17,7 @@ function PerfilLayout() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 lg:px-10">
-      <div className="grid gap-8 md:grid-cols-[220px,1fr]">
+      <div className="grid gap-8 md:grid-cols-[220px_1fr]">
         <aside className="md:sticky md:top-6 md:self-start md:border-r md:border-border md:pr-6">
           <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">Minha conta</div>
           <nav className="mt-4 flex flex-col gap-1">
