@@ -425,11 +425,7 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
             </select>
           </AdminField>
           <AdminField label="Categoria">
-            <CategorySelect
-              catalog={catalog}
-              value={form.category}
-              onChange={(v) => setForm({ ...form, category: v })}
-            />
+            <CategoryPicker value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
           </AdminField>
 
           <AdminField label={`Fotos (até ${MAX_PHOTOS}) — clique na estrela para definir como principal`} className="sm:col-span-2">
