@@ -156,6 +156,7 @@ function AdminCalendario() {
           {days.map((d) => {
             const key = format(d, "yyyy-MM-dd");
             const dayEvents = eventsByDay.get(key) ?? [];
+            const dayRentals = rentalsByDay.get(key) ?? [];
             const inMonth = d.getMonth() === cursor.getMonth();
             const isToday = isSameDay(d, today);
             return (
