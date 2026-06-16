@@ -232,6 +232,59 @@ export type Database = {
         }
         Relationships: []
       }
+      rental_requests: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          payment_terms: string | null
+          period_days: number
+          product_id: string
+          size: string | null
+          start_date: string
+          status: string
+          total_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          payment_terms?: string | null
+          period_days: number
+          product_id: string
+          size?: string | null
+          start_date: string
+          status?: string
+          total_value?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          payment_terms?: string | null
+          period_days?: number
+          product_id?: string
+          size?: string | null
+          start_date?: string
+          status?: string
+          total_value?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles, Truck, ShieldCheck } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { ProductCard, type Product } from "@/components/site/ProductCard";
+import { CATEGORY_OPTIONS, COLOR_PALETTE, fmtISODate, parseISODate, rangesOverlap } from "@/lib/catalog-constants";
 import heroImage from "@/assets/hero-dress.jpg";
 
 export const Route = createFileRoute("/")({
@@ -22,6 +24,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const [category, setCategory] = useState<string>("");
+  const [eventDate, setEventDate] = useState<string>("");
+  const [color, setColor] = useState<string>("");
+
   const { data: products = [] } = useQuery<Product[]>({
     queryKey: ["products"],
     queryFn: async () => {
@@ -34,6 +40,40 @@ function Home() {
       return data as Product[];
     },
   });
+
+  const { data: confirmedRentals = [] } = useQuery({
+    queryKey: ["confirmed-rentals"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("rental_requests")
+        .select("product_id, start_date, end_date, status")
+        .in("status", ["confirmed", "pending"]);
+      return data ?? [];
+    },
+  });
+
+  const reservedSet = useMemo(() => {
+    return new Set(confirmedRentals.filter((r: any) => r.status === "confirmed" || r.status === "pending").map((r: any) => r.product_id));
+  }, [confirmedRentals]);
+
+  const filtered = useMemo(() => {
+    return products.filter((p) => {
+      if (category && p.category !== category) return false;
+      if (color && (p as any).color !== color) return false;
+      if (eventDate) {
+        const target = parseISODate(eventDate);
+        const taken = confirmedRentals.some((r: any) => {
+          if (r.product_id !== p.id) return false;
+          if (r.status !== "confirmed") return false;
+          return rangesOverlap(target, target, parseISODate(r.start_date), parseISODate(r.end_date));
+        });
+        if (taken) return false;
+      }
+      return true;
+    });
+  }, [products, category, color, eventDate, confirmedRentals]);
+
+  const hasFilters = category || color || eventDate;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -142,12 +182,74 @@ function Home() {
           </p>
         </div>
 
+        {/* FILTROS */}
+        <div className="mt-10 rounded-2xl border border-border bg-muted/20 p-5">
+          <div className="flex flex-wrap items-end gap-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Categoria</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="min-w-[180px] rounded-full border border-border bg-background px-4 py-2 text-sm"
+              >
+                <option value="">Todas</option>
+                {CATEGORY_OPTIONS.filter((c) => c !== "Outro").map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Data do evento</label>
+              <input
+                type="date"
+                value={eventDate}
+                min={fmtISODate(new Date())}
+                onChange={(e) => setEventDate(e.target.value)}
+                className="rounded-full border border-border bg-background px-4 py-2 text-sm"
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Cor</label>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_PALETTE.map((c) => {
+                  const selected = color === c.name;
+                  return (
+                    <button
+                      key={c.name}
+                      type="button"
+                      onClick={() => setColor(selected ? "" : c.name)}
+                      title={c.name}
+                      className={`h-7 w-7 rounded-full transition ${selected ? "ring-2 ring-offset-2 ring-[#260d58]" : "hover:scale-110"} ${c.border ? "border border-border" : ""}`}
+                      style={{ background: c.hex }}
+                      aria-label={c.name}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+
+            {hasFilters && (
+              <button
+                type="button"
+                onClick={() => { setCategory(""); setEventDate(""); setColor(""); }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs uppercase tracking-widest hover:bg-background"
+              >
+                <X className="h-3.5 w-3.5" /> Limpar filtros
+              </button>
+            )}
+          </div>
+        </div>
+
         <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {filtered.map((p) => (
+            <ProductCard key={p.id} product={p} isReserved={reservedSet.has(p.id)} />
           ))}
-          {products.length === 0 && (
-            <p className="col-span-full text-center text-muted-foreground">Nenhum vestido disponível no momento.</p>
+          {filtered.length === 0 && (
+            <p className="col-span-full text-center text-muted-foreground">
+              {hasFilters ? "Nenhum vestido disponível com esses filtros." : "Nenhum vestido disponível no momento."}
+            </p>
           )}
         </div>
       </section>

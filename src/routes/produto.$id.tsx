@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Heart, ShoppingBag, ArrowLeft, Truck, Ruler, CreditCard, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, ShoppingBag, ArrowLeft, Truck, Ruler, CreditCard, X, ChevronLeft, ChevronRight, CalendarCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { RENTAL_PERIODS, addDays, fmtISODate, parseISODate, rangesOverlap } from "@/lib/catalog-constants";
 
 export const Route = createFileRoute("/produto/$id")({
   head: ({ params }) => ({
@@ -25,6 +26,8 @@ function ProductPage() {
   const qc = useQueryClient();
   const [active, setActive] = useState(0);
   const [zoomIndex, setZoomIndex] = useState<number | null>(null);
+  const [period, setPeriod] = useState<number>(4);
+  const [startDate, setStartDate] = useState<string>("");
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -159,6 +162,15 @@ function ProductPage() {
                 <li className="flex items-center gap-2"><CreditCard className="h-4 w-4" style={{ color: "var(--lilac)" }} /> {product.payment_terms}</li>
               </ul>
 
+              <PeriodAvailability
+                productId={id}
+                period={period}
+                setPeriod={setPeriod}
+                startDate={startDate}
+                setStartDate={setStartDate}
+              />
+
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   onClick={() => addToCart.mutate()}
@@ -256,3 +268,81 @@ function ZoomImage({ src }: { src: string }) {
     </div>
   );
 }
+
+function PeriodAvailability({
+  productId,
+  period,
+  setPeriod,
+  startDate,
+  setStartDate,
+}: {
+  productId: string;
+  period: number;
+  setPeriod: (n: number) => void;
+  startDate: string;
+  setStartDate: (s: string) => void;
+}) {
+  const { data: rentals = [] } = useQuery({
+    queryKey: ["product-rentals", productId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("rental_requests")
+        .select("start_date, end_date, status")
+        .eq("product_id", productId)
+        .eq("status", "confirmed");
+      return data ?? [];
+    },
+  });
+
+  const endDate = useMemo(() => {
+    if (!startDate) return "";
+    const s = parseISODate(startDate);
+    return fmtISODate(addDays(s, period - 1));
+  }, [startDate, period]);
+
+  const conflict = useMemo(() => {
+    if (!startDate) return false;
+    const s = parseISODate(startDate);
+    const e = addDays(s, period - 1);
+    return rentals.some((r: any) => rangesOverlap(s, e, parseISODate(r.start_date), parseISODate(r.end_date)));
+  }, [startDate, period, rentals]);
+
+  return (
+    <div className="mt-6 rounded-2xl border border-border bg-muted/20 p-5">
+      <div className="flex flex-wrap items-end gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(Number(e.target.value))}
+            className="rounded-full border border-border bg-background px-4 py-2 text-sm"
+          >
+            {RENTAL_PERIODS.map((d) => <option key={d} value={d}>{d} dias</option>)}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Verificar Disponibilidade</label>
+          <input
+            type="date"
+            value={startDate}
+            min={fmtISODate(new Date())}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="rounded-full border border-border bg-background px-4 py-2 text-sm"
+          />
+        </div>
+        {startDate && (
+          <div className="text-xs text-muted-foreground">
+            Devolução prevista: <strong className="text-foreground">{endDate.split("-").reverse().join("/")}</strong>
+          </div>
+        )}
+      </div>
+      {startDate && (
+        <div className={`mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs ${conflict ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+          <CalendarCheck className="h-3.5 w-3.5" />
+          {conflict ? "Indisponível neste período" : "Disponível neste período"}
+        </div>
+      )}
+    </div>
+  );
+}
+
