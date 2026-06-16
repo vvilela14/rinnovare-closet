@@ -162,6 +162,15 @@ function ProductPage() {
                 <li className="flex items-center gap-2"><CreditCard className="h-4 w-4" style={{ color: "var(--lilac)" }} /> {product.payment_terms}</li>
               </ul>
 
+              <PeriodAvailability
+                productId={id}
+                period={period}
+                setPeriod={setPeriod}
+                startDate={startDate}
+                setStartDate={setStartDate}
+              />
+
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   onClick={() => addToCart.mutate()}
