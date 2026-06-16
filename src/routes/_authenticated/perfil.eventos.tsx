@@ -23,6 +23,7 @@ const EVENT_CATEGORIES = [
   "Casamento no campo",
   "Festa de formatura",
   "Aniversário",
+  "Noiva",
   "Outro",
 ];
 
