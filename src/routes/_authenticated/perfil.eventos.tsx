@@ -117,11 +117,7 @@ function EventosPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      setEventTitle("");
-      setEventCategory("");
-      setEventDate(undefined);
-      setEventProductId("");
-      setCustomCategoryOpen(false);
+      resetForm();
       qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
     },
     onError: (e: any) => toast.error(e.message),
