@@ -303,9 +303,15 @@ function EventosPage() {
                 </Carousel>
               )}
             </div>
-            <Button type="button" size="sm" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
-              <Plus className="mr-2 h-4 w-4" /> Adicionar evento
-            </Button>
+            {editingId ? (
+              <Button type="button" size="sm" onClick={() => updateEvent.mutate()} disabled={updateEvent.isPending}>
+                <Pencil className="mr-2 h-4 w-4" /> Salvar alterações
+              </Button>
+            ) : (
+              <Button type="button" size="sm" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
+                <Plus className="mr-2 h-4 w-4" /> Adicionar evento
+              </Button>
+            )}
           </div>
 
         </div>
