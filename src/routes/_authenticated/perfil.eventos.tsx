@@ -383,6 +383,7 @@ function EventosPage() {
             onSubmit={() => updateEvent.mutate()}
             submitting={updateEvent.isPending}
             submitLabel="Salvar alterações"
+            showCalendar
             submitIcon={<Pencil className="mr-2 h-4 w-4" />}
           />
         </DialogContent>
