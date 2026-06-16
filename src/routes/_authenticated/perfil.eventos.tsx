@@ -183,7 +183,19 @@ function EventosPage() {
         </div>
 
         <div className="flex h-full flex-col rounded-2xl border border-border bg-white p-4">
-          <h2 className="text-lg">Cadastrar evento</h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-lg">{editingId ? "Editar evento" : "Cadastrar evento"}</h2>
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Cancelar edição"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           <p className="mt-1 text-xs text-muted-foreground">
             {eventDate
               ? `Data selecionada: ${format(eventDate, "PPP", { locale: ptBR })}`
