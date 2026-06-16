@@ -112,14 +112,33 @@ function AdminLocacoes() {
         Acompanhe e confirme as locações solicitadas. Locações confirmadas aparecem no calendário.
       </p>
 
-      <div className="mt-6 relative max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por nome da cliente…"
-          className="pl-9"
-        />
+      <div className="mt-6 flex flex-wrap items-end gap-3">
+        <div className="relative w-full max-w-xs">
+          <label className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Nome da cliente</label>
+          <Search className="pointer-events-none absolute left-3 top-[34px] h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nome…"
+            className="pl-9"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Data do Evento</label>
+          <Input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="w-[180px]" />
+        </div>
+        <div>
+          <label className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Data da Solicitação</label>
+          <Input type="date" value={requestDate} onChange={(e) => setRequestDate(e.target.value)} className="w-[180px]" />
+        </div>
+        {(eventDate || requestDate || search) && (
+          <button
+            onClick={() => { setSearch(""); setEventDate(""); setRequestDate(""); }}
+            className="h-10 rounded-md border border-border bg-white px-3 text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
+          >
+            Limpar
+          </button>
+        )}
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-white">
