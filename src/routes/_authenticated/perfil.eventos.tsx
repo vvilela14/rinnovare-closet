@@ -192,21 +192,21 @@ function EventosPage() {
               )}
             </div>
 
-            <div className="grid gap-2">
-              <Label>Vestido escolhido <span className="text-xs text-muted-foreground">(opcional)</span></Label>
+            <div className="grid gap-1">
+              <Label className="text-xs">Vestido escolhido <span className="text-[10px] text-muted-foreground">(opcional)</span></Label>
               {favorites.length === 0 ? (
-                <p className="text-xs text-muted-foreground">
-                  Você ainda não tem favoritos. Salve vestidos no catálogo para escolher aqui.
+                <p className="text-[11px] text-muted-foreground">
+                  Você ainda não tem favoritos.
                 </p>
               ) : (
-                <Carousel opts={{ align: "start", dragFree: true }} className="px-10">
-                  <CarouselContent className="-ml-3">
-                    <CarouselItem className="pl-3 basis-auto">
+                <Carousel opts={{ align: "start", dragFree: true }} className="px-8">
+                  <CarouselContent className="-ml-2">
+                    <CarouselItem className="pl-2 basis-auto">
                       <button
                         type="button"
                         onClick={() => setEventProductId("")}
                         className={cn(
-                          "flex h-[120px] w-[100px] items-center justify-center rounded-2xl border text-xs transition",
+                          "flex h-[80px] w-[68px] items-center justify-center rounded-xl border text-[11px] transition",
                           eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
                         )}
                       >
@@ -218,40 +218,41 @@ function EventosPage() {
                       const img = p.image_url || p.images?.[0];
                       const selected = eventProductId === p.id;
                       return (
-                        <CarouselItem key={p.id} className="pl-3 basis-auto">
+                        <CarouselItem key={p.id} className="pl-2 basis-auto">
                           <button
                             type="button"
                             onClick={() => setEventProductId(p.id)}
-                            className="group flex w-[100px] flex-col gap-2 text-left transition"
+                            className="group flex w-[68px] flex-col gap-1 text-left transition"
                             title={p.name}
                           >
                             <div className={cn(
-                              "relative h-[100px] w-[100px] overflow-hidden rounded-2xl border",
+                              "relative h-[68px] w-[68px] overflow-hidden rounded-xl border",
                               selected ? "border-primary ring-2 ring-primary/40" : "border-border group-hover:border-foreground/40"
                             )}>
                               {img ? (
                                 <img src={img} alt={p.name} className="h-full w-full object-cover" />
                               ) : (
-                                <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground px-2 text-center">
+                                <div className="flex h-full w-full items-center justify-center bg-muted text-[10px] text-muted-foreground px-1 text-center">
                                   {p.name}
                                 </div>
                               )}
                             </div>
-                            <span className="text-xs font-medium truncate">{p.name}</span>
+                            <span className="text-[10px] font-medium truncate">{p.name}</span>
                           </button>
                         </CarouselItem>
                       );
                     })}
                   </CarouselContent>
-                  <CarouselPrevious type="button" className="h-8 w-8" />
-                  <CarouselNext type="button" className="h-8 w-8" />
+                  <CarouselPrevious type="button" className="h-6 w-6" />
+                  <CarouselNext type="button" className="h-6 w-6" />
                 </Carousel>
               )}
             </div>
-            <Button type="button" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
+            <Button type="button" size="sm" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
               <Plus className="mr-2 h-4 w-4" /> Adicionar evento
             </Button>
           </div>
+
         </div>
       </div>
 
