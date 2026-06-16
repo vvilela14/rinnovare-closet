@@ -113,7 +113,7 @@ function EventosPage() {
         Marque ocasiões para receber sugestões na medida.
       </p>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-[1fr_380px] md:items-start">
+      <div className="mt-8 grid gap-6 md:grid-cols-[1fr_380px] md:items-stretch">
         <div className="rounded-2xl border border-border bg-white p-6">
           <h2 className="text-xl">Calendário</h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -147,7 +147,7 @@ function EventosPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-white p-4">
+        <div className="flex h-full flex-col rounded-2xl border border-border bg-white p-4">
           <h2 className="text-lg">Cadastrar evento</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             {eventDate
@@ -265,7 +265,7 @@ function EventosPage() {
       </div>
 
 
-      <div className="mt-6 rounded-2xl border border-border bg-white p-6">
+      <div className="mt-6 ml-auto w-full md:w-[380px] rounded-2xl border border-border bg-white p-6">
         <h2 className="text-xl">Eventos marcados</h2>
         {events.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">Nenhum evento marcado ainda.</p>
