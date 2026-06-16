@@ -268,3 +268,81 @@ function ZoomImage({ src }: { src: string }) {
     </div>
   );
 }
+
+function PeriodAvailability({
+  productId,
+  period,
+  setPeriod,
+  startDate,
+  setStartDate,
+}: {
+  productId: string;
+  period: number;
+  setPeriod: (n: number) => void;
+  startDate: string;
+  setStartDate: (s: string) => void;
+}) {
+  const { data: rentals = [] } = useQuery({
+    queryKey: ["product-rentals", productId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("rental_requests")
+        .select("start_date, end_date, status")
+        .eq("product_id", productId)
+        .eq("status", "confirmed");
+      return data ?? [];
+    },
+  });
+
+  const endDate = useMemo(() => {
+    if (!startDate) return "";
+    const s = parseISODate(startDate);
+    return fmtISODate(addDays(s, period - 1));
+  }, [startDate, period]);
+
+  const conflict = useMemo(() => {
+    if (!startDate) return false;
+    const s = parseISODate(startDate);
+    const e = addDays(s, period - 1);
+    return rentals.some((r: any) => rangesOverlap(s, e, parseISODate(r.start_date), parseISODate(r.end_date)));
+  }, [startDate, period, rentals]);
+
+  return (
+    <div className="mt-6 rounded-2xl border border-border bg-muted/20 p-5">
+      <div className="flex flex-wrap items-end gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(Number(e.target.value))}
+            className="rounded-full border border-border bg-background px-4 py-2 text-sm"
+          >
+            {RENTAL_PERIODS.map((d) => <option key={d} value={d}>{d} dias</option>)}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Verificar Disponibilidade</label>
+          <input
+            type="date"
+            value={startDate}
+            min={fmtISODate(new Date())}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="rounded-full border border-border bg-background px-4 py-2 text-sm"
+          />
+        </div>
+        {startDate && (
+          <div className="text-xs text-muted-foreground">
+            Devolução prevista: <strong className="text-foreground">{endDate.split("-").reverse().join("/")}</strong>
+          </div>
+        )}
+      </div>
+      {startDate && (
+        <div className={`mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs ${conflict ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+          <CalendarCheck className="h-3.5 w-3.5" />
+          {conflict ? "Indisponível neste período" : "Disponível neste período"}
+        </div>
+      )}
+    </div>
+  );
+}
+
