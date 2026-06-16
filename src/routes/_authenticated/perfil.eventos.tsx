@@ -1,15 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Plus, Trash2, Pencil, X } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -29,6 +30,132 @@ export const Route = createFileRoute("/_authenticated/perfil/eventos")({
   head: () => ({ meta: [{ title: "Meus eventos — Rinnovare" }] }),
   component: EventosPage,
 });
+
+type EventFormValues = {
+  title: string;
+  category: string;
+  date: Date | undefined;
+  productId: string;
+};
+
+type EventFormProps = {
+  values: EventFormValues;
+  onChange: (v: EventFormValues) => void;
+  favorites: any[];
+  onSubmit: () => void;
+  submitting: boolean;
+  submitLabel: string;
+  submitIcon: React.ReactNode;
+};
+
+function EventForm({ values, onChange, favorites, onSubmit, submitting, submitLabel, submitIcon }: EventFormProps) {
+  const customCategoryOpen = !!values.category && !EVENT_CATEGORIES.includes(values.category);
+  const set = (patch: Partial<EventFormValues>) => onChange({ ...values, ...patch });
+
+  return (
+    <div className="grid gap-2.5">
+      <p className="text-xs text-muted-foreground">
+        {values.date
+          ? `Data selecionada: ${format(values.date, "PPP", { locale: ptBR })}`
+          : "Selecione uma data no calendário."}
+      </p>
+
+      <div className="grid gap-1">
+        <Label htmlFor="event-title" className="text-xs">Nome do evento</Label>
+        <Input id="event-title" className="h-8 text-sm" placeholder="Ex.: Casamento da Ana" value={values.title}
+          onChange={(e) => set({ title: e.target.value })} />
+      </div>
+      <div className="grid gap-1">
+        <Label className="text-xs">Categoria</Label>
+        <Select
+          value={customCategoryOpen ? "Outro" : (EVENT_CATEGORIES.includes(values.category) ? values.category : "")}
+          onValueChange={(v) => {
+            if (v === "Outro") set({ category: " " });
+            else set({ category: v });
+          }}
+        >
+          <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Selecione" /></SelectTrigger>
+          <SelectContent>
+            {EVENT_CATEGORIES.map((c) => (
+              <SelectItem key={c} value={c}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {customCategoryOpen && (
+          <Input
+            className="h-8 text-sm"
+            placeholder="Descreva a categoria"
+            value={values.category.trim()}
+            onChange={(e) => set({ category: e.target.value || " " })}
+          />
+        )}
+      </div>
+
+      <div className="grid gap-1">
+        <Label className="text-xs">Vestido escolhido <span className="text-[10px] text-muted-foreground">(opcional)</span></Label>
+        {favorites.length === 0 ? (
+          <p className="text-[11px] text-muted-foreground">Você ainda não tem favoritos.</p>
+        ) : (
+          <Carousel opts={{ align: "start", dragFree: true }} className="relative">
+            <div className="mb-1 flex justify-end gap-1">
+              <CarouselPrevious type="button" className="static translate-x-0 translate-y-0 h-6 w-6" />
+              <CarouselNext type="button" className="static translate-x-0 translate-y-0 h-6 w-6" />
+            </div>
+            <CarouselContent className="-ml-2">
+              <CarouselItem className="pl-2 basis-auto">
+                <button
+                  type="button"
+                  onClick={() => set({ productId: "" })}
+                  className={cn(
+                    "flex h-[80px] w-[68px] items-center justify-center rounded-xl border text-[11px] transition",
+                    values.productId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
+                  )}
+                >
+                  Nenhum
+                </button>
+              </CarouselItem>
+              {favorites.map((f: any) => {
+                const p = f.products;
+                const img = p.image_url || p.images?.[0];
+                const selected = values.productId === p.id;
+                return (
+                  <CarouselItem key={p.id} className="pl-2 basis-auto">
+                    <button
+                      type="button"
+                      onClick={() => set({ productId: p.id })}
+                      className="group flex w-[68px] flex-col gap-1 text-left transition"
+                      title={p.name}
+                    >
+                      <div className={cn(
+                        "relative h-[68px] w-[68px] overflow-hidden rounded-xl border",
+                        selected ? "border-primary ring-2 ring-primary/40" : "border-border group-hover:border-foreground/40"
+                      )}>
+                        {img ? (
+                          <img src={img} alt={p.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-muted text-[10px] text-muted-foreground px-1 text-center">
+                            {p.name}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[10px] font-medium truncate">{p.name}</span>
+                    </button>
+                  </CarouselItem>
+                );
+              })}
+            </CarouselContent>
+          </Carousel>
+        )}
+      </div>
+      <Button type="button" size="sm" onClick={onSubmit} disabled={submitting}>
+        {submitIcon}
+        {submitLabel}
+      </Button>
+    </div>
+  );
+}
+
+const emptyForm: EventFormValues = { title: "", category: "", date: undefined, productId: "" };
 
 function EventosPage() {
   const { user } = useAuth();
@@ -59,66 +186,55 @@ function EventosPage() {
     },
   });
 
-  const [eventTitle, setEventTitle] = useState("");
-  const [eventCategory, setEventCategory] = useState("");
-  const [eventDate, setEventDate] = useState<Date | undefined>();
-  const [eventProductId, setEventProductId] = useState<string>("");
-  const [customCategoryOpen, setCustomCategoryOpen] = useState(false);
+  const [createForm, setCreateForm] = useState<EventFormValues>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  const resetForm = () => {
-    setEventTitle("");
-    setEventCategory("");
-    setEventDate(undefined);
-    setEventProductId("");
-    setCustomCategoryOpen(false);
-    setEditingId(null);
-  };
+  const [editForm, setEditForm] = useState<EventFormValues>(emptyForm);
 
   const startEdit = (ev: any) => {
     setEditingId(ev.id);
-    setEventTitle(ev.title ?? "");
-    setEventCategory(ev.category ?? "");
-    setCustomCategoryOpen(!!ev.category && !EVENT_CATEGORIES.includes(ev.category));
-    setEventDate(new Date(ev.event_date + "T00:00:00"));
-    setEventProductId(ev.product_id ?? "");
+    setEditForm({
+      title: ev.title ?? "",
+      category: ev.category ?? "",
+      date: new Date(ev.event_date + "T00:00:00"),
+      productId: ev.product_id ?? "",
+    });
   };
-
-  const updateEvent = useMutation({
-    mutationFn: async () => {
-      if (!editingId) throw new Error("Sem evento selecionado");
-      if (!eventTitle.trim() || !eventDate) throw new Error("Preencha título e data");
-      const { error } = await supabase.from("profile_events").update({
-        title: eventTitle.trim(),
-        category: eventCategory.trim() || null,
-        event_date: format(eventDate, "yyyy-MM-dd"),
-        product_id: eventProductId || null,
-      }).eq("id", editingId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      resetForm();
-      qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
-      toast.success("Evento atualizado");
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
 
   const addEvent = useMutation({
     mutationFn: async () => {
-      if (!eventTitle.trim() || !eventDate) throw new Error("Preencha título e data");
+      if (!createForm.title.trim() || !createForm.date) throw new Error("Preencha título e data");
       const { error } = await supabase.from("profile_events").insert({
         user_id: user!.id,
-        title: eventTitle.trim(),
-        category: eventCategory.trim() || null,
-        event_date: format(eventDate, "yyyy-MM-dd"),
-        product_id: eventProductId || null,
+        title: createForm.title.trim(),
+        category: createForm.category.trim() || null,
+        event_date: format(createForm.date, "yyyy-MM-dd"),
+        product_id: createForm.productId || null,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      resetForm();
+      setCreateForm(emptyForm);
       qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const updateEvent = useMutation({
+    mutationFn: async () => {
+      if (!editingId) throw new Error("Sem evento selecionado");
+      if (!editForm.title.trim() || !editForm.date) throw new Error("Preencha título e data");
+      const { error } = await supabase.from("profile_events").update({
+        title: editForm.title.trim(),
+        category: editForm.category.trim() || null,
+        event_date: format(editForm.date, "yyyy-MM-dd"),
+        product_id: editForm.productId || null,
+      }).eq("id", editingId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setEditingId(null);
+      qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
+      toast.success("Evento atualizado");
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -158,8 +274,8 @@ function EventosPage() {
             <Calendar
               mode="single"
               numberOfMonths={2}
-              selected={eventDate}
-              onSelect={setEventDate}
+              selected={createForm.date}
+              onSelect={(d) => setCreateForm((f) => ({ ...f, date: d }))}
               month={calendarMonth}
               onMonthChange={setCalendarMonth}
               modifiers={{ hasEvent: eventDates }}
@@ -183,143 +299,23 @@ function EventosPage() {
         </div>
 
         <div className="flex h-full flex-col rounded-2xl border border-border bg-white p-4">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg">{editingId ? "Editar evento" : "Cadastrar evento"}</h2>
-            {editingId && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                aria-label="Cancelar edição"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
+          <h2 className="text-lg">Cadastrar evento</h2>
+          <div className="mt-3">
+            <EventForm
+              values={createForm}
+              onChange={setCreateForm}
+              favorites={favorites}
+              onSubmit={() => addEvent.mutate()}
+              submitting={addEvent.isPending}
+              submitLabel="Adicionar evento"
+              submitIcon={<Plus className="mr-2 h-4 w-4" />}
+            />
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {eventDate
-              ? `Data selecionada: ${format(eventDate, "PPP", { locale: ptBR })}`
-              : "Selecione uma data no calendário ao lado."}
-          </p>
-
-          <div className="mt-3 grid gap-2.5">
-            <div className="grid gap-1">
-              <Label htmlFor="event-title" className="text-xs">Nome do evento</Label>
-              <Input id="event-title" className="h-8 text-sm" placeholder="Ex.: Casamento da Ana" value={eventTitle}
-                onChange={(e) => setEventTitle(e.target.value)} />
-            </div>
-            <div className="grid gap-1">
-              <Label className="text-xs">Categoria</Label>
-              <Select
-                value={customCategoryOpen ? "Outro" : (EVENT_CATEGORIES.includes(eventCategory) ? eventCategory : "")}
-                onValueChange={(v) => {
-                  if (v === "Outro") {
-                    setCustomCategoryOpen(true);
-                    setEventCategory("");
-                  } else {
-                    setCustomCategoryOpen(false);
-                    setEventCategory(v);
-                  }
-                }}
-              >
-                <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  {EVENT_CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {customCategoryOpen && (
-                <Input
-                  className="h-8 text-sm"
-                  placeholder="Descreva a categoria"
-                  value={eventCategory}
-                  onChange={(e) => setEventCategory(e.target.value)}
-                />
-              )}
-            </div>
-
-            <div className="grid gap-1">
-              <Label className="text-xs">Vestido escolhido <span className="text-[10px] text-muted-foreground">(opcional)</span></Label>
-              {favorites.length === 0 ? (
-                <p className="text-[11px] text-muted-foreground">
-                  Você ainda não tem favoritos.
-                </p>
-              ) : (
-                <Carousel opts={{ align: "start", dragFree: true }} className="relative">
-                  <div className="mb-1 flex justify-end gap-1">
-                    <CarouselPrevious
-                      type="button"
-                      className="static translate-x-0 translate-y-0 h-6 w-6"
-                    />
-                    <CarouselNext
-                      type="button"
-                      className="static translate-x-0 translate-y-0 h-6 w-6"
-                    />
-                  </div>
-                  <CarouselContent className="-ml-2">
-                    <CarouselItem className="pl-2 basis-auto">
-                      <button
-                        type="button"
-                        onClick={() => setEventProductId("")}
-                        className={cn(
-                          "flex h-[80px] w-[68px] items-center justify-center rounded-xl border text-[11px] transition",
-                          eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
-                        )}
-                      >
-                        Nenhum
-                      </button>
-                    </CarouselItem>
-                    {favorites.map((f: any) => {
-                      const p = f.products;
-                      const img = p.image_url || p.images?.[0];
-                      const selected = eventProductId === p.id;
-                      return (
-                        <CarouselItem key={p.id} className="pl-2 basis-auto">
-                          <button
-                            type="button"
-                            onClick={() => setEventProductId(p.id)}
-                            className="group flex w-[68px] flex-col gap-1 text-left transition"
-                            title={p.name}
-                          >
-                            <div className={cn(
-                              "relative h-[68px] w-[68px] overflow-hidden rounded-xl border",
-                              selected ? "border-primary ring-2 ring-primary/40" : "border-border group-hover:border-foreground/40"
-                            )}>
-                              {img ? (
-                                <img src={img} alt={p.name} className="h-full w-full object-cover" />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center bg-muted text-[10px] text-muted-foreground px-1 text-center">
-                                  {p.name}
-                                </div>
-                              )}
-                            </div>
-                            <span className="text-[10px] font-medium truncate">{p.name}</span>
-                          </button>
-                        </CarouselItem>
-                      );
-                    })}
-                  </CarouselContent>
-                </Carousel>
-              )}
-            </div>
-            {editingId ? (
-              <Button type="button" size="sm" onClick={() => updateEvent.mutate()} disabled={updateEvent.isPending}>
-                <Pencil className="mr-2 h-4 w-4" /> Salvar alterações
-              </Button>
-            ) : (
-              <Button type="button" size="sm" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
-                <Plus className="mr-2 h-4 w-4" /> Adicionar evento
-              </Button>
-            )}
-          </div>
-
         </div>
       </div>
 
-
       <div className="mt-6 rounded-2xl border border-border bg-white p-6">
-        <h2 className="text-xl">Eventos marcados</h2>
+        <h2 className="text-xl">Próximos eventos</h2>
         {events.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">Nenhum evento marcado ainda.</p>
         ) : (
@@ -358,7 +354,23 @@ function EventosPage() {
           </ul>
         )}
       </div>
+
+      <Dialog open={!!editingId} onOpenChange={(open) => { if (!open) setEditingId(null); }}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle>Cadastrar evento</DialogTitle>
+          </DialogHeader>
+          <EventForm
+            values={editForm}
+            onChange={setEditForm}
+            favorites={favorites}
+            onSubmit={() => updateEvent.mutate()}
+            submitting={updateEvent.isPending}
+            submitLabel="Salvar alterações"
+            submitIcon={<Pencil className="mr-2 h-4 w-4" />}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
-
