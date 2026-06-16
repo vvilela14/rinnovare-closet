@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/catalogo")({
   head: () => ({ meta: [{ title: "Catálogo — Admin Rinnovare" }] }),
@@ -13,6 +14,43 @@ export const Route = createFileRoute("/_authenticated/admin/catalogo")({
 const SIZE_OPTIONS = ["34-36", "36-38", "38-40", "40-42", "42-44", "44-46", "46-48"];
 const INSTALLMENT_OPTIONS = [1, 2, 3, 4, 5, 6];
 const MAX_PHOTOS = 6;
+
+const CATEGORY_OPTIONS = [
+  "Casamento à noite",
+  "Casamento na praia",
+  "Casamento no campo",
+  "Festa de formatura",
+  "Aniversário",
+  "Noiva",
+  "Outro",
+];
+
+const COLOR_PALETTE: { name: string; hex: string; border?: boolean }[] = [
+  { name: "Amarelo", hex: "#FFF24D" },
+  { name: "Azul", hex: "#2A1FE0" },
+  { name: "Azul claro", hex: "#7EC8E3" },
+  { name: "Azul marinho", hex: "#0B1F4D" },
+  { name: "Bege", hex: "#D2B48C" },
+  { name: "Branco", hex: "#FFFFFF", border: true },
+  { name: "Cinza", hex: "#8A8A8A" },
+  { name: "Dourado", hex: "#D4AF37" },
+  { name: "Laranja", hex: "#F97316" },
+  { name: "Lilás", hex: "#C8A2C8" },
+  { name: "Marrom", hex: "#7B3F00" },
+  { name: "Multicor", hex: "conic-gradient(from 0deg, #ec4899, #3b82f6, #f59e0b, #10b981, #ec4899)" },
+  { name: "Nude", hex: "#E6BFA5" },
+  { name: "Off white", hex: "#F5F1E6", border: true },
+  { name: "Prata", hex: "#C0C0C0" },
+  { name: "Preto", hex: "#000000" },
+  { name: "Rosa", hex: "#F4A6C0" },
+  { name: "Rosa choque", hex: "#E91E63" },
+  { name: "Roxo", hex: "#6B21A8" },
+  { name: "Verde", hex: "#16A34A" },
+  { name: "Verde esmeralda", hex: "#047857" },
+  { name: "Verde menta", hex: "#A8E6CF" },
+  { name: "Vermelho", hex: "#DC2626" },
+  { name: "Vinho", hex: "#7B1E2B" },
+];
 
 type ProductRow = {
   id: string;
