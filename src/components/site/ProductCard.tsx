@@ -15,9 +15,10 @@ export type Product = {
   payment_terms: string;
   image_url: string | null;
   category: string | null;
+  color?: string | null;
 };
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, isReserved = false }: { product: Product; isReserved?: boolean }) {
   const { user } = useAuth();
   const qc = useQueryClient();
 
@@ -87,6 +88,11 @@ export function ProductCard({ product }: { product: Product }) {
           />
         ) : (
           <div className="h-full w-full" />
+        )}
+        {isReserved && (
+          <span className="absolute left-3 top-3 rounded-full bg-[#260d58] px-3 py-1 text-[10px] uppercase tracking-widest text-white">
+            Reservado
+          </span>
         )}
         <button
           type="button"
