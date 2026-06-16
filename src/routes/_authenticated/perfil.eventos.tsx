@@ -113,7 +113,7 @@ function EventosPage() {
         Marque ocasiões para receber sugestões na medida.
       </p>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-[1fr_380px] md:items-start">
+      <div className="mt-8 grid gap-6 md:grid-cols-[1fr_380px] md:items-stretch">
         <div className="rounded-2xl border border-border bg-white p-6">
           <h2 className="text-xl">Calendário</h2>
           <p className="mt-1 text-sm text-muted-foreground">
