@@ -85,11 +85,15 @@ export type Database = {
           id: string
           image_url: string | null
           images: string[]
+          installments: number | null
           is_active: boolean
           name: string
           parent_product_id: string | null
           payment_terms: string
           price: number
+          price_12_days: number | null
+          price_4_days: number | null
+          price_7_days: number | null
           size: string
           updated_at: string
         }
@@ -102,11 +106,15 @@ export type Database = {
           id?: string
           image_url?: string | null
           images?: string[]
+          installments?: number | null
           is_active?: boolean
           name: string
           parent_product_id?: string | null
           payment_terms?: string
           price: number
+          price_12_days?: number | null
+          price_4_days?: number | null
+          price_7_days?: number | null
           size: string
           updated_at?: string
         }
@@ -119,11 +127,15 @@ export type Database = {
           id?: string
           image_url?: string | null
           images?: string[]
+          installments?: number | null
           is_active?: boolean
           name?: string
           parent_product_id?: string | null
           payment_terms?: string
           price?: number
+          price_12_days?: number | null
+          price_4_days?: number | null
+          price_7_days?: number | null
           size?: string
           updated_at?: string
         }
