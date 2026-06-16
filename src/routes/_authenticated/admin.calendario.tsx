@@ -169,6 +169,15 @@ function AdminCalendario() {
                     {d.getDate()}
                   </div>
                 </div>
+                {dayRentals.length > 0 && (
+                  <div className="mt-2 space-y-0.5">
+                    {dayRentals.map((r: any) => (
+                      <div key={r.id} className="truncate rounded bg-[#260d58] px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-white" title={`${r.product?.name ?? ""} — ${r.profile?.full_name ?? ""}`}>
+                        Vestido Alugado
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {dayEvents.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {dayEvents.map((ev) => (
