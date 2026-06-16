@@ -114,11 +114,13 @@ function EventosPage() {
       </p>
 
       <div className="mt-8 grid gap-6 md:grid-cols-[320px,1fr] md:items-start">
-        <div className="rounded-2xl border border-border bg-white p-6">
-          <h2 className="text-xl">Cadastrar evento</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-border bg-white p-4">
+          <h2 className="text-lg">Cadastrar evento</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
             Marque um novo evento na sua agenda.
           </p>
+
+
 
           <div className="mt-4 grid gap-3">
             <div className="grid gap-2">
