@@ -46,19 +46,35 @@ type EventFormProps = {
   submitting: boolean;
   submitLabel: string;
   submitIcon: React.ReactNode;
+  showCalendar?: boolean;
 };
 
-function EventForm({ values, onChange, favorites, onSubmit, submitting, submitLabel, submitIcon }: EventFormProps) {
+function EventForm({ values, onChange, favorites, onSubmit, submitting, submitLabel, submitIcon, showCalendar }: EventFormProps) {
   const customCategoryOpen = !!values.category && !EVENT_CATEGORIES.includes(values.category);
   const set = (patch: Partial<EventFormValues>) => onChange({ ...values, ...patch });
 
   return (
     <div className="grid gap-2.5">
-      <p className="text-xs text-muted-foreground">
-        {values.date
-          ? `Data selecionada: ${format(values.date, "PPP", { locale: ptBR })}`
-          : "Selecione uma data no calendário."}
-      </p>
+      {showCalendar ? (
+        <div className="grid gap-1">
+          <Label className="text-xs">Data do evento</Label>
+          <div className="rounded-lg border border-border">
+            <Calendar
+              mode="single"
+              selected={values.date}
+              onSelect={(d) => set({ date: d })}
+              locale={ptBR}
+              className="p-2 pointer-events-auto"
+            />
+          </div>
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          {values.date
+            ? `Data selecionada: ${format(values.date, "PPP", { locale: ptBR })}`
+            : "Selecione uma data no calendário."}
+        </p>
+      )}
 
       <div className="grid gap-1">
         <Label htmlFor="event-title" className="text-xs">Nome do evento</Label>
