@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { format, isSameDay, startOfMonth, endOfMonth, addMonths, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Popover,
@@ -71,16 +71,24 @@ function AdminCalendario() {
       const to = format(endOfMonth(cursor), "yyyy-MM-dd");
       const { data } = await supabase
         .from("rental_requests")
-        .select("id, start_date, end_date, user_id, status, product:products(name)")
+        .select("id, start_date, end_date, user_id, product_id, status, total_value, product:products(name)")
         .in("status", ["pending", "confirmed"])
         .lte("start_date", to)
         .gte("end_date", from);
       const list = (data ?? []) as any[];
       const ids = Array.from(new Set(list.map((r) => r.user_id)));
       if (ids.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
-        const map = new Map((profs ?? []).map((p: any) => [p.id, p]));
-        list.forEach((r) => { r.profile = map.get(r.user_id) ?? null; });
+        const [{ data: profs }, { data: evs }] = await Promise.all([
+          supabase.from("profiles").select("id, full_name, whatsapp").in("id", ids),
+          supabase.from("profile_events").select("user_id, product_id, event_date").in("user_id", ids),
+        ]);
+        const pMap = new Map((profs ?? []).map((p: any) => [p.id, p]));
+        const eMap = new Map<string, string>();
+        (evs ?? []).forEach((e: any) => { if (e.product_id) eMap.set(`${e.user_id}:${e.product_id}`, e.event_date); });
+        list.forEach((r) => {
+          r.profile = pMap.get(r.user_id) ?? null;
+          r.event_date = eMap.get(`${r.user_id}:${r.product_id}`) ?? null;
+        });
       }
       return list;
     },
@@ -206,16 +214,60 @@ function AdminCalendario() {
                   <div className="mt-2 space-y-0.5">
                     {dayRentals.map((r: any) => {
                       const isPending = r.status === "pending";
+                      const wa = (() => {
+                        const digits = (r.profile?.whatsapp ?? "").replace(/\D/g, "");
+                        if (!digits) return null;
+                        return `https://wa.me/${digits.startsWith("55") ? digits : `55${digits}`}`;
+                      })();
                       return (
-                        <div
-                          key={r.id}
-                          className={`truncate rounded px-1.5 py-0.5 text-[9px] uppercase tracking-wider ${
-                            isPending ? "bg-amber-400 text-amber-950" : "bg-[#260d58] text-white"
-                          }`}
-                          title={`${r.product?.name ?? ""} — ${r.profile?.full_name ?? ""}`}
-                        >
-                          {isPending ? "Vestido Reservado" : "Vestido Alugado"}
-                        </div>
+                        <Popover key={r.id}>
+                          <PopoverTrigger asChild>
+                            <button
+                              className={`block w-full truncate rounded px-1.5 py-0.5 text-left text-[9px] uppercase tracking-wider transition hover:opacity-80 ${
+                                isPending ? "bg-amber-400 text-amber-950" : "bg-[#260d58] text-white"
+                              }`}
+                            >
+                              {isPending ? "Vestido Reservado" : "Vestido Alugado"}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-64" align="start">
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                              {isPending ? "Vestido Reservado" : "Locação Confirmada"}
+                            </div>
+                            <div className="mt-1 text-sm font-medium">{r.profile?.full_name ?? "Cliente"}</div>
+                            <div className="mt-0.5 text-xs text-muted-foreground">{r.product?.name ?? "—"}</div>
+                            <div className="mt-3 space-y-2 text-sm">
+                              <div>
+                                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Data do evento</div>
+                                <div>
+                                  {r.event_date
+                                    ? format(new Date(r.event_date + "T00:00:00"), "PPP", { locale: ptBR })
+                                    : "—"}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Valor</div>
+                                <div>R$ {Number(r.total_value ?? 0).toFixed(2).replace(".", ",")}</div>
+                              </div>
+                            </div>
+                            <div className="mt-3 flex justify-end">
+                              {wa ? (
+                                <a
+                                  href={wa}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white hover:bg-green-600 transition"
+                                  aria-label="Abrir WhatsApp"
+                                  title="Enviar mensagem via WhatsApp"
+                                >
+                                  <MessageCircle className="h-4 w-4" />
+                                </a>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">Sem WhatsApp</span>
+                              )}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       );
                     })}
                   </div>
