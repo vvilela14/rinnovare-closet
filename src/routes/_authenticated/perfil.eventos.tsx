@@ -340,11 +340,18 @@ function EventosPage() {
                       {p && <div className="text-xs text-muted-foreground mt-0.5 truncate">Vestido: {p.name}</div>}
                     </div>
                   </div>
-                  <button onClick={() => removeEvent.mutate(ev.id)}
-                    className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground flex-shrink-0"
-                    aria-label="Remover">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => startEdit(ev)}
+                      className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      aria-label="Editar">
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => removeEvent.mutate(ev.id)}
+                      className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      aria-label="Remover">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </li>
               );
             })}
