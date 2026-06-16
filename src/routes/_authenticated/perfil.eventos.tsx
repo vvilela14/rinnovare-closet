@@ -155,14 +155,14 @@ function EventosPage() {
               : "Selecione uma data no calendário ao lado."}
           </p>
 
-          <div className="mt-4 grid gap-3">
-            <div className="grid gap-2">
-              <Label htmlFor="event-title">Nome do evento</Label>
-              <Input id="event-title" placeholder="Ex.: Casamento da Ana" value={eventTitle}
+          <div className="mt-3 grid gap-2.5">
+            <div className="grid gap-1">
+              <Label htmlFor="event-title" className="text-xs">Nome do evento</Label>
+              <Input id="event-title" className="h-8 text-sm" placeholder="Ex.: Casamento da Ana" value={eventTitle}
                 onChange={(e) => setEventTitle(e.target.value)} />
             </div>
-            <div className="grid gap-2">
-              <Label>Categoria</Label>
+            <div className="grid gap-1">
+              <Label className="text-xs">Categoria</Label>
               <Select
                 value={customCategoryOpen ? "Outro" : (EVENT_CATEGORIES.includes(eventCategory) ? eventCategory : "")}
                 onValueChange={(v) => {
@@ -175,7 +175,7 @@ function EventosPage() {
                   }
                 }}
               >
-                <SelectTrigger><SelectValue placeholder="Selecione a categoria" /></SelectTrigger>
+                <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   {EVENT_CATEGORIES.map((c) => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -184,12 +184,14 @@ function EventosPage() {
               </Select>
               {customCategoryOpen && (
                 <Input
+                  className="h-8 text-sm"
                   placeholder="Descreva a categoria"
                   value={eventCategory}
                   onChange={(e) => setEventCategory(e.target.value)}
                 />
               )}
             </div>
+
             <div className="grid gap-2">
               <Label>Vestido escolhido <span className="text-xs text-muted-foreground">(opcional)</span></Label>
               {favorites.length === 0 ? (
