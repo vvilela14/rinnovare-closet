@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
+
+function waLink(raw?: string | null) {
+  if (!raw) return null;
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return null;
+  const full = digits.startsWith("55") ? digits : `55${digits}`;
+  return `https://wa.me/${full}`;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/favoritos")({
   head: () => ({ meta: [{ title: "Favoritos — Admin Rinnovare" }] }),
