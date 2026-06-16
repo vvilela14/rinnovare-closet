@@ -96,9 +96,20 @@ function AdminCalendario() {
     return map;
   }, [events]);
 
+  const [statusFilter, setStatusFilter] = useState<"all" | "saved" | "reserved" | "confirmed">("all");
+
+  const filteredRentals = useMemo(() => {
+    return (rentalsAll as any[]).filter((r) => {
+      if (statusFilter === "all") return true;
+      if (statusFilter === "reserved") return r.status === "pending";
+      if (statusFilter === "confirmed") return r.status === "confirmed";
+      return false;
+    });
+  }, [rentalsAll, statusFilter]);
+
   const rentalsByDay = useMemo(() => {
     const map = new Map<string, any[]>();
-    for (const r of confirmedRentals) {
+    for (const r of filteredRentals) {
       const start = new Date(r.start_date + "T00:00:00");
       const end = new Date(r.end_date + "T00:00:00");
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
@@ -108,7 +119,9 @@ function AdminCalendario() {
       }
     }
     return map;
-  }, [confirmedRentals]);
+  }, [filteredRentals]);
+
+  const showEvents = statusFilter === "all" || statusFilter === "saved";
 
 
   // Build month grid (weeks of 7)
