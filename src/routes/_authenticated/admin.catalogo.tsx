@@ -377,8 +377,8 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
           <AdminField label="Nome" className="sm:col-span-2">
             <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="admin-input" />
           </AdminField>
-          <AdminField label="Cor">
-            <input value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="admin-input" placeholder="Lilás, Preto, Vinho..." />
+          <AdminField label="Cor" className="sm:col-span-2">
+            <ColorPalettePicker value={form.color} onChange={(v) => setForm({ ...form, color: v })} />
           </AdminField>
           <AdminField label="Tamanho">
             <select
