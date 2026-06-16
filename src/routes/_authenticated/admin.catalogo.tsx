@@ -539,58 +539,76 @@ function AdminField({ label, children, className = "" }: { label: string; childr
   );
 }
 
-function CategorySelect({
-  catalog,
-  value,
-  onChange,
-}: {
-  catalog: ProductRow[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  const options = Array.from(
-    new Set(catalog.map((p) => (p.category ?? "").trim()).filter(Boolean))
-  ).sort((a, b) => a.localeCompare(b, "pt-BR"));
+function CategoryPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const isCustom = value !== "" && !CATEGORY_OPTIONS.filter((c) => c !== "Outro").includes(value);
+  const [mode, setMode] = useState<"preset" | "outro">(isCustom ? "outro" : "preset");
+  const selectValue = mode === "outro" ? "Outro" : value;
 
-  const isNew = value !== "" && !options.includes(value);
-  const [mode, setMode] = useState<"select" | "new">(isNew ? "new" : "select");
-
-  if (mode === "new") {
-    return (
-      <div className="flex gap-2">
+  return (
+    <div className="space-y-2">
+      <select
+        value={selectValue}
+        onChange={(e) => {
+          const v = e.target.value;
+          if (v === "Outro") {
+            setMode("outro");
+            onChange("");
+          } else {
+            setMode("preset");
+            onChange(v);
+          }
+        }}
+        className="admin-input"
+        required
+      >
+        <option value="">— Selecione uma categoria —</option>
+        {CATEGORY_OPTIONS.map((c) => (
+          <option key={c} value={c}>{c}</option>
+        ))}
+      </select>
+      {mode === "outro" && (
         <input
           autoFocus
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="admin-input"
-          placeholder="Nome da nova categoria"
+          placeholder="Descreva a categoria"
+          required
         />
-        <button
-          type="button"
-          onClick={() => { onChange(""); setMode("select"); }}
-          className="rounded-full border border-border px-3 text-[11px] uppercase tracking-widest hover:bg-muted"
-        >
-          Cancelar
-        </button>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
+}
 
+function ColorPalettePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <select
-      value={value}
-      onChange={(e) => {
-        const v = e.target.value;
-        if (v === "__new__") { onChange(""); setMode("new"); return; }
-        onChange(v);
-      }}
-      className="admin-input"
-    >
-      <option value="">— Selecione uma categoria —</option>
-      {options.map((c) => (
-        <option key={c} value={c}>{c}</option>
-      ))}
-      <option value="__new__">+ Criar nova categoria…</option>
-    </select>
+    <div className="flex flex-wrap gap-3 pt-1">
+      {COLOR_PALETTE.map((c) => {
+        const selected = value === c.name;
+        const isGradient = c.hex.startsWith("conic") || c.hex.startsWith("linear");
+        return (
+          <button
+            key={c.name}
+            type="button"
+            onClick={() => onChange(selected ? "" : c.name)}
+            className="flex flex-col items-center gap-1 group"
+            aria-pressed={selected}
+            title={c.name}
+          >
+            <span
+              className={cn(
+                "h-9 w-9 rounded-full border-2 transition",
+                selected ? "border-primary ring-2 ring-primary/30" : "border-border group-hover:border-foreground/40",
+                c.border && !selected && "border-border"
+              )}
+              style={isGradient ? { backgroundImage: c.hex } : { backgroundColor: c.hex }}
+            />
+            <span className={cn("text-[10px]", selected ? "text-foreground font-medium" : "text-muted-foreground")}>
+              {c.name}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
