@@ -72,13 +72,20 @@ function AdminLocacoes() {
     },
   });
 
-  const confirmRental = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("rental_requests").update({ status: "confirmed" }).eq("id", id);
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("rental_requests").update({ status }).eq("id", id);
       if (error) throw error;
+      return status;
     },
-    onSuccess: () => {
-      toast.success("Locação confirmada!");
+    onSuccess: (status) => {
+      toast.success(
+        status === "confirmed"
+          ? "Locação confirmada!"
+          : status === "returned"
+          ? "Devolução registrada!"
+          : "Status atualizado."
+      );
       qc.invalidateQueries({ queryKey: ["admin-rentals"] });
       qc.invalidateQueries({ queryKey: ["admin-pending-rentals"] });
       qc.invalidateQueries({ queryKey: ["admin-pending-rentals-fallback"] });
@@ -86,7 +93,7 @@ function AdminLocacoes() {
       qc.invalidateQueries({ queryKey: ["admin-calendar-rentals"] });
       qc.invalidateQueries({ queryKey: ["confirmed-rentals"] });
     },
-    onError: () => toast.error("Não foi possível confirmar a locação."),
+    onError: () => toast.error("Não foi possível atualizar o status."),
   });
 
   const filtered = useMemo(() => {
