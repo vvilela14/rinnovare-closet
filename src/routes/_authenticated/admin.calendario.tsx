@@ -64,6 +64,28 @@ function AdminCalendario() {
     },
   });
 
+  const { data: confirmedRentals = [] } = useQuery({
+    queryKey: ["admin-calendar-rentals", cursor.toISOString().slice(0, 7)],
+    queryFn: async () => {
+      const from = format(startOfMonth(cursor), "yyyy-MM-dd");
+      const to = format(endOfMonth(cursor), "yyyy-MM-dd");
+      const { data } = await supabase
+        .from("rental_requests")
+        .select("id, start_date, end_date, user_id, product:products(name)")
+        .eq("status", "confirmed")
+        .lte("start_date", to)
+        .gte("end_date", from);
+      const list = (data ?? []) as any[];
+      const ids = Array.from(new Set(list.map((r) => r.user_id)));
+      if (ids.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
+        const map = new Map((profs ?? []).map((p: any) => [p.id, p]));
+        list.forEach((r) => { r.profile = map.get(r.user_id) ?? null; });
+      }
+      return list;
+    },
+  });
+
   const eventsByDay = useMemo(() => {
     const map = new Map<string, EventRow[]>();
     for (const e of events) {
@@ -73,6 +95,21 @@ function AdminCalendario() {
     }
     return map;
   }, [events]);
+
+  const rentalsByDay = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const r of confirmedRentals) {
+      const start = new Date(r.start_date + "T00:00:00");
+      const end = new Date(r.end_date + "T00:00:00");
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const key = format(d, "yyyy-MM-dd");
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(r);
+      }
+    }
+    return map;
+  }, [confirmedRentals]);
+
 
   // Build month grid (weeks of 7)
   const monthStart = startOfMonth(cursor);
