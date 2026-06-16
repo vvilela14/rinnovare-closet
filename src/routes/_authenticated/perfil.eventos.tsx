@@ -147,7 +147,7 @@ function EventosPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-white p-4">
+        <div className="flex h-full flex-col rounded-2xl border border-border bg-white p-4">
           <h2 className="text-lg">Cadastrar evento</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             {eventDate
