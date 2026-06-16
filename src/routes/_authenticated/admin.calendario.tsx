@@ -71,16 +71,24 @@ function AdminCalendario() {
       const to = format(endOfMonth(cursor), "yyyy-MM-dd");
       const { data } = await supabase
         .from("rental_requests")
-        .select("id, start_date, end_date, user_id, status, product:products(name)")
+        .select("id, start_date, end_date, user_id, product_id, status, total_value, product:products(name)")
         .in("status", ["pending", "confirmed"])
         .lte("start_date", to)
         .gte("end_date", from);
       const list = (data ?? []) as any[];
       const ids = Array.from(new Set(list.map((r) => r.user_id)));
       if (ids.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
-        const map = new Map((profs ?? []).map((p: any) => [p.id, p]));
-        list.forEach((r) => { r.profile = map.get(r.user_id) ?? null; });
+        const [{ data: profs }, { data: evs }] = await Promise.all([
+          supabase.from("profiles").select("id, full_name, whatsapp").in("id", ids),
+          supabase.from("profile_events").select("user_id, product_id, event_date").in("user_id", ids),
+        ]);
+        const pMap = new Map((profs ?? []).map((p: any) => [p.id, p]));
+        const eMap = new Map<string, string>();
+        (evs ?? []).forEach((e: any) => { if (e.product_id) eMap.set(`${e.user_id}:${e.product_id}`, e.event_date); });
+        list.forEach((r) => {
+          r.profile = pMap.get(r.user_id) ?? null;
+          r.event_date = eMap.get(`${r.user_id}:${r.product_id}`) ?? null;
+        });
       }
       return list;
     },
