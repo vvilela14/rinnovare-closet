@@ -80,6 +80,23 @@ function AdminFavoritos() {
                   <td className="px-5 py-3">R$ {Number(row.products?.price ?? 0).toFixed(2).replace(".", ",")}</td>
                   <td className="px-5 py-3">{row.full_name || <span className="font-mono text-xs text-muted-foreground">{String(row.user_id).slice(0, 8)}…</span>}</td>
                   <td className="px-5 py-3 text-muted-foreground">{new Date(row.created_at).toLocaleString("pt-BR")}</td>
+                  <td className="px-5 py-3 text-muted-foreground">{new Date(row.created_at).toLocaleString("pt-BR")}</td>
+                  <td className="px-5 py-3 text-center">
+                    {waLink(row.whatsapp) ? (
+                      <a
+                        href={waLink(row.whatsapp)!}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white hover:bg-green-600 transition"
+                        aria-label="Abrir WhatsApp"
+                        title="Enviar mensagem via WhatsApp"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
