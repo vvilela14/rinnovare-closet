@@ -265,7 +265,7 @@ function EventosPage() {
       </div>
 
 
-      <div className="mt-6 rounded-2xl border border-border bg-white p-6">
+      <div className="mt-6 ml-auto w-full md:w-[380px] rounded-2xl border border-border bg-white p-6">
         <h2 className="text-xl">Eventos marcados</h2>
         {events.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">Nenhum evento marcado ainda.</p>
