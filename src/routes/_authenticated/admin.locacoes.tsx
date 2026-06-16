@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Check, Clock, Search, MessageCircle } from "lucide-react";
+import { Check, Clock, Search, MessageCircle, PackageCheck, Undo2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
@@ -72,13 +72,20 @@ function AdminLocacoes() {
     },
   });
 
-  const confirmRental = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("rental_requests").update({ status: "confirmed" }).eq("id", id);
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("rental_requests").update({ status }).eq("id", id);
       if (error) throw error;
+      return status;
     },
-    onSuccess: () => {
-      toast.success("Locação confirmada!");
+    onSuccess: (status) => {
+      toast.success(
+        status === "confirmed"
+          ? "Locação confirmada!"
+          : status === "returned"
+          ? "Devolução registrada!"
+          : "Status atualizado."
+      );
       qc.invalidateQueries({ queryKey: ["admin-rentals"] });
       qc.invalidateQueries({ queryKey: ["admin-pending-rentals"] });
       qc.invalidateQueries({ queryKey: ["admin-pending-rentals-fallback"] });
@@ -86,7 +93,7 @@ function AdminLocacoes() {
       qc.invalidateQueries({ queryKey: ["admin-calendar-rentals"] });
       qc.invalidateQueries({ queryKey: ["confirmed-rentals"] });
     },
-    onError: () => toast.error("Não foi possível confirmar a locação."),
+    onError: () => toast.error("Não foi possível atualizar o status."),
   });
 
   const filtered = useMemo(() => {
@@ -166,8 +173,25 @@ function AdminLocacoes() {
                 <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">Nenhuma locação encontrada.</td></tr>
               )}
               {filtered.map((r) => {
-                const isConfirmed = r.status === "confirmed";
                 const wa = waLink(r.profile?.whatsapp);
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                const refDateStr = r.event_date ?? r.end_date;
+                const refDate = new Date(refDateStr + "T00:00:00");
+                const eventPassed = refDate.getTime() <= today.getTime();
+
+                let stage: "pending" | "confirmed" | "awaiting_return" | "returned";
+                if (r.status === "returned") stage = "returned";
+                else if (r.status === "pending") stage = "pending";
+                else stage = eventPassed ? "awaiting_return" : "confirmed";
+
+                const btn = {
+                  pending: { label: "Aguardando Confirmação", icon: Clock, cls: "bg-green-600 hover:bg-green-700", next: "confirmed" as const, clickable: true },
+                  confirmed: { label: "Locação confirmada", icon: Check, cls: "bg-[#260d58] cursor-default", next: null, clickable: false },
+                  awaiting_return: { label: "Aguardando Devolução", icon: Undo2, cls: "bg-amber-500 hover:bg-amber-600", next: "returned" as const, clickable: true },
+                  returned: { label: "Devolução Realizada", icon: PackageCheck, cls: "bg-slate-500 cursor-default", next: null, clickable: false },
+                }[stage];
+                const Icon = btn.icon;
+
                 return (
                   <tr key={r.id}>
                     <td className="px-4 py-3">{r.profile?.full_name ?? "Cliente"}</td>
@@ -187,16 +211,12 @@ function AdminLocacoes() {
                     <td className="px-4 py-3">R$ {Number(r.total_value).toFixed(2).replace(".", ",")}</td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => !isConfirmed && confirmRental.mutate(r.id)}
-                        disabled={isConfirmed || confirmRental.isPending}
-                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] uppercase tracking-widest text-white transition ${
-                          isConfirmed
-                            ? "bg-[#260d58] cursor-default"
-                            : "bg-green-600 hover:bg-green-700"
-                        }`}
+                        onClick={() => btn.clickable && btn.next && updateStatus.mutate({ id: r.id, status: btn.next })}
+                        disabled={!btn.clickable || updateStatus.isPending}
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] uppercase tracking-widest text-white transition ${btn.cls}`}
                       >
-                        {isConfirmed ? <Check className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                        {isConfirmed ? "Locação confirmada" : "Aguardando Confirmação"}
+                        <Icon className="h-3 w-3" />
+                        {btn.label}
                       </button>
                     </td>
                     <td className="px-4 py-3 text-center">
