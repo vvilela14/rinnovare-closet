@@ -199,7 +199,17 @@ function EventosPage() {
                   Você ainda não tem favoritos.
                 </p>
               ) : (
-                <Carousel opts={{ align: "start", dragFree: true }} className="px-8">
+                <Carousel opts={{ align: "start", dragFree: true }} className="relative">
+                  <div className="mb-1 flex justify-end gap-1">
+                    <CarouselPrevious
+                      type="button"
+                      className="static translate-x-0 translate-y-0 h-6 w-6"
+                    />
+                    <CarouselNext
+                      type="button"
+                      className="static translate-x-0 translate-y-0 h-6 w-6"
+                    />
+                  </div>
                   <CarouselContent className="-ml-2">
                     <CarouselItem className="pl-2 basis-auto">
                       <button
@@ -243,8 +253,6 @@ function EventosPage() {
                       );
                     })}
                   </CarouselContent>
-                  <CarouselPrevious type="button" className="h-6 w-6" />
-                  <CarouselNext type="button" className="h-6 w-6" />
                 </Carousel>
               )}
             </div>
