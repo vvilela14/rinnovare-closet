@@ -55,11 +55,12 @@ function AdminFavoritos() {
                 <th className="px-5 py-3">Valor</th>
                 <th className="px-5 py-3">Cliente</th>
                 <th className="px-5 py-3">Salvo em</th>
+                <th className="px-5 py-3 text-center">Contato</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {data.length === 0 && (
-                <tr><td colSpan={5} className="px-5 py-16 text-center text-muted-foreground">
+                <tr><td colSpan={6} className="px-5 py-16 text-center text-muted-foreground">
                   <Heart className="mx-auto mb-3 h-6 w-6 opacity-40" />
                   Nenhum favorito salvo ainda.
                 </td></tr>
