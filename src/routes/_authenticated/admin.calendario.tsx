@@ -147,6 +147,26 @@ function AdminCalendario() {
         Veja em quais dias as clientes marcaram ocasiões importantes.
       </p>
 
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground mr-2">Status:</span>
+        {([
+          { id: "all", label: "Todos", cls: "bg-foreground text-white" },
+          { id: "saved", label: "Evento Salvo", cls: "bg-[#be9ffc] text-[#260d58]" },
+          { id: "reserved", label: "Vestido Reservado", cls: "bg-amber-400 text-amber-950" },
+          { id: "confirmed", label: "Locação Confirmada", cls: "bg-[#260d58] text-white" },
+        ] as const).map((s) => (
+          <button
+            key={s.id}
+            onClick={() => setStatusFilter(s.id as any)}
+            className={`rounded-full px-3 py-1 text-[11px] uppercase tracking-widest transition ${
+              statusFilter === s.id ? s.cls : "bg-muted text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       <div className="mt-8 rounded-2xl border border-border bg-white p-6">
         <div className="flex items-center justify-between">
           <Button variant="ghost" size="icon" onClick={() => setCursor(subMonths(cursor, 1))}>
