@@ -27,15 +27,15 @@ function AdminFavoritos() {
       const rows = favs ?? [];
 
       const userIds = Array.from(new Set(rows.map((r: any) => r.user_id)));
-      let profiles: Record<string, string | null> = {};
+      let profiles: Record<string, { full_name: string | null; whatsapp: string | null }> = {};
       if (userIds.length > 0) {
         const { data: profs } = await supabase
           .from("profiles")
-          .select("id, full_name")
+          .select("id, full_name, whatsapp")
           .in("id", userIds);
-        profiles = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.full_name]));
+        profiles = Object.fromEntries((profs ?? []).map((p: any) => [p.id, { full_name: p.full_name, whatsapp: p.whatsapp }]));
       }
-      return rows.map((r: any) => ({ ...r, full_name: profiles[r.user_id] ?? null }));
+      return rows.map((r: any) => ({ ...r, full_name: profiles[r.user_id]?.full_name ?? null, whatsapp: profiles[r.user_id]?.whatsapp ?? null }));
     },
   });
 
