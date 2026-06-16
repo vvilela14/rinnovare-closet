@@ -113,12 +113,14 @@ function EventosPage() {
         Marque ocasiões para receber sugestões na medida.
       </p>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,420px),1fr]">
-        <div className="rounded-2xl border border-border bg-white p-6">
-          <h2 className="text-xl">Cadastrar evento</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+      <div className="mt-8 grid gap-6 md:grid-cols-[320px,1fr] md:items-start">
+        <div className="rounded-2xl border border-border bg-white p-4">
+          <h2 className="text-lg">Cadastrar evento</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
             Marque um novo evento na sua agenda.
           </p>
+
+
 
           <div className="mt-4 grid gap-3">
             <div className="grid gap-2">
@@ -184,7 +186,7 @@ function EventosPage() {
                         type="button"
                         onClick={() => setEventProductId("")}
                         className={cn(
-                          "flex h-[200px] w-[180px] items-center justify-center rounded-2xl border text-sm transition",
+                          "flex h-[140px] w-[120px] items-center justify-center rounded-2xl border text-xs transition",
                           eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
                         )}
                       >
@@ -201,12 +203,12 @@ function EventosPage() {
                             type="button"
                             onClick={() => setEventProductId(p.id)}
                             className={cn(
-                              "group flex w-[180px] flex-col gap-2 text-left transition",
+                              "group flex w-[120px] flex-col gap-2 text-left transition",
                             )}
                             title={p.name}
                           >
                             <div className={cn(
-                              "relative h-[180px] w-[180px] overflow-hidden rounded-2xl border",
+                              "relative h-[120px] w-[120px] overflow-hidden rounded-2xl border",
                               selected ? "border-primary ring-2 ring-primary/40" : "border-border group-hover:border-foreground/40"
                             )}>
                               {img ? (
@@ -217,7 +219,8 @@ function EventosPage() {
                                 </div>
                               )}
                             </div>
-                            <span className="text-sm font-medium truncate">{p.name}</span>
+                            <span className="text-xs font-medium truncate">{p.name}</span>
+
                           </button>
                         </CarouselItem>
                       );
