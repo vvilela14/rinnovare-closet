@@ -167,38 +167,53 @@ function EventosPage() {
                   Você ainda não tem favoritos. Salve vestidos no catálogo para poder escolher aqui.
                 </p>
               ) : (
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setEventProductId("")}
-                    className={cn(
-                      "rounded-full border px-3 py-1 text-xs transition",
-                      eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
-                    )}
-                  >
-                    Nenhum
-                  </button>
-                  {favorites.map((f: any) => {
-                    const p = f.products;
-                    const img = p.image_url || p.images?.[0];
-                    const selected = eventProductId === p.id;
-                    return (
+                <Carousel opts={{ align: "start", dragFree: true }} className="px-10">
+                  <CarouselContent className="-ml-2">
+                    <CarouselItem className="pl-2 basis-auto">
                       <button
-                        key={p.id}
                         type="button"
-                        onClick={() => setEventProductId(p.id)}
+                        onClick={() => setEventProductId("")}
                         className={cn(
-                          "flex items-center gap-2 rounded-full border px-2 py-1 text-xs transition",
-                          selected ? "border-primary bg-primary/10" : "border-border hover:bg-muted"
+                          "flex h-[90px] w-[90px] items-center justify-center rounded-lg border text-xs transition",
+                          eventProductId === "" ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
                         )}
-                        title={p.name}
                       >
-                        {img && <img src={img} alt="" className="h-6 w-6 rounded-full object-cover" />}
-                        <span className="max-w-[140px] truncate">{p.name}</span>
+                        Nenhum
                       </button>
-                    );
-                  })}
-                </div>
+                    </CarouselItem>
+                    {favorites.map((f: any) => {
+                      const p = f.products;
+                      const img = p.image_url || p.images?.[0];
+                      const selected = eventProductId === p.id;
+                      return (
+                        <CarouselItem key={p.id} className="pl-2 basis-auto">
+                          <button
+                            type="button"
+                            onClick={() => setEventProductId(p.id)}
+                            className={cn(
+                              "group relative flex h-[90px] w-[72px] flex-col overflow-hidden rounded-lg border transition",
+                              selected ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-foreground/40"
+                            )}
+                            title={p.name}
+                          >
+                            {img ? (
+                              <img src={img} alt={p.name} className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center bg-muted text-[10px] text-muted-foreground px-1 text-center">
+                                {p.name}
+                              </div>
+                            )}
+                            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-1 py-1 text-[9px] text-white truncate text-left">
+                              {p.name}
+                            </span>
+                          </button>
+                        </CarouselItem>
+                      );
+                    })}
+                  </CarouselContent>
+                  <CarouselPrevious type="button" className="h-7 w-7" />
+                  <CarouselNext type="button" className="h-7 w-7" />
+                </Carousel>
               )}
             </div>
             <Button type="button" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
