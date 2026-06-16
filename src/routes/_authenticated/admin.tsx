@@ -137,9 +137,9 @@ function AdminLayout() {
   return (
     <div className="min-h-screen bg-[#0f0a1f] text-white">
       <div className="flex min-h-screen">
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-[#0a0716] p-6 md:flex">
-          <Link to="/" className="mb-10 flex items-center gap-2">
-            <img src={logoAsset.url} alt="Rinnovare Closet" className="h-12 w-auto" />
+        <aside className="hidden w-52 shrink-0 flex-col border-r border-white/10 bg-[#0a0716] px-4 py-5 md:flex">
+          <Link to="/" className="mb-8 flex items-center gap-2">
+            <img src={logoAsset.url} alt="Rinnovare Closet" className="h-10 w-auto" />
           </Link>
           <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-white/40">Administração</div>
           <nav className="flex flex-col gap-1">
