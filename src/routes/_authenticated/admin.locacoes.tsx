@@ -41,6 +41,8 @@ function waLink(raw?: string | null) {
 function AdminLocacoes() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [requestDate, setRequestDate] = useState("");
 
   const { data: rows = [], isLoading } = useQuery<Row[]>({
     queryKey: ["admin-rentals"],
