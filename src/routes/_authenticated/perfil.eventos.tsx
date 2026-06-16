@@ -96,6 +96,16 @@ function EventosPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["profile-events", user?.id] }),
   });
 
+  const eventDates = events.map((e: any) => new Date(e.event_date + "T00:00:00"));
+  const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
+  const selectedDayEvents = events.filter((e: any) => {
+    const d = new Date(e.event_date + "T00:00:00");
+    return (
+      d.getFullYear() === calendarMonth.getFullYear() &&
+      d.getMonth() === calendarMonth.getMonth()
+    );
+  });
+
   return (
     <>
       <h1 className="text-4xl">Meus Eventos</h1>
@@ -103,7 +113,45 @@ function EventosPage() {
         Marque ocasiões para receber sugestões na medida.
       </p>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 rounded-2xl border border-border bg-white p-6">
+        <h2 className="text-xl">Calendário</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Visualize seus eventos marcados. Datas destacadas indicam um evento.
+        </p>
+        <div className="mt-4 grid gap-6 md:grid-cols-[auto,1fr] md:items-start">
+          <Calendar
+            mode="single"
+            month={calendarMonth}
+            onMonthChange={setCalendarMonth}
+            modifiers={{ hasEvent: eventDates }}
+            modifiersClassNames={{ hasEvent: "bg-primary text-primary-foreground rounded-full font-semibold" }}
+            locale={ptBR}
+            className={cn("p-3 pointer-events-auto")}
+          />
+          <div className="min-w-0">
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {format(calendarMonth, "MMMM yyyy", { locale: ptBR })}
+            </div>
+            {selectedDayEvents.length === 0 ? (
+              <p className="mt-3 text-sm text-muted-foreground">Nenhum evento neste mês.</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {selectedDayEvents.map((ev: any) => (
+                  <li key={ev.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                    <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                      {format(new Date(ev.event_date + "T00:00:00"), "dd/MM", { locale: ptBR })}
+                    </span>
+                    <span className="truncate">{ev.title}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+
         <div className="rounded-2xl border border-border bg-white p-6">
           <h2 className="text-xl">Próximos eventos</h2>
           <p className="mt-1 text-sm text-muted-foreground">
