@@ -24,6 +24,7 @@ type Row = {
   end_date: string;
   total_value: number;
   status: string;
+  created_at: string;
   product?: { name: string } | null;
   profile?: { full_name: string | null; whatsapp: string | null } | null;
   event_date?: string | null;
