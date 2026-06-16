@@ -91,9 +91,13 @@ function AdminLocacoes() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((r) => (r.profile?.full_name ?? "").toLowerCase().includes(q));
-  }, [rows, search]);
+    return rows.filter((r) => {
+      if (q && !(r.profile?.full_name ?? "").toLowerCase().includes(q)) return false;
+      if (eventDate && r.event_date !== eventDate) return false;
+      if (requestDate && (r.created_at ?? "").slice(0, 10) !== requestDate) return false;
+      return true;
+    });
+  }, [rows, search, eventDate, requestDate]);
 
   const total = useMemo(
     () => filtered.reduce((acc, r) => acc + Number(r.total_value || 0), 0),
