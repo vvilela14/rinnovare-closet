@@ -117,11 +117,11 @@ function CartPage() {
               <h2 className="text-2xl">Resumo</h2>
               <div className="mt-6 space-y-3 border-b border-border pb-6 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>R$ {total.toFixed(2).replace(".", ",")}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>a calcular</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>R$ 36,90</span></div>
               </div>
               <div className="mt-6 flex justify-between text-lg">
                 <span>Total</span>
-                <span className="font-medium">R$ {total.toFixed(2).replace(".", ",")}</span>
+                <span className="font-medium">R$ {(total + 36.9).toFixed(2).replace(".", ",")}</span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">Em até 12x sem juros no cartão</p>
               <button className="mt-6 w-full rounded-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90">
