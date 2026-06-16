@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Camera, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -44,9 +46,18 @@ export const Route = createFileRoute("/_authenticated/perfil/")({
   component: DadosCadastraisPage,
 });
 
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  return (parts[0][0] + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+
 function DadosCadastraisPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -54,7 +65,7 @@ function DadosCadastraisPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, whatsapp, address, address_number, address_complement, postal_code, favorite_colors, size")
+        .select("id, full_name, whatsapp, address, address_number, address_complement, postal_code, favorite_colors, size, avatar_url")
         .eq("id", user!.id)
         .maybeSingle();
       return data;
@@ -70,6 +81,7 @@ function DadosCadastraisPage() {
     postal_code: "",
     size: "",
     favorite_colors: [] as string[],
+    avatar_url: "" as string | null,
   });
 
   useEffect(() => {
@@ -83,9 +95,26 @@ function DadosCadastraisPage() {
         postal_code: (profile as any).postal_code ?? "",
         size: (profile as any).size ?? "",
         favorite_colors: (profile as any).favorite_colors ?? [],
+        avatar_url: (profile as any).avatar_url ?? "",
       });
     }
   }, [profile]);
+
+  // Generate a signed URL for the avatar (private bucket)
+  useEffect(() => {
+    let active = true;
+    async function loadAvatar() {
+      if (!form.avatar_url) { setAvatarPreview(null); return; }
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(form.avatar_url, 60 * 60);
+      if (!active) return;
+      if (error) { setAvatarPreview(null); return; }
+      setAvatarPreview(data.signedUrl);
+    }
+    loadAvatar();
+    return () => { active = false; };
+  }, [form.avatar_url]);
 
   const saveProfile = useMutation({
     mutationFn: async () => {
@@ -110,6 +139,63 @@ function DadosCadastraisPage() {
     }));
   }
 
+  async function handleAvatarFile(file: File) {
+    if (!user) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Imagem muito grande (máx. 5MB).");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+
+      // Remove old file if any
+      if (form.avatar_url && form.avatar_url !== path) {
+        await supabase.storage.from("avatars").remove([form.avatar_url]);
+      }
+
+      const { error: dbErr } = await supabase
+        .from("profiles")
+        .upsert({ id: user.id, avatar_url: path });
+      if (dbErr) throw dbErr;
+
+      setForm((f) => ({ ...f, avatar_url: path }));
+      qc.invalidateQueries({ queryKey: ["profile", user.id] });
+      toast.success("Foto de perfil atualizada!");
+    } catch (e: any) {
+      toast.error(e.message ?? "Falha no upload");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleRemoveAvatar() {
+    if (!user || !form.avatar_url) return;
+    setUploading(true);
+    try {
+      await supabase.storage.from("avatars").remove([form.avatar_url]);
+      const { error } = await supabase.from("profiles").upsert({ id: user.id, avatar_url: null });
+      if (error) throw error;
+      setForm((f) => ({ ...f, avatar_url: "" }));
+      setAvatarPreview(null);
+      qc.invalidateQueries({ queryKey: ["profile", user.id] });
+      toast.success("Foto removida.");
+    } catch (e: any) {
+      toast.error(e.message ?? "Erro ao remover");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <>
       <h1 className="text-4xl">Dados Cadastrais</h1>
@@ -121,6 +207,60 @@ function DadosCadastraisPage() {
         onSubmit={(e) => { e.preventDefault(); saveProfile.mutate(); }}
         className="mt-8 grid gap-6 rounded-2xl border border-border bg-white p-6"
       >
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:gap-6">
+          <div className="relative">
+            <Avatar className="h-24 w-24 border border-border">
+              {avatarPreview && <AvatarImage src={avatarPreview} alt="Foto de perfil" />}
+              <AvatarFallback className="text-xl">
+                {initials(form.full_name || user?.email || "?")}
+              </AvatarFallback>
+            </Avatar>
+            {uploading && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Foto de perfil</Label>
+            <div className="flex flex-wrap gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleAvatarFile(f);
+                  e.target.value = "";
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera className="mr-2 h-4 w-4" />
+                {form.avatar_url ? "Trocar foto" : "Carregar foto"}
+              </Button>
+              {form.avatar_url && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={uploading}
+                  onClick={handleRemoveAvatar}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" /> Remover
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">PNG ou JPG até 5MB.</p>
+          </div>
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor="full_name">Nome completo</Label>
