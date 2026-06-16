@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,45 @@ function EventosPage() {
   const [eventDate, setEventDate] = useState<Date | undefined>();
   const [eventProductId, setEventProductId] = useState<string>("");
   const [customCategoryOpen, setCustomCategoryOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setEventTitle("");
+    setEventCategory("");
+    setEventDate(undefined);
+    setEventProductId("");
+    setCustomCategoryOpen(false);
+    setEditingId(null);
+  };
+
+  const startEdit = (ev: any) => {
+    setEditingId(ev.id);
+    setEventTitle(ev.title ?? "");
+    setEventCategory(ev.category ?? "");
+    setCustomCategoryOpen(!!ev.category && !EVENT_CATEGORIES.includes(ev.category));
+    setEventDate(new Date(ev.event_date + "T00:00:00"));
+    setEventProductId(ev.product_id ?? "");
+  };
+
+  const updateEvent = useMutation({
+    mutationFn: async () => {
+      if (!editingId) throw new Error("Sem evento selecionado");
+      if (!eventTitle.trim() || !eventDate) throw new Error("Preencha título e data");
+      const { error } = await supabase.from("profile_events").update({
+        title: eventTitle.trim(),
+        category: eventCategory.trim() || null,
+        event_date: format(eventDate, "yyyy-MM-dd"),
+        product_id: eventProductId || null,
+      }).eq("id", editingId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      resetForm();
+      qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
+      toast.success("Evento atualizado");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
 
   const addEvent = useMutation({
     mutationFn: async () => {
@@ -78,11 +117,7 @@ function EventosPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      setEventTitle("");
-      setEventCategory("");
-      setEventDate(undefined);
-      setEventProductId("");
-      setCustomCategoryOpen(false);
+      resetForm();
       qc.invalidateQueries({ queryKey: ["profile-events", user?.id] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -148,7 +183,19 @@ function EventosPage() {
         </div>
 
         <div className="flex h-full flex-col rounded-2xl border border-border bg-white p-4">
-          <h2 className="text-lg">Cadastrar evento</h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-lg">{editingId ? "Editar evento" : "Cadastrar evento"}</h2>
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Cancelar edição"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           <p className="mt-1 text-xs text-muted-foreground">
             {eventDate
               ? `Data selecionada: ${format(eventDate, "PPP", { locale: ptBR })}`
@@ -256,16 +303,22 @@ function EventosPage() {
                 </Carousel>
               )}
             </div>
-            <Button type="button" size="sm" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
-              <Plus className="mr-2 h-4 w-4" /> Adicionar evento
-            </Button>
+            {editingId ? (
+              <Button type="button" size="sm" onClick={() => updateEvent.mutate()} disabled={updateEvent.isPending}>
+                <Pencil className="mr-2 h-4 w-4" /> Salvar alterações
+              </Button>
+            ) : (
+              <Button type="button" size="sm" onClick={() => addEvent.mutate()} disabled={addEvent.isPending}>
+                <Plus className="mr-2 h-4 w-4" /> Adicionar evento
+              </Button>
+            )}
           </div>
 
         </div>
       </div>
 
 
-      <div className="mt-6 ml-auto w-full md:w-[380px] rounded-2xl border border-border bg-white p-6">
+      <div className="mt-6 rounded-2xl border border-border bg-white p-6">
         <h2 className="text-xl">Eventos marcados</h2>
         {events.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">Nenhum evento marcado ainda.</p>
@@ -287,11 +340,18 @@ function EventosPage() {
                       {p && <div className="text-xs text-muted-foreground mt-0.5 truncate">Vestido: {p.name}</div>}
                     </div>
                   </div>
-                  <button onClick={() => removeEvent.mutate(ev.id)}
-                    className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground flex-shrink-0"
-                    aria-label="Remover">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => startEdit(ev)}
+                      className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      aria-label="Editar">
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => removeEvent.mutate(ev.id)}
+                      className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      aria-label="Remover">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </li>
               );
             })}
