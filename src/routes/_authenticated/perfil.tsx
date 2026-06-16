@@ -17,10 +17,11 @@ function PerfilLayout() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 lg:px-10">
-      <div className="grid gap-8 lg:grid-cols-[220px,1fr]">
-        <aside className="lg:sticky lg:top-6 lg:self-start">
+      <div className="grid gap-8 md:grid-cols-[220px,1fr]">
+        <aside className="md:sticky md:top-6 md:self-start">
           <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">Minha conta</div>
-          <nav className="mt-4 flex flex-row gap-2 overflow-x-auto lg:flex-col lg:gap-1">
+          <nav className="mt-4 flex flex-col gap-1">
+
             {NAV.map((item) => {
               const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
               const Icon = item.icon;
