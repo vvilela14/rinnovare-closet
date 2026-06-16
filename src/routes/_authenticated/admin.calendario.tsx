@@ -64,15 +64,15 @@ function AdminCalendario() {
     },
   });
 
-  const { data: confirmedRentals = [] } = useQuery({
+  const { data: rentalsAll = [] } = useQuery({
     queryKey: ["admin-calendar-rentals", cursor.toISOString().slice(0, 7)],
     queryFn: async () => {
       const from = format(startOfMonth(cursor), "yyyy-MM-dd");
       const to = format(endOfMonth(cursor), "yyyy-MM-dd");
       const { data } = await supabase
         .from("rental_requests")
-        .select("id, start_date, end_date, user_id, product:products(name)")
-        .eq("status", "confirmed")
+        .select("id, start_date, end_date, user_id, status, product:products(name)")
+        .in("status", ["pending", "confirmed"])
         .lte("start_date", to)
         .gte("end_date", from);
       const list = (data ?? []) as any[];
@@ -96,9 +96,20 @@ function AdminCalendario() {
     return map;
   }, [events]);
 
+  const [statusFilter, setStatusFilter] = useState<"all" | "saved" | "reserved" | "confirmed">("all");
+
+  const filteredRentals = useMemo(() => {
+    return (rentalsAll as any[]).filter((r) => {
+      if (statusFilter === "all") return true;
+      if (statusFilter === "reserved") return r.status === "pending";
+      if (statusFilter === "confirmed") return r.status === "confirmed";
+      return false;
+    });
+  }, [rentalsAll, statusFilter]);
+
   const rentalsByDay = useMemo(() => {
     const map = new Map<string, any[]>();
-    for (const r of confirmedRentals) {
+    for (const r of filteredRentals) {
       const start = new Date(r.start_date + "T00:00:00");
       const end = new Date(r.end_date + "T00:00:00");
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
@@ -108,7 +119,9 @@ function AdminCalendario() {
       }
     }
     return map;
-  }, [confirmedRentals]);
+  }, [filteredRentals]);
+
+  const showEvents = statusFilter === "all" || statusFilter === "saved";
 
 
   // Build month grid (weeks of 7)
@@ -133,6 +146,26 @@ function AdminCalendario() {
       <p className="mt-1 text-sm text-muted-foreground">
         Veja em quais dias as clientes marcaram ocasiões importantes.
       </p>
+
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground mr-2">Status:</span>
+        {([
+          { id: "all", label: "Todos", cls: "bg-foreground text-white" },
+          { id: "saved", label: "Evento Salvo", cls: "bg-[#be9ffc] text-[#260d58]" },
+          { id: "reserved", label: "Vestido Reservado", cls: "bg-amber-400 text-amber-950" },
+          { id: "confirmed", label: "Locação Confirmada", cls: "bg-[#260d58] text-white" },
+        ] as const).map((s) => (
+          <button
+            key={s.id}
+            onClick={() => setStatusFilter(s.id as any)}
+            className={`rounded-full px-3 py-1 text-[11px] uppercase tracking-widest transition ${
+              statusFilter === s.id ? s.cls : "bg-muted text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-8 rounded-2xl border border-border bg-white p-6">
         <div className="flex items-center justify-between">
@@ -171,14 +204,23 @@ function AdminCalendario() {
                 </div>
                 {dayRentals.length > 0 && (
                   <div className="mt-2 space-y-0.5">
-                    {dayRentals.map((r: any) => (
-                      <div key={r.id} className="truncate rounded bg-[#260d58] px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-white" title={`${r.product?.name ?? ""} — ${r.profile?.full_name ?? ""}`}>
-                        Vestido Alugado
-                      </div>
-                    ))}
+                    {dayRentals.map((r: any) => {
+                      const isPending = r.status === "pending";
+                      return (
+                        <div
+                          key={r.id}
+                          className={`truncate rounded px-1.5 py-0.5 text-[9px] uppercase tracking-wider ${
+                            isPending ? "bg-amber-400 text-amber-950" : "bg-[#260d58] text-white"
+                          }`}
+                          title={`${r.product?.name ?? ""} — ${r.profile?.full_name ?? ""}`}
+                        >
+                          {isPending ? "Vestido Reservado" : "Vestido Alugado"}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
-                {dayEvents.length > 0 && (
+                {showEvents && dayEvents.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {dayEvents.map((ev) => (
                       <Popover key={ev.id}>

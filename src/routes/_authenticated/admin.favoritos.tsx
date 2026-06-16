@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
+
+function waLink(raw?: string | null) {
+  if (!raw) return null;
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return null;
+  const full = digits.startsWith("55") ? digits : `55${digits}`;
+  return `https://wa.me/${full}`;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/favoritos")({
   head: () => ({ meta: [{ title: "Favoritos — Admin Rinnovare" }] }),
@@ -19,15 +27,15 @@ function AdminFavoritos() {
       const rows = favs ?? [];
 
       const userIds = Array.from(new Set(rows.map((r: any) => r.user_id)));
-      let profiles: Record<string, string | null> = {};
+      let profiles: Record<string, { full_name: string | null; whatsapp: string | null }> = {};
       if (userIds.length > 0) {
         const { data: profs } = await supabase
           .from("profiles")
-          .select("id, full_name")
+          .select("id, full_name, whatsapp")
           .in("id", userIds);
-        profiles = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.full_name]));
+        profiles = Object.fromEntries((profs ?? []).map((p: any) => [p.id, { full_name: p.full_name, whatsapp: p.whatsapp }]));
       }
-      return rows.map((r: any) => ({ ...r, full_name: profiles[r.user_id] ?? null }));
+      return rows.map((r: any) => ({ ...r, full_name: profiles[r.user_id]?.full_name ?? null, whatsapp: profiles[r.user_id]?.whatsapp ?? null }));
     },
   });
 
@@ -47,11 +55,12 @@ function AdminFavoritos() {
                 <th className="px-5 py-3">Valor</th>
                 <th className="px-5 py-3">Cliente</th>
                 <th className="px-5 py-3">Salvo em</th>
+                <th className="px-5 py-3 text-center">Contato</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {data.length === 0 && (
-                <tr><td colSpan={5} className="px-5 py-16 text-center text-muted-foreground">
+                <tr><td colSpan={6} className="px-5 py-16 text-center text-muted-foreground">
                   <Heart className="mx-auto mb-3 h-6 w-6 opacity-40" />
                   Nenhum favorito salvo ainda.
                 </td></tr>
@@ -71,6 +80,23 @@ function AdminFavoritos() {
                   <td className="px-5 py-3">R$ {Number(row.products?.price ?? 0).toFixed(2).replace(".", ",")}</td>
                   <td className="px-5 py-3">{row.full_name || <span className="font-mono text-xs text-muted-foreground">{String(row.user_id).slice(0, 8)}…</span>}</td>
                   <td className="px-5 py-3 text-muted-foreground">{new Date(row.created_at).toLocaleString("pt-BR")}</td>
+                  <td className="px-5 py-3 text-muted-foreground">{new Date(row.created_at).toLocaleString("pt-BR")}</td>
+                  <td className="px-5 py-3 text-center">
+                    {waLink(row.whatsapp) ? (
+                      <a
+                        href={waLink(row.whatsapp)!}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white hover:bg-green-600 transition"
+                        aria-label="Abrir WhatsApp"
+                        title="Enviar mensagem via WhatsApp"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
