@@ -150,7 +150,7 @@ function Home() {
           {[
             { icon: Sparkles, title: "Curadoria de moda", text: "Peças selecionadas para cada tipo de ocasião." },
             { icon: Truck, title: "Entrega rápida", text: "Receba seu vestido em até 3 dias úteis." },
-            { icon: ShieldCheck, title: "Higienização garantida", text: "Todas as peças higienizadas e prontas para usar." },
+            { icon: ShieldCheck, title: "Higienização", text: "Todas as peças higienizadas e prontas para usar." },
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="flex items-start gap-4">
               <div className="rounded-full border border-border p-3">
