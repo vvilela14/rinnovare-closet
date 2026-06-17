@@ -89,8 +89,7 @@ function Home() {
             </div>
 
             <h1 className="mt-8 text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
-              Seja para <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>casamentos</em>,
-              festas ou qualquer ocasião especial
+              Seu <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>look exclusivo</em> para cada ocasião
             </h1>
 
 
@@ -249,23 +248,6 @@ function Home() {
         </div>
       </section>
 
-      {/* ABOUT */}
-      <section id="sobre" className="border-t border-border/60 bg-muted/30">
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-2 lg:px-10">
-          <div>
-            <span className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Sobre</span>
-            <h2 className="mt-3 text-4xl sm:text-5xl">
-              Renove seu <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>closet</em> a cada festa
-            </h2>
-          </div>
-          <p className="text-base leading-relaxed text-muted-foreground">
-            A <strong className="text-foreground">Rinnovare Closet</strong> nasceu para transformar a forma como
-            mulheres se vestem para ocasiões especiais. Aluguel de vestidos com curadoria, qualidade premium e
-            preços acessíveis — porque cada momento merece um look exclusivo, sem o peso de comprar uma peça
-            para usar uma única vez.
-          </p>
-        </div>
-      </section>
 
       <footer className="border-t border-border bg-background">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-10 text-xs text-muted-foreground sm:flex-row lg:px-10">

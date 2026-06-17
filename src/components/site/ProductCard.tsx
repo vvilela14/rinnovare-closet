@@ -78,7 +78,7 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
 
   return (
     <article className="group relative flex flex-col">
-      <Link to="/produto/$id" params={{ id: product.id }} className="relative block overflow-hidden bg-muted aspect-[3/4]">
+      <Link to="/produto/$id" params={{ id: product.id }} className="relative block overflow-hidden bg-muted aspect-[2/3]">
         {product.image_url ? (
           <img
             src={product.image_url}
