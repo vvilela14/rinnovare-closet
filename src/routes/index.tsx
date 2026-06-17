@@ -93,11 +93,6 @@ function Home() {
               festas ou qualquer ocasião especial
             </h1>
 
-            <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Alugue vestidos de festa exclusivos, com curadoria de moda assinada pela Rinnovare Closet.
-              Da madrinha à noiva, do jantar à formatura — encontre a peça perfeita, com entrega rápida
-              e parcelamento em até 12x sem juros.
-            </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
