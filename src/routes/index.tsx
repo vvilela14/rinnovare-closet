@@ -89,8 +89,7 @@ function Home() {
             </div>
 
             <h1 className="mt-8 text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
-              Seja para <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>casamentos</em>,
-              festas ou qualquer ocasião especial
+              Seu <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>look exclusivo</em> para cada ocasião
             </h1>
 
 
