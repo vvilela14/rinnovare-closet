@@ -184,7 +184,7 @@ function Home() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="min-w-[180px] rounded-full border border-border bg-background px-4 py-2 text-sm"
+                className="min-w-[180px] rounded-none border border-border bg-background px-4 py-2 text-sm"
               >
                 <option value="">Todas</option>
                 {CATEGORY_OPTIONS.filter((c) => c !== "Outro").map((c) => (
@@ -200,7 +200,7 @@ function Home() {
                 value={eventDate}
                 min={fmtISODate(new Date())}
                 onChange={(e) => setEventDate(e.target.value)}
-                className="rounded-full border border-border bg-background px-4 py-2 text-sm"
+                className="rounded-none border border-border bg-background px-4 py-2 text-sm"
               />
             </div>
 
