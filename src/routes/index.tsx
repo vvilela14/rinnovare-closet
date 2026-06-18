@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ArrowRight, Sparkles, Truck, ShieldCheck, X } from "lucide-react";
+import { Sparkles, Truck, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { ProductCard, type Product } from "@/components/site/ProductCard";
@@ -96,13 +96,13 @@ function Home() {
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
                 href="#vitrine"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
+                className="inline-flex items-center rounded-none bg-primary px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
               >
-                Ver vitrine <ArrowRight className="h-4 w-4" />
+                Ver vitrine
               </a>
               <a
                 href="#categorias"
-                className="inline-flex items-center gap-2 rounded-full border border-foreground px-7 py-3.5 text-xs uppercase tracking-[0.2em] text-foreground transition hover:bg-foreground hover:text-background"
+                className="inline-flex items-center rounded-none border border-foreground px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-foreground transition hover:bg-foreground hover:text-background"
               >
                 Categorias
               </a>
@@ -184,7 +184,7 @@ function Home() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="min-w-[180px] rounded-full border border-border bg-background px-4 py-2 text-sm"
+                className="min-w-[180px] rounded-none border border-border bg-background px-4 py-2 text-sm"
               >
                 <option value="">Todas</option>
                 {CATEGORY_OPTIONS.filter((c) => c !== "Outro").map((c) => (
@@ -200,43 +200,37 @@ function Home() {
                 value={eventDate}
                 min={fmtISODate(new Date())}
                 onChange={(e) => setEventDate(e.target.value)}
-                className="rounded-full border border-border bg-background px-4 py-2 text-sm"
+                className="rounded-none border border-border bg-background px-4 py-2 text-sm"
               />
             </div>
 
-            <div className="flex flex-1 flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Cor</label>
-              <div className="flex flex-wrap gap-2">
-                {COLOR_PALETTE.map((c) => {
-                  const selected = color === c.name;
-                  return (
-                    <button
-                      key={c.name}
-                      type="button"
-                      onClick={() => setColor(selected ? "" : c.name)}
-                      title={c.name}
-                      className={`h-7 w-7 rounded-full transition ${selected ? "ring-2 ring-offset-2 ring-[#260d58]" : "hover:scale-110"} ${c.border ? "border border-border" : ""}`}
-                      style={{ background: c.hex }}
-                      aria-label={c.name}
-                    />
-                  );
-                })}
-              </div>
+              <select
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="min-w-[180px] rounded-none border border-border bg-background px-4 py-2 text-sm"
+              >
+                <option value="">Todas</option>
+                {COLOR_PALETTE.map((c) => (
+                  <option key={c.name} value={c.name}>{c.name}</option>
+                ))}
+              </select>
             </div>
 
             {hasFilters && (
               <button
                 type="button"
                 onClick={() => { setCategory(""); setEventDate(""); setColor(""); }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs uppercase tracking-widest hover:bg-background"
+                className="rounded-none border border-border px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-background"
               >
-                <X className="h-3.5 w-3.5" /> Limpar filtros
+                Limpar filtros
               </button>
             )}
           </div>
         </div>
 
-        <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} isReserved={reservedSet.has(p.id)} />
           ))}

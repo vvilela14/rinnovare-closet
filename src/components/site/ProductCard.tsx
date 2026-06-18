@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -125,9 +125,9 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
         <button
           type="button"
           onClick={() => addToCart.mutate()}
-          className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.94] active:shadow-inner active:opacity-80"
+          className="mt-4 inline-flex items-center justify-center rounded-none bg-primary px-4 py-2.5 text-[10px] uppercase tracking-[0.2em] text-primary-foreground transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.98]"
         >
-          <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
+          Adicionar ao carrinho
         </button>
       </div>
     </article>
