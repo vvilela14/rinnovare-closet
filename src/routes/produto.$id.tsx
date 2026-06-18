@@ -27,7 +27,7 @@ function ProductPage() {
   const [active, setActive] = useState(0);
   const [zoomIndex, setZoomIndex] = useState<number | null>(null);
   const [period, setPeriod] = useState<number>(4);
-  const [startDate, setStartDate] = useState<string>("");
+
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
