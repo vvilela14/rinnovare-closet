@@ -166,9 +166,8 @@ function ProductPage() {
                 productId={id}
                 period={period}
                 setPeriod={setPeriod}
-                startDate={startDate}
-                setStartDate={setStartDate}
               />
+
 
 
               <div className="mt-8 flex flex-wrap gap-3">
