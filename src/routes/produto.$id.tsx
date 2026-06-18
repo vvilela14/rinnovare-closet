@@ -277,7 +277,7 @@ function PeriodAvailability({
   period: number;
   setPeriod: (n: number) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  
   const [month, setMonth] = useState<Date>(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
