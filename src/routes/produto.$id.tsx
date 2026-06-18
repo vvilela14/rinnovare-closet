@@ -174,13 +174,13 @@ function ProductPage() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   onClick={() => addToCart.mutate()}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-xs uppercase tracking-[0.2em] text-primary-foreground transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.96] active:shadow-inner active:opacity-80"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-none bg-primary px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-primary-foreground transition-all duration-150 ease-out hover:opacity-90"
                 >
-                  <ShoppingBag className="h-4 w-4" /> Adicionar ao carrinho
+                  Adicionar
                 </button>
                 <button
                   onClick={() => toggleFavorite.mutate()}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-6 py-4 text-xs uppercase tracking-[0.2em] transition hover:bg-muted"
+                  className="inline-flex items-center justify-center gap-2 rounded-none border border-border px-5 py-3 text-[10px] uppercase tracking-[0.2em] transition hover:bg-muted"
                   aria-label="Favoritar"
                 >
                   <Heart className="h-4 w-4" style={{ color: "var(--lilac)" }} fill={isFavorite ? "var(--lilac)" : "transparent"} />
