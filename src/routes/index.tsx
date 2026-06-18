@@ -204,33 +204,27 @@ function Home() {
               />
             </div>
 
-            <div className="flex flex-1 flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Cor</label>
-              <div className="flex flex-wrap gap-2">
-                {COLOR_PALETTE.map((c) => {
-                  const selected = color === c.name;
-                  return (
-                    <button
-                      key={c.name}
-                      type="button"
-                      onClick={() => setColor(selected ? "" : c.name)}
-                      title={c.name}
-                      className={`h-7 w-7 rounded-full transition ${selected ? "ring-2 ring-offset-2 ring-[#260d58]" : "hover:scale-110"} ${c.border ? "border border-border" : ""}`}
-                      style={{ background: c.hex }}
-                      aria-label={c.name}
-                    />
-                  );
-                })}
-              </div>
+              <select
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="min-w-[180px] rounded-none border border-border bg-background px-4 py-2 text-sm"
+              >
+                <option value="">Todas</option>
+                {COLOR_PALETTE.map((c) => (
+                  <option key={c.name} value={c.name}>{c.name}</option>
+                ))}
+              </select>
             </div>
 
             {hasFilters && (
               <button
                 type="button"
                 onClick={() => { setCategory(""); setEventDate(""); setColor(""); }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs uppercase tracking-widest hover:bg-background"
+                className="rounded-none border border-border px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-background"
               >
-                <X className="h-3.5 w-3.5" /> Limpar filtros
+                Limpar filtros
               </button>
             )}
           </div>
