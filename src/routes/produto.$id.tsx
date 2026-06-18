@@ -321,24 +321,24 @@ function PeriodAvailability({
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(month.getFullYear(), month.getMonth(), d));
 
   return (
-    <div className="mt-6 rounded-2xl border border-border bg-muted/20 p-5">
+    <div className="mt-6 max-w-sm rounded-2xl border border-border bg-background p-4">
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
         <select
           value={period}
           onChange={(e) => setPeriod(Number(e.target.value))}
-          className="w-fit rounded-none border border-border bg-background px-4 py-2 text-sm"
+          className="w-fit rounded-none border border-border bg-background px-3 py-1.5 text-xs"
         >
           {RENTAL_PERIODS.map((d) => <option key={d} value={d}>{d} dias</option>)}
         </select>
       </div>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
-            className="rounded-full border border-border p-2 hover:bg-muted"
+            className="rounded-full p-1.5 hover:bg-muted"
             aria-label="Mês anterior"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -347,17 +347,17 @@ function PeriodAvailability({
           <button
             type="button"
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
-            className="rounded-full border border-border p-2 hover:bg-muted"
+            className="rounded-full p-1.5 hover:bg-muted"
             aria-label="Próximo mês"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="mt-3 grid grid-cols-7 gap-0.5 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
           {["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => <div key={i}>{d}</div>)}
         </div>
-        <div className="mt-2 grid grid-cols-7 gap-1">
+        <div className="mt-1 grid grid-cols-7 gap-0.5">
           {cells.map((d, i) => {
             if (!d) return <div key={i} />;
             const iso = fmtISODate(d);
@@ -367,10 +367,10 @@ function PeriodAvailability({
             return (
               <div
                 key={i}
-                className={`flex aspect-square items-center justify-center rounded-md text-sm ${
+                className={`flex aspect-square items-center justify-center text-sm ${
                   unavailable
-                    ? "bg-red-100 text-red-700 line-through"
-                    : "bg-green-100 text-green-700"
+                    ? "text-muted-foreground/50 line-through"
+                    : "font-semibold text-foreground"
                 }`}
               >
                 {d.getDate()}
@@ -378,19 +378,10 @@ function PeriodAvailability({
             );
           })}
         </div>
-
-        <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="h-3 w-3 rounded-sm bg-green-100" /> Disponível
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="h-3 w-3 rounded-sm bg-red-100" /> Indisponível
-          </span>
-        </div>
       </div>
-
     </div>
   );
 }
+
 
 
