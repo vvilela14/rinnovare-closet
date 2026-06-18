@@ -277,7 +277,7 @@ function PeriodAvailability({
   period: number;
   setPeriod: (n: number) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  
   const [month, setMonth] = useState<Date>(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -322,102 +322,73 @@ function PeriodAvailability({
 
   return (
     <div className="mt-6 rounded-2xl border border-border bg-muted/20 p-5">
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
-          <select
-            value={period}
-            onChange={(e) => setPeriod(Number(e.target.value))}
-            className="rounded-none border border-border bg-background px-4 py-2 text-sm"
-          >
-            {RENTAL_PERIODS.map((d) => <option key={d} value={d}>{d} dias</option>)}
-          </select>
-        </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 rounded-none border border-border bg-background px-5 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-muted"
+      <div className="flex flex-col gap-1.5">
+        <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
+        <select
+          value={period}
+          onChange={(e) => setPeriod(Number(e.target.value))}
+          className="w-fit rounded-none border border-border bg-background px-4 py-2 text-sm"
         >
-          <CalendarCheck className="h-4 w-4" style={{ color: "var(--lilac)" }} />
-          Ver disponibilidade
-        </button>
+          {RENTAL_PERIODS.map((d) => <option key={d} value={d}>{d} dias</option>)}
+        </select>
       </div>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 p-4 animate-fade-in"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="relative w-full max-w-md rounded-2xl bg-background p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
+      <div className="mt-5">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
+            className="rounded-full border border-border p-2 hover:bg-muted"
+            aria-label="Mês anterior"
           >
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="absolute right-4 top-4 rounded-full p-1.5 hover:bg-muted"
-              aria-label="Fechar"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Disponibilidade</h3>
-
-            <div className="mt-4 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
-                className="rounded-full border border-border p-2 hover:bg-muted"
-                aria-label="Mês anterior"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <div className="text-sm font-medium capitalize">{monthLabel}</div>
-              <button
-                type="button"
-                onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
-                className="rounded-full border border-border p-2 hover:bg-muted"
-                aria-label="Próximo mês"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
-              {["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => <div key={i}>{d}</div>)}
-            </div>
-            <div className="mt-2 grid grid-cols-7 gap-1">
-              {cells.map((d, i) => {
-                if (!d) return <div key={i} />;
-                const iso = fmtISODate(d);
-                const isPast = d < today;
-                const isBooked = bookedSet.has(iso);
-                const unavailable = isPast || isBooked;
-                return (
-                  <div
-                    key={i}
-                    className={`flex aspect-square items-center justify-center rounded-md text-sm ${
-                      unavailable
-                        ? "bg-red-100 text-red-700 line-through"
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
-                    {d.getDate()}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-sm bg-green-100" /> Disponível
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-sm bg-red-100" /> Indisponível
-              </span>
-            </div>
-          </div>
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div className="text-sm font-medium capitalize">{monthLabel}</div>
+          <button
+            type="button"
+            onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
+            className="rounded-full border border-border p-2 hover:bg-muted"
+            aria-label="Próximo mês"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
-      )}
+
+        <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
+          {["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => <div key={i}>{d}</div>)}
+        </div>
+        <div className="mt-2 grid grid-cols-7 gap-1">
+          {cells.map((d, i) => {
+            if (!d) return <div key={i} />;
+            const iso = fmtISODate(d);
+            const isPast = d < today;
+            const isBooked = bookedSet.has(iso);
+            const unavailable = isPast || isBooked;
+            return (
+              <div
+                key={i}
+                className={`flex aspect-square items-center justify-center rounded-md text-sm ${
+                  unavailable
+                    ? "bg-red-100 text-red-700 line-through"
+                    : "bg-green-100 text-green-700"
+                }`}
+              >
+                {d.getDate()}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-3 w-3 rounded-sm bg-green-100" /> Disponível
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-3 w-3 rounded-sm bg-red-100" /> Indisponível
+          </span>
+        </div>
+      </div>
+
     </div>
   );
 }
