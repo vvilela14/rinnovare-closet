@@ -236,7 +236,7 @@ function Home() {
           </div>
         </div>
 
-        <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} isReserved={reservedSet.has(p.id)} />
           ))}
