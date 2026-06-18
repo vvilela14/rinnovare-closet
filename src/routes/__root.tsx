@@ -86,6 +86,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Rinnovare Closet" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Rinnovare Closet — Aluguel de Vestidos para Festas e Casamentos" },
+      { name: "twitter:title", content: "Rinnovare Closet — Aluguel de Vestidos para Festas e Casamentos" },
+      { property: "og:description", content: "Aluguel de vestidos exclusivos para casamentos, madrinhas, formaturas e festas. Curadoria de moda, entrega rápida e parcelamento em até 12x sem juros." },
+      { name: "twitter:description", content: "Aluguel de vestidos exclusivos para casamentos, madrinhas, formaturas e festas. Curadoria de moda, entrega rápida e parcelamento em até 12x sem juros." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ae3a19c4-6ef3-405a-95f5-17aa6fc3678f/id-preview-4d3fd49f--a61199fd-b22e-4f8f-a06c-9b65c967a66c.lovable.app-1781741996260.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ae3a19c4-6ef3-405a-95f5-17aa6fc3678f/id-preview-4d3fd49f--a61199fd-b22e-4f8f-a06c-9b65c967a66c.lovable.app-1781741996260.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
