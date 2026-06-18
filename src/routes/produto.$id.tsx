@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { RENTAL_PERIODS, addDays, fmtISODate, parseISODate, rangesOverlap } from "@/lib/catalog-constants";
+import { RENTAL_PERIODS, addDays, fmtISODate, parseISODate } from "@/lib/catalog-constants";
 
 export const Route = createFileRoute("/produto/$id")({
   head: ({ params }) => ({
