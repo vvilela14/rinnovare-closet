@@ -96,13 +96,13 @@ function Home() {
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
                 href="#vitrine"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
+                className="inline-flex items-center rounded-none bg-primary px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
               >
-                Ver vitrine <ArrowRight className="h-4 w-4" />
+                Ver vitrine
               </a>
               <a
                 href="#categorias"
-                className="inline-flex items-center gap-2 rounded-full border border-foreground px-7 py-3.5 text-xs uppercase tracking-[0.2em] text-foreground transition hover:bg-foreground hover:text-background"
+                className="inline-flex items-center rounded-none border border-foreground px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-foreground transition hover:bg-foreground hover:text-background"
               >
                 Categorias
               </a>
