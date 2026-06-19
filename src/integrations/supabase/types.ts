@@ -18,22 +18,28 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          period_days: number | null
           product_id: string
           quantity: number
+          start_date: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          period_days?: number | null
           product_id: string
           quantity?: number
+          start_date?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          period_days?: number | null
           product_id?: string
           quantity?: number
+          start_date?: string | null
           user_id?: string
         }
         Relationships: [

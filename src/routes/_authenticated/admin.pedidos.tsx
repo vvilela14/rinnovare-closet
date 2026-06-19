@@ -14,7 +14,7 @@ function AdminPedidos() {
     queryFn: async () => {
       const { data: items } = await supabase
         .from("cart_items")
-        .select("id, quantity, created_at, user_id, products(name, price, size, image_url, color)")
+        .select("id, quantity, created_at, user_id, start_date, period_days, products(name, price, size, image_url, color)")
         .order("created_at", { ascending: false });
       const rows = items ?? [];
       const userIds = Array.from(new Set(rows.map((r: any) => r.user_id)));
@@ -29,6 +29,7 @@ function AdminPedidos() {
       return rows.map((r: any) => ({ ...r, full_name: profiles[r.user_id] ?? null }));
     },
   });
+
 
   return (
     <div className="px-6 py-10 lg:px-12">
@@ -45,36 +46,53 @@ function AdminPedidos() {
                 <th className="px-5 py-3">Tamanho</th>
                 <th className="px-5 py-3">Qtd.</th>
                 <th className="px-5 py-3">Valor</th>
+                <th className="px-5 py-3">Data de locação</th>
                 <th className="px-5 py-3">Cliente</th>
                 <th className="px-5 py-3">Adicionado em</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {data.length === 0 && (
-                <tr><td colSpan={6} className="px-5 py-16 text-center text-muted-foreground">
+                <tr><td colSpan={7} className="px-5 py-16 text-center text-muted-foreground">
                   <ShoppingBag className="mx-auto mb-3 h-6 w-6 opacity-40" />
                   Nenhum item em carrinhos no momento.
                 </td></tr>
               )}
-              {data.map((row: any) => (
-                <tr key={row.id}>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      {row.products?.image_url && <img src={row.products.image_url} alt="" className="h-10 w-8 rounded object-cover" />}
-                      <div>
-                        <div>{row.products?.name ?? "—"}</div>
-                        {row.products?.color && <div className="text-xs text-muted-foreground">{row.products.color}</div>}
+              {data.map((row: any) => {
+                const start = row.start_date ? new Date(row.start_date + "T00:00:00") : null;
+                const days = row.period_days ?? null;
+                const end = start && days ? new Date(start.getTime() + (days - 1) * 86400000) : null;
+                return (
+                  <tr key={row.id}>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-3">
+                        {row.products?.image_url && <img src={row.products.image_url} alt="" className="h-10 w-8 rounded object-cover" />}
+                        <div>
+                          <div>{row.products?.name ?? "—"}</div>
+                          {row.products?.color && <div className="text-xs text-muted-foreground">{row.products.color}</div>}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3">{row.products?.size ?? "—"}</td>
-                  <td className="px-5 py-3">{row.quantity}</td>
-                  <td className="px-5 py-3">R$ {Number(row.products?.price ?? 0).toFixed(2).replace(".", ",")}</td>
-                  <td className="px-5 py-3">{row.full_name || <span className="font-mono text-xs text-muted-foreground">{String(row.user_id).slice(0, 8)}…</span>}</td>
-                  <td className="px-5 py-3 text-muted-foreground">{new Date(row.created_at).toLocaleString("pt-BR")}</td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-5 py-3">{row.products?.size ?? "—"}</td>
+                    <td className="px-5 py-3">{row.quantity}</td>
+                    <td className="px-5 py-3">R$ {Number(row.products?.price ?? 0).toFixed(2).replace(".", ",")}</td>
+                    <td className="px-5 py-3">
+                      {start && end ? (
+                        <span>
+                          {start.toLocaleDateString("pt-BR")} – {end.toLocaleDateString("pt-BR")}
+                          <span className="ml-1 text-xs text-muted-foreground">({days} dias)</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">{row.full_name || <span className="font-mono text-xs text-muted-foreground">{String(row.user_id).slice(0, 8)}…</span>}</td>
+                    <td className="px-5 py-3 text-muted-foreground">{new Date(row.created_at).toLocaleString("pt-BR")}</td>
+                  </tr>
+                );
+              })}
             </tbody>
+
           </table>
         </div>
       </div>
