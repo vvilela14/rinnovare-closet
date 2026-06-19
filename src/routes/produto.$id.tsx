@@ -89,19 +89,25 @@ function ProductPage() {
   const addToCart = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("auth");
+      if (!selectedDate) throw new Error("date");
+      const payload = { start_date: selectedDate, period_days: period };
       const { data: existing } = await supabase.from("cart_items").select("id, quantity").eq("user_id", user.id).eq("product_id", id).maybeSingle();
       if (existing) {
-        await supabase.from("cart_items").update({ quantity: existing.quantity + 1 }).eq("id", existing.id);
+        await supabase.from("cart_items").update({ quantity: existing.quantity + 1, ...payload }).eq("id", existing.id);
       } else {
-        await supabase.from("cart_items").insert({ user_id: user.id, product_id: id, quantity: 1 });
+        await supabase.from("cart_items").insert({ user_id: user.id, product_id: id, quantity: 1, ...payload });
       }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["cart-count"] });
       toast.success("Adicionado ao carrinho");
     },
-    onError: () => toast.error("Faça login para adicionar ao carrinho"),
+    onError: (e: any) => {
+      if (e?.message === "date") toast.error("Selecione uma data de início no calendário");
+      else toast.error("Faça login para adicionar ao carrinho");
+    },
   });
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -169,7 +175,10 @@ function ProductPage() {
                 productId={id}
                 period={period}
                 setPeriod={setPeriod}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
               />
+
 
 
 
@@ -275,12 +284,15 @@ function PeriodAvailability({
   productId,
   period,
   setPeriod,
+  selectedDate,
+  setSelectedDate,
 }: {
   productId: string;
   period: number;
   setPeriod: (n: number) => void;
+  selectedDate: string | null;
+  setSelectedDate: (d: string | null) => void;
 }) {
-  
   const [month, setMonth] = useState<Date>(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -293,7 +305,7 @@ function PeriodAvailability({
         .from("rental_requests")
         .select("start_date, end_date, status")
         .eq("product_id", productId)
-        .eq("status", "confirmed");
+        .in("status", ["pending", "confirmed"]);
       return data ?? [];
     },
   });
@@ -323,13 +335,25 @@ function PeriodAvailability({
   for (let i = 0; i < firstWeekday; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(month.getFullYear(), month.getMonth(), d));
 
+  // Check whether the whole [start, start+period-1] window is free
+  function rangeAvailable(start: Date) {
+    for (let i = 0; i < period; i++) {
+      if (bookedSet.has(fmtISODate(addDays(start, i)))) return false;
+    }
+    return true;
+  }
+
+  const selectedEnd = selectedDate
+    ? fmtISODate(addDays(parseISODate(selectedDate), period - 1))
+    : null;
+
   return (
-    <div className="mt-6 max-w-sm rounded-2xl border border-border bg-background p-4">
+    <div className="mt-6 w-full rounded-2xl border border-border bg-background p-5">
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
         <select
           value={period}
-          onChange={(e) => setPeriod(Number(e.target.value))}
+          onChange={(e) => { setPeriod(Number(e.target.value)); setSelectedDate(null); }}
           className="w-fit rounded-none border border-border bg-background px-3 py-1.5 text-xs"
         >
           {RENTAL_PERIODS.map((d) => <option key={d} value={d}>{d} dias</option>)}
@@ -357,34 +381,61 @@ function PeriodAvailability({
           </button>
         </div>
 
-        <div className="mt-3 grid grid-cols-7 gap-0.5 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
           {["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => <div key={i}>{d}</div>)}
         </div>
-        <div className="mt-1 grid grid-cols-7 gap-0.5">
+        <div className="mt-1 grid grid-cols-7 gap-1">
           {cells.map((d, i) => {
             if (!d) return <div key={i} />;
             const iso = fmtISODate(d);
             const isPast = d < today;
             const isBooked = bookedSet.has(iso);
+            const canStart = !isPast && !isBooked && rangeAvailable(d);
+            const isSelected = selectedDate === iso;
+            const isInSelectedRange =
+              selectedDate && selectedEnd && iso >= selectedDate && iso <= selectedEnd;
             const unavailable = isPast || isBooked;
             return (
-              <div
+              <button
+                type="button"
                 key={i}
-                className={`flex aspect-square items-center justify-center text-sm ${
-                  unavailable
-                    ? "text-muted-foreground/50 line-through"
-                    : "font-semibold text-foreground"
+                disabled={!canStart}
+                onClick={() => setSelectedDate(iso)}
+                className={`flex aspect-square items-center justify-center rounded-md text-sm transition ${
+                  isSelected
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : isInSelectedRange
+                    ? "bg-primary/20 text-foreground"
+                    : unavailable
+                    ? "text-muted-foreground/50 line-through cursor-not-allowed"
+                    : canStart
+                    ? "font-medium text-foreground hover:bg-muted"
+                    : "text-muted-foreground/50 cursor-not-allowed"
                 }`}
+                title={
+                  unavailable
+                    ? "Data indisponível"
+                    : !canStart
+                    ? "Sem janela livre para o período escolhido"
+                    : "Disponível"
+                }
               >
                 {d.getDate()}
-              </div>
+              </button>
             );
           })}
         </div>
+
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          {selectedDate
+            ? `Retirada em ${parseISODate(selectedDate).toLocaleDateString("pt-BR")} · devolução em ${parseISODate(selectedEnd!).toLocaleDateString("pt-BR")}`
+            : "Selecione uma data de retirada disponível."}
+        </p>
       </div>
     </div>
   );
 }
+
 
 
 
