@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Heart, ShoppingBag, ArrowLeft, Truck, Ruler, CreditCard, X, ChevronLeft, ChevronRight, CalendarCheck } from "lucide-react";
+import { Heart, ArrowLeft, Truck, Ruler, CreditCard, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { useAuth } from "@/lib/auth";
