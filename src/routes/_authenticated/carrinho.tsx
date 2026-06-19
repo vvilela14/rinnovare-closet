@@ -1,26 +1,24 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/site/Header";
-import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
+import { Trash2, Minus, Plus, ShoppingBag, CalendarCheck } from "lucide-react";
 import { toast } from "sonner";
-import { RENTAL_PERIODS, addDays, fmtISODate, parseISODate } from "@/lib/catalog-constants";
+import { addDays, fmtISODate, parseISODate } from "@/lib/catalog-constants";
 
 export const Route = createFileRoute("/_authenticated/carrinho")({
   head: () => ({ meta: [{ title: "Meu carrinho — Rinnovare Closet" }] }),
   component: CartPage,
 });
 
-type CartRow = { id: string; quantity: number; product: any };
+type CartRow = { id: string; quantity: number; start_date: string | null; period_days: number | null; product: any };
+
 
 function CartPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const [periods, setPeriods] = useState<Record<string, number>>({});
-  const [startDates, setStartDates] = useState<Record<string, string>>({});
 
   const { data: items = [], isLoading } = useQuery<CartRow[]>({
     queryKey: ["cart", user?.id],
@@ -28,7 +26,7 @@ function CartPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("cart_items")
-        .select("id, quantity, product:products(*)")
+        .select("id, quantity, start_date, period_days, product:products(*)")
         .eq("user_id", user!.id);
       if (error) throw error;
       return (data ?? []) as any;
@@ -54,8 +52,8 @@ function CartPage() {
       if (!user) throw new Error("auth");
       const today = new Date();
       const rows = items.map((r) => {
-        const periodDays = periods[r.id] ?? 4;
-        const start = startDates[r.id] ? parseISODate(startDates[r.id]) : addDays(today, 3);
+        const periodDays = r.period_days ?? 4;
+        const start = r.start_date ? parseISODate(r.start_date) : addDays(today, 3);
         const end = addDays(start, periodDays - 1);
         return {
           user_id: user.id,
@@ -82,6 +80,7 @@ function CartPage() {
     },
     onError: () => toast.error("Não foi possível enviar a solicitação."),
   });
+
 
   const total = items.reduce((sum, r) => sum + Number(r.product?.price ?? 0) * r.quantity, 0);
 
