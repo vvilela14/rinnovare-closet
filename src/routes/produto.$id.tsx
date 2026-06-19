@@ -27,6 +27,9 @@ function ProductPage() {
   const [active, setActive] = useState(0);
   const [zoomIndex, setZoomIndex] = useState<number | null>(null);
   const [period, setPeriod] = useState<number>(4);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+
 
 
   const { data: product, isLoading } = useQuery({

@@ -133,12 +133,6 @@ function Home() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="absolute -bottom-6 -left-6 hidden max-w-[220px] border border-border bg-background p-5 shadow-[var(--shadow-soft)] lg:block animate-float-card">
-              <p className="font-script text-2xl animate-shimmer-text" style={{ color: "var(--lilac)" }}>Closet</p>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Vista a sua ocasião especial sem comprar. Renove o guarda-roupa a cada festa.
-              </p>
-            </div>
           </div>
         </div>
       </section>
