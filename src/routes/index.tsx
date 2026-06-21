@@ -198,9 +198,21 @@ function Home() {
                 type="date"
                 value={eventDate}
                 min={fmtISODate(new Date())}
-                onChange={(e) => setEventDate(e.target.value)}
+                onChange={(e) => { setEventDate(e.target.value); setCheckedAvailability(false); }}
                 className="rounded-none border border-border bg-background px-4 py-2 text-sm"
               />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período <span className="text-destructive">*</span></label>
+              <select
+                value={periodDays}
+                onChange={(e) => { setPeriodDays(e.target.value); setCheckedAvailability(false); }}
+                className="min-w-[140px] rounded-none border border-border bg-background px-4 py-2 text-sm"
+              >
+                <option value="4">4 dias</option>
+                <option value="8">8 dias</option>
+              </select>
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -217,10 +229,19 @@ function Home() {
               </select>
             </div>
 
+            <button
+              type="button"
+              disabled={!eventDate || !periodDays}
+              onClick={() => setCheckedAvailability(true)}
+              className="rounded-none bg-primary px-5 py-2 text-[10px] uppercase tracking-widest text-primary-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Verificar Disponibilidade
+            </button>
+
             {hasFilters && (
               <button
                 type="button"
-                onClick={() => { setCategory(""); setEventDate(""); setColor(""); }}
+                onClick={() => { setCategory(""); setEventDate(""); setColor(""); setCheckedAvailability(false); }}
                 className="rounded-none border border-border px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-background"
               >
                 Limpar filtros
