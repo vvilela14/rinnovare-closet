@@ -287,10 +287,10 @@ function EventosPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Clique em uma data para selecioná-la. Datas destacadas indicam um evento.
           </p>
-          <div className="mt-4 overflow-x-auto">
+          <div className="mt-4">
             <Calendar
               mode="single"
-              numberOfMonths={2}
+              numberOfMonths={1}
               selected={createForm.date}
               onSelect={(d) => setCreateForm((f) => ({ ...f, date: d }))}
               month={calendarMonth}
@@ -298,7 +298,7 @@ function EventosPage() {
               modifiers={{ hasEvent: eventDates }}
               modifiersClassNames={{ hasEvent: "bg-primary/10 text-primary rounded-full font-semibold" }}
               locale={ptBR}
-              className={cn("p-3 pointer-events-auto")}
+              className={cn("p-2 pointer-events-auto")}
             />
           </div>
           {selectedDayEvents.length > 0 && (
