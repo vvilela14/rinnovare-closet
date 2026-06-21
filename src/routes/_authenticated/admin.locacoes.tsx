@@ -179,16 +179,26 @@ function AdminLocacoes() {
                 const refDate = new Date(refDateStr + "T00:00:00");
                 const eventPassed = refDate.getTime() <= today.getTime();
 
-                let stage: "pending" | "confirmed" | "awaiting_return" | "returned";
-                if (r.status === "returned") stage = "returned";
+                const STATUS_LABELS_PT: Record<string, string> = {
+                  pending: "Pendente",
+                  reserved: "Reservado",
+                  awaiting_payment: "Aguardando Pagamento",
+                  confirmed: "Confirmado",
+                  cancelled: "Cancelado",
+                };
+
+                let stage: "pending" | "confirmed" | "awaiting_return" | "returned" | "cancelled";
+                if (r.status === "cancelled") stage = "cancelled";
+                else if (r.status === "returned") stage = "returned";
                 else if (r.status === "pending") stage = "pending";
                 else stage = eventPassed ? "awaiting_return" : "confirmed";
 
                 const btn = {
-                  pending: { label: "Aguardando Confirmação", icon: Clock, cls: "bg-green-600 hover:bg-green-700", next: "confirmed" as const, clickable: true },
-                  confirmed: { label: "Locação confirmada", icon: Check, cls: "bg-[#260d58] cursor-default", next: null, clickable: false },
-                  awaiting_return: { label: "Aguardando Devolução", icon: Undo2, cls: "bg-amber-500 hover:bg-amber-600", next: "returned" as const, clickable: true },
+                  pending: { label: STATUS_LABELS_PT.pending, icon: Clock, cls: "bg-amber-500 hover:bg-amber-600", next: "confirmed" as const, clickable: true },
+                  confirmed: { label: STATUS_LABELS_PT.confirmed, icon: Check, cls: "bg-emerald-600 cursor-default", next: null, clickable: false },
+                  awaiting_return: { label: "Aguardando Devolução", icon: Undo2, cls: "bg-orange-500 hover:bg-orange-600", next: "returned" as const, clickable: true },
                   returned: { label: "Devolução Realizada", icon: PackageCheck, cls: "bg-slate-500 cursor-default", next: null, clickable: false },
+                  cancelled: { label: STATUS_LABELS_PT.cancelled, icon: Clock, cls: "bg-slate-400 cursor-default", next: null, clickable: false },
                 }[stage];
                 const Icon = btn.icon;
 
