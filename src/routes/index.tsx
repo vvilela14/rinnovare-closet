@@ -26,7 +26,9 @@ export const Route = createFileRoute("/")({
 function Home() {
   const [category, setCategory] = useState<string>("");
   const [eventDate, setEventDate] = useState<string>("");
+  const [periodDays, setPeriodDays] = useState<string>("4");
   const [color, setColor] = useState<string>("");
+  const [checkedAvailability, setCheckedAvailability] = useState(false);
 
   const { data: products = [] } = useQuery<Product[]>({
     queryKey: ["products"],
@@ -47,33 +49,36 @@ function Home() {
       const { data } = await supabase
         .from("rental_requests")
         .select("product_id, start_date, end_date, status")
-        .in("status", ["confirmed", "pending"]);
+        .in("status", ["confirmed", "reserved", "awaiting_payment", "pending"]);
       return data ?? [];
     },
   });
 
   const reservedSet = useMemo(() => {
-    return new Set(confirmedRentals.filter((r: any) => r.status === "confirmed" || r.status === "pending").map((r: any) => r.product_id));
+    return new Set(confirmedRentals.map((r: any) => r.product_id));
   }, [confirmedRentals]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (category && p.category !== category) return false;
       if (color && (p as any).color !== color) return false;
-      if (eventDate) {
-        const target = parseISODate(eventDate);
+      if (checkedAvailability && eventDate) {
+        const start = parseISODate(eventDate);
+        const end = new Date(start);
+        end.setDate(end.getDate() + Number(periodDays) - 1);
         const taken = confirmedRentals.some((r: any) => {
           if (r.product_id !== p.id) return false;
-          if (r.status !== "confirmed") return false;
-          return rangesOverlap(target, target, parseISODate(r.start_date), parseISODate(r.end_date));
+          if (r.status === "cancelled") return false;
+          return rangesOverlap(start, end, parseISODate(r.start_date), parseISODate(r.end_date));
         });
         if (taken) return false;
       }
       return true;
     });
-  }, [products, category, color, eventDate, confirmedRentals]);
+  }, [products, category, color, eventDate, periodDays, checkedAvailability, confirmedRentals]);
 
-  const hasFilters = category || color || eventDate;
+  const hasFilters = category || color || (checkedAvailability && eventDate);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
