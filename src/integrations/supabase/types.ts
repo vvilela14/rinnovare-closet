@@ -238,9 +238,78 @@ export type Database = {
         }
         Relationships: []
       }
+      rental_credits: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          reason: string | null
+          rental_request_id: string | null
+          used_at: string | null
+          used_in_rental_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          reason?: string | null
+          rental_request_id?: string | null
+          used_at?: string | null
+          used_in_rental_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          reason?: string | null
+          rental_request_id?: string | null
+          used_at?: string | null
+          used_in_rental_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_credits_rental_request_id_fkey"
+            columns: ["rental_request_id"]
+            isOneToOne: false
+            referencedRelation: "rental_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_credits_rental_request_id_fkey"
+            columns: ["rental_request_id"]
+            isOneToOne: false
+            referencedRelation: "rental_requests_effective"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_credits_used_in_rental_id_fkey"
+            columns: ["used_in_rental_id"]
+            isOneToOne: false
+            referencedRelation: "rental_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_credits_used_in_rental_id_fkey"
+            columns: ["used_in_rental_id"]
+            isOneToOne: false
+            referencedRelation: "rental_requests_effective"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rental_requests: {
         Row: {
+          balance_paid_at: string | null
+          balance_value: number | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
           created_at: string
+          credit_applied: number
+          deposit_paid_at: string | null
+          deposit_value: number | null
           end_date: string
           id: string
           payment_terms: string | null
@@ -254,7 +323,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          balance_paid_at?: string | null
+          balance_value?: number | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
+          credit_applied?: number
+          deposit_paid_at?: string | null
+          deposit_value?: number | null
           end_date: string
           id?: string
           payment_terms?: string | null
@@ -268,7 +344,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          balance_paid_at?: string | null
+          balance_value?: number | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
+          credit_applied?: number
+          deposit_paid_at?: string | null
+          deposit_value?: number | null
           end_date?: string
           id?: string
           payment_terms?: string | null
@@ -314,9 +397,113 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      admin_monthly_stats: {
+        Row: {
+          faturamento_realizado: number | null
+          locacoes_realizadas_valor: number | null
+          month: string | null
+          qtd_locacoes_realizadas: number | null
+          qtd_realizada_total: number | null
+          qtd_reservas_realizadas: number | null
+          reservas_realizadas_valor: number | null
+        }
+        Relationships: []
+      }
+      rental_requests_effective: {
+        Row: {
+          balance_paid_at: string | null
+          balance_value: number | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string | null
+          credit_applied: number | null
+          deposit_paid_at: string | null
+          deposit_value: number | null
+          effective_total: number | null
+          end_date: string | null
+          id: string | null
+          payment_terms: string | null
+          period_days: number | null
+          product_id: string | null
+          size: string | null
+          start_date: string | null
+          status: string | null
+          status_label: string | null
+          total_value: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          balance_paid_at?: string | null
+          balance_value?: number | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          credit_applied?: number | null
+          deposit_paid_at?: string | null
+          deposit_value?: number | null
+          effective_total?: never
+          end_date?: string | null
+          id?: string | null
+          payment_terms?: string | null
+          period_days?: number | null
+          product_id?: string | null
+          size?: string | null
+          start_date?: string | null
+          status?: string | null
+          status_label?: never
+          total_value?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          balance_paid_at?: string | null
+          balance_value?: number | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          credit_applied?: number | null
+          deposit_paid_at?: string | null
+          deposit_value?: number | null
+          effective_total?: never
+          end_date?: string | null
+          id?: string | null
+          payment_terms?: string | null
+          period_days?: number | null
+          product_id?: string | null
+          size?: string | null
+          start_date?: string | null
+          status?: string | null
+          status_label?: never
+          total_value?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_credit_balance: {
+        Row: {
+          available_balance: number | null
+          total_balance: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      cancel_rental_request: {
+        Args: { _reason?: string; _rental_id: string }
+        Returns: Json
+      }
+      get_admin_kpis: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

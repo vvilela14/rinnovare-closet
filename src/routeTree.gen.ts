@@ -19,6 +19,7 @@ import { Route as AuthenticatedCarrinhoRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPerfilIndexRouteImport } from './routes/_authenticated/perfil.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedPerfilLocacoesRouteImport } from './routes/_authenticated/perfil.locacoes'
 import { Route as AuthenticatedPerfilEventosRouteImport } from './routes/_authenticated/perfil.eventos'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
 import { Route as AuthenticatedAdminLocacoesRouteImport } from './routes/_authenticated/admin.locacoes'
@@ -77,6 +78,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedPerfilLocacoesRoute =
+  AuthenticatedPerfilLocacoesRouteImport.update({
+    id: '/locacoes',
+    path: '/locacoes',
+    getParentRoute: () => AuthenticatedPerfilRoute,
+  } as any)
 const AuthenticatedPerfilEventosRoute =
   AuthenticatedPerfilEventosRouteImport.update({
     id: '/eventos',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/admin/locacoes': typeof AuthenticatedAdminLocacoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
+  '/perfil/locacoes': typeof AuthenticatedPerfilLocacoesRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/perfil/': typeof AuthenticatedPerfilIndexRoute
 }
@@ -151,6 +159,7 @@ export interface FileRoutesByTo {
   '/admin/locacoes': typeof AuthenticatedAdminLocacoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
+  '/perfil/locacoes': typeof AuthenticatedPerfilLocacoesRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/perfil': typeof AuthenticatedPerfilIndexRoute
 }
@@ -171,6 +180,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/locacoes': typeof AuthenticatedAdminLocacoesRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/perfil/eventos': typeof AuthenticatedPerfilEventosRoute
+  '/_authenticated/perfil/locacoes': typeof AuthenticatedPerfilLocacoesRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/perfil/': typeof AuthenticatedPerfilIndexRoute
 }
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/admin/locacoes'
     | '/admin/pedidos'
     | '/perfil/eventos'
+    | '/perfil/locacoes'
     | '/admin/'
     | '/perfil/'
   fileRoutesByTo: FileRoutesByTo
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin/locacoes'
     | '/admin/pedidos'
     | '/perfil/eventos'
+    | '/perfil/locacoes'
     | '/admin'
     | '/perfil'
   id:
@@ -226,6 +238,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/locacoes'
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/perfil/eventos'
+    | '/_authenticated/perfil/locacoes'
     | '/_authenticated/admin/'
     | '/_authenticated/perfil/'
   fileRoutesById: FileRoutesById
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/perfil/locacoes': {
+      id: '/_authenticated/perfil/locacoes'
+      path: '/locacoes'
+      fullPath: '/perfil/locacoes'
+      preLoaderRoute: typeof AuthenticatedPerfilLocacoesRouteImport
+      parentRoute: typeof AuthenticatedPerfilRoute
+    }
     '/_authenticated/perfil/eventos': {
       id: '/_authenticated/perfil/eventos'
       path: '/eventos'
@@ -386,11 +406,13 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedPerfilRouteChildren {
   AuthenticatedPerfilEventosRoute: typeof AuthenticatedPerfilEventosRoute
+  AuthenticatedPerfilLocacoesRoute: typeof AuthenticatedPerfilLocacoesRoute
   AuthenticatedPerfilIndexRoute: typeof AuthenticatedPerfilIndexRoute
 }
 
 const AuthenticatedPerfilRouteChildren: AuthenticatedPerfilRouteChildren = {
   AuthenticatedPerfilEventosRoute: AuthenticatedPerfilEventosRoute,
+  AuthenticatedPerfilLocacoesRoute: AuthenticatedPerfilLocacoesRoute,
   AuthenticatedPerfilIndexRoute: AuthenticatedPerfilIndexRoute,
 }
 
@@ -423,13 +445,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

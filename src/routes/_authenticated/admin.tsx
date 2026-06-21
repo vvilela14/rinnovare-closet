@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Package, Users, ShoppingBag, Heart, CalendarDays, LogOut, ArrowLeft, Bell, ClipboardList } from "lucide-react";
+import { useState } from "react";
+import { LayoutDashboard, Package, Users, ShoppingBag, Heart, CalendarDays, LogOut, ArrowLeft, Bell, ClipboardList, ChevronLeft, ChevronRight } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -126,6 +127,7 @@ function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const [collapsed, setCollapsed] = useState(false);
 
   async function handleSignOut() {
     await qc.cancelQueries();
@@ -137,11 +139,20 @@ function AdminLayout() {
   return (
     <div className="min-h-screen bg-[#0f0a1f] text-white">
       <div className="flex min-h-screen">
-        <aside className="hidden w-52 shrink-0 flex-col border-r border-white/10 bg-[#0a0716] px-4 py-5 md:flex">
-          <Link to="/" className="mb-8 flex items-center gap-2">
-            <img src={logoAsset.url} alt="Rinnovare Closet" className="h-10 w-auto" />
-          </Link>
-          <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-white/40">Administração</div>
+        <aside className={`hidden shrink-0 flex-col border-r border-white/10 bg-[#0a0716] px-3 py-5 md:flex transition-all ${collapsed ? "w-16" : "w-52"}`}>
+          <div className="mb-6 flex items-center justify-between gap-2">
+            <Link to="/" className="flex items-center gap-2 overflow-hidden">
+              <img src={logoAsset.url} alt="Rinnovare Closet" className={`h-10 w-auto ${collapsed ? "hidden" : ""}`} />
+            </Link>
+            <button
+              onClick={() => setCollapsed((c) => !c)}
+              className="rounded-md p-1 text-white/60 hover:bg-white/10 hover:text-white"
+              aria-label={collapsed ? "Expandir" : "Recolher"}
+            >
+              {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </button>
+          </div>
+          {!collapsed && <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-white/40">Administração</div>}
           <nav className="flex flex-col gap-1">
             {NAV.map((item) => {
               const active = item.exact
@@ -152,14 +163,15 @@ function AdminLayout() {
                 <Link
                   key={item.to}
                   to={item.to}
+                  title={item.label}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
                     active
                       ? "bg-[#260d58] text-white"
                       : "text-white/70 hover:bg-white/5 hover:text-white"
                   }`}
                 >
-                  <Icon className="h-4 w-4" style={{ color: active ? "#be9ffc" : undefined }} />
-                  {item.label}
+                  <Icon className="h-4 w-4 shrink-0" style={{ color: active ? "#be9ffc" : undefined }} />
+                  {!collapsed && item.label}
                 </Link>
               );
             })}
@@ -168,15 +180,17 @@ function AdminLayout() {
           <div className="mt-auto flex flex-col gap-2 pt-8">
             <Link
               to="/"
+              title="Voltar à vitrine"
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs uppercase tracking-widest text-white/60 hover:text-white"
             >
-              <ArrowLeft className="h-3.5 w-3.5" /> Voltar à vitrine
+              <ArrowLeft className="h-3.5 w-3.5 shrink-0" /> {!collapsed && "Voltar à vitrine"}
             </Link>
             <button
               onClick={handleSignOut}
+              title="Sair"
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs uppercase tracking-widest text-white/60 hover:text-white"
             >
-              <LogOut className="h-3.5 w-3.5" /> Sair
+              <LogOut className="h-3.5 w-3.5 shrink-0" /> {!collapsed && "Sair"}
             </button>
           </div>
         </aside>
