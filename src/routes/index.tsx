@@ -211,7 +211,8 @@ function Home() {
                 className="min-w-[140px] rounded-none border border-border bg-background px-4 py-2 text-sm"
               >
                 <option value="4">4 dias</option>
-                <option value="8">8 dias</option>
+                <option value="7">7 dias</option>
+                <option value="12">12 dias</option>
               </select>
             </div>
 
