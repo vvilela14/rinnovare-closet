@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Truck, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
@@ -25,6 +25,11 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const [category, setCategory] = useState<string>("");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const cat = new URLSearchParams(window.location.search).get("cat");
+    if (cat) setCategory(cat);
+  }, []);
   const [eventDate, setEventDate] = useState<string>("");
   const [periodDays, setPeriodDays] = useState<string>("4");
   const [color, setColor] = useState<string>("");
