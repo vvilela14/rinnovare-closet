@@ -1,14 +1,13 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, ShoppingBag, User as UserIcon, LogOut, LayoutGrid, UserCog } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Heart, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { UserDrawer } from "@/components/site/UserDrawer";
 import logoAsset from "@/assets/rinnovare-logo.png.asset.json";
 
 export function Header() {
-  const { user, isAdmin } = useAuth();
-  const navigate = useNavigate();
-  const qc = useQueryClient();
+  const { user } = useAuth();
 
   const { data: cartCount = 0 } = useQuery({
     queryKey: ["cart-count", user?.id],
@@ -21,13 +20,6 @@ export function Header() {
       return count ?? 0;
     },
   });
-
-  async function handleSignOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/" });
-  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md">
@@ -44,11 +36,6 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           {user && (
-            <Link to="/perfil" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Meu perfil">
-              <UserCog className="h-5 w-5" style={{ color: "var(--lilac)" }} />
-            </Link>
-          )}
-          {user && (
             <Link to="/favoritos" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Favoritos">
               <Heart className="h-5 w-5" style={{ color: "var(--lilac)" }} />
             </Link>
@@ -63,20 +50,9 @@ export function Header() {
               )}
             </Link>
           )}
-          {isAdmin && (
-            <Link to="/admin" className="ml-1 hidden items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs uppercase tracking-widest hover:bg-muted md:inline-flex">
-              <LayoutGrid className="h-3.5 w-3.5" /> Admin
-            </Link>
-          )}
-          {user ? (
-            <button onClick={handleSignOut} className="ml-1 rounded-full p-2.5 hover:bg-muted transition" aria-label="Sair">
-              <LogOut className="h-5 w-5" />
-            </button>
-          ) : (
-            <Link to="/auth" className="ml-1 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs uppercase tracking-widest text-primary-foreground transition hover:opacity-90">
-              <UserIcon className="h-4 w-4" /> Entrar
-            </Link>
-          )}
+          <div className="ml-1">
+            <UserDrawer />
+          </div>
         </div>
       </div>
     </header>
