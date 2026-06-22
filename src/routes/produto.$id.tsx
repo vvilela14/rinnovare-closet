@@ -121,7 +121,7 @@ function ProductPage() {
           <div className="py-32 text-center text-muted-foreground">Carregando...</div>
         ) : (
           <div className="mt-8 grid gap-12 lg:grid-cols-2">
-            <div>
+            <div className="lg:max-w-[80%]">
               <button
                 type="button"
                 onClick={() => gallery.length > 0 && setZoomIndex(active)}
@@ -348,43 +348,43 @@ function PeriodAvailability({
     : null;
 
   return (
-    <div className="mt-6 w-full rounded-2xl border border-border bg-background p-5">
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
+    <div className="mt-6 w-full max-w-xs rounded-xl border border-border bg-background p-3">
+      <div className="flex flex-col gap-1">
+        <label className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground">Período de Locação</label>
         <select
           value={period}
           onChange={(e) => { setPeriod(Number(e.target.value)); setSelectedDate(null); }}
-          className="w-fit rounded-none border border-border bg-background px-3 py-1.5 text-xs"
+          className="w-fit rounded-none border border-border bg-background px-2 py-1 text-[11px]"
         >
           {RENTAL_PERIODS.map((d) => <option key={d} value={d}>{d} dias</option>)}
         </select>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-2.5">
         <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
-            className="rounded-full p-1.5 hover:bg-muted"
+            className="rounded-full p-1 hover:bg-muted"
             aria-label="Mês anterior"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5" />
           </button>
-          <div className="text-sm font-medium capitalize">{monthLabel}</div>
+          <div className="text-xs font-medium capitalize">{monthLabel}</div>
           <button
             type="button"
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
-            className="rounded-full p-1.5 hover:bg-muted"
+            className="rounded-full p-1 hover:bg-muted"
             aria-label="Próximo mês"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           </button>
         </div>
 
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-[9px] uppercase tracking-widest text-muted-foreground">
           {["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => <div key={i}>{d}</div>)}
         </div>
-        <div className="mt-1 grid grid-cols-7 gap-1">
+        <div className="mt-0.5 grid grid-cols-7 gap-0.5">
           {cells.map((d, i) => {
             if (!d) return <div key={i} />;
             const iso = fmtISODate(d);
@@ -401,7 +401,7 @@ function PeriodAvailability({
                 key={i}
                 disabled={!canStart}
                 onClick={() => setSelectedDate(iso)}
-                className={`flex aspect-square items-center justify-center rounded-md text-sm transition ${
+                className={`flex aspect-square items-center justify-center rounded-md text-[11px] transition ${
                   isSelected
                     ? "bg-primary text-primary-foreground font-semibold"
                     : isInSelectedRange
@@ -426,7 +426,7 @@ function PeriodAvailability({
           })}
         </div>
 
-        <p className="mt-3 text-[11px] text-muted-foreground">
+        <p className="mt-2 text-[10px] text-muted-foreground">
           {selectedDate
             ? `Retirada em ${parseISODate(selectedDate).toLocaleDateString("pt-BR")} · devolução em ${parseISODate(selectedEnd!).toLocaleDateString("pt-BR")}`
             : "Selecione uma data de retirada disponível."}

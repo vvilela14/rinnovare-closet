@@ -258,7 +258,9 @@ function Home() {
 
         <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2">
           {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} isReserved={reservedSet.has(p.id)} />
+            <div key={p.id} className="mx-auto w-4/5">
+              <ProductCard product={p} isReserved={reservedSet.has(p.id)} />
+            </div>
           ))}
           {filtered.length === 0 && (
             <p className="col-span-full text-center text-muted-foreground">
