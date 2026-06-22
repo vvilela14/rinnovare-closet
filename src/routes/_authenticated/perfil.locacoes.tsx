@@ -17,11 +17,11 @@ export const Route = createFileRoute("/_authenticated/perfil/locacoes")({
 });
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: "Pendente",
-  reserved: "Reservado",
+  pending: "Reserva Pendente",
+  reserved: "Reserva Efetuada",
   awaiting_payment: "Aguardando Pagamento",
-  confirmed: "Confirmado",
-  cancelled: "Cancelado",
+  confirmed: "Locação Confirmada",
+  cancelled: "Cancelada",
 };
 
 const STATUS_COLORS: Record<string, string> = {

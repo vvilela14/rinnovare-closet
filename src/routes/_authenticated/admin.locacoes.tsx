@@ -180,11 +180,11 @@ function AdminLocacoes() {
                 const eventPassed = refDate.getTime() <= today.getTime();
 
                 const STATUS_LABELS_PT: Record<string, string> = {
-                  pending: "Pendente",
-                  reserved: "Reservado",
+                  pending: "Reserva Pendente",
+                  reserved: "Reserva Efetuada",
                   awaiting_payment: "Aguardando Pagamento",
-                  confirmed: "Confirmado",
-                  cancelled: "Cancelado",
+                  confirmed: "Locação Confirmada",
+                  cancelled: "Cancelada",
                 };
 
                 let stage: "pending" | "confirmed" | "awaiting_return" | "returned" | "cancelled";
