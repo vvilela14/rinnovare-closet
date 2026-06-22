@@ -195,11 +195,9 @@ export function UserDrawer() {
           </div>
           <nav className="px-2">
             {CATEGORY_OPTIONS.map((cat) => (
-              <Link
+              <a
                 key={cat}
-                to="/"
-                search={{ cat } as any}
-                hash="categorias"
+                href={`/?cat=${encodeURIComponent(cat)}#categorias`}
                 onClick={close}
                 className="block"
               >
@@ -207,7 +205,7 @@ export function UserDrawer() {
                   <span className="flex-1 text-sm">{cat}</span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-              </Link>
+              </a>
             ))}
             <Link to="/" hash="categorias" onClick={close} className="block">
               <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/60 transition rounded-lg">
