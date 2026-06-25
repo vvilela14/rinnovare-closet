@@ -17,7 +17,6 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetTrigger,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -139,28 +138,29 @@ export function UserDrawer() {
   const saldoFmt = `R$ ${Number(credit?.available_balance ?? 0).toFixed(2).replace(".", ",")}`;
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <button
-          type="button"
-          className="relative inline-flex items-center gap-2 rounded-full p-1 hover:bg-muted transition"
-          aria-label="Abrir menu"
-        >
-          <MenuIcon className="h-5 w-5 text-foreground/80 hidden sm:block" />
-          <span className="relative">
-            <Avatar className="h-9 w-9 border border-border">
-              <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
-              <AvatarFallback className="text-xs">{initialsOf(name, email)}</AvatarFallback>
-            </Avatar>
-            {pendingCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white ring-2 ring-background">
-                {pendingCount > 9 ? "9+" : pendingCount}
-              </span>
-            )}
-          </span>
-        </button>
-      </SheetTrigger>
-      <SheetContent side="right" className="w-full max-w-sm p-0 flex flex-col">
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="fixed left-4 top-1/2 z-[60] flex -translate-y-1/2 flex-col items-center gap-2 rounded-full border border-border bg-background/95 p-2.5 shadow-lg backdrop-blur transition hover:shadow-xl"
+        aria-label={open ? "Fechar menu" : "Abrir menu"}
+        aria-expanded={open}
+      >
+        <MenuIcon className={`h-5 w-5 text-foreground/80 transition-transform duration-300 ${open ? "rotate-90" : ""}`} />
+        <span className="relative">
+          <Avatar className="h-9 w-9 border border-border">
+            <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
+            <AvatarFallback className="text-xs">{initialsOf(name, email)}</AvatarFallback>
+          </Avatar>
+          {pendingCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white ring-2 ring-background">
+              {pendingCount > 9 ? "9+" : pendingCount}
+            </span>
+          )}
+        </span>
+      </button>
+      <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent side="left" className="w-full max-w-sm p-0 flex flex-col">
         <SheetHeader className="px-5 pt-6 pb-4 border-b">
           <SheetTitle className="sr-only">Menu</SheetTitle>
           <div className="flex items-center gap-3">
@@ -245,6 +245,7 @@ export function UserDrawer() {
           </button>
         </div>
       </SheetContent>
-    </Sheet>
+      </Sheet>
+    </>
   );
 }
