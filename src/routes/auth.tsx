@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
-import logoAsset from "@/assets/rinnovare-logo.png.asset.json";
+import logoUrl from "@/assets/rinnovare-logo-wordmark.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -89,7 +89,7 @@ function AuthPage() {
       <div className="flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-sm">
           <Link to="/" className="mb-10 inline-block lg:hidden">
-            <img src={logoAsset.url} alt="Rinnovare" className="h-10" />
+            <img src={logoUrl} alt="Rinnovare" className="h-10" />
           </Link>
           <h1 className="text-3xl">{mode === "login" ? "Entrar" : "Criar conta"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">

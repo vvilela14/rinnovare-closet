@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { UserDrawer } from "@/components/site/UserDrawer";
-import logoAsset from "@/assets/rinnovare-logo.png.asset.json";
+import logoUrl from "@/assets/rinnovare-logo-wordmark.png";
 
 export function Header() {
   const { user } = useAuth();
@@ -25,7 +25,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logoAsset.url} alt="Rinnovare Closet — Aluguel de vestidos" className="h-10 w-auto" />
+          <img src={logoUrl} alt="Rinnovare Closet — Aluguel de vestidos" className="h-10 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-10 text-sm tracking-wide text-foreground/80 md:flex">
