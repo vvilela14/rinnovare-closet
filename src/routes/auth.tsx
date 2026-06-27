@@ -111,6 +111,11 @@ function AuthPage() {
                 </button>
               </div>
             </Field>
+            {mode === "login" && (
+              <Link to="/esqueci-senha" className="block text-right text-xs text-muted-foreground hover:text-foreground">
+                Esqueci minha senha
+              </Link>
+            )}
             <button
               type="submit"
               disabled={busy}
