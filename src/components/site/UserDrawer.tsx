@@ -141,11 +141,10 @@ export function UserDrawer() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="fixed inset-y-0 left-0 z-[60] flex w-14 flex-col items-center justify-center gap-3 border-r border-border bg-background/95 shadow-lg backdrop-blur transition hover:shadow-xl"
+        className="fixed inset-y-0 left-0 z-[60] flex w-14 flex-col items-center justify-start gap-3 border-r border-border bg-background/95 pt-5 shadow-lg backdrop-blur transition hover:shadow-xl"
         aria-label={open ? "Fechar menu" : "Abrir menu"}
         aria-expanded={open}
       >
-        <MenuIcon className={`h-5 w-5 text-foreground/80 transition-transform duration-300 ${open ? "rotate-90" : ""}`} />
         <span className="relative">
           <Avatar className="h-9 w-9 border border-border">
             <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
@@ -157,9 +156,10 @@ export function UserDrawer() {
             </span>
           )}
         </span>
+        <MenuIcon className={`h-5 w-5 text-foreground/80 transition-transform duration-300 ${open ? "rotate-90" : ""}`} />
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side="left" className="w-full max-w-sm p-0 flex flex-col">
+      <SheetContent side="left" className="w-full max-w-sm p-0 pl-14 flex flex-col">
         <SheetHeader className="px-5 pt-6 pb-4 border-b">
           <SheetTitle className="sr-only">Menu</SheetTitle>
           {user ? (
