@@ -94,16 +94,16 @@ function Home() {
         <img
           src={heroImage}
           alt="Grupo de madrinhas com vestidos de festa Rinnovare"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover brightness-[1.3]"
         />
-        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-black/35" />
 
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-32">
-          <div className="mx-auto flex max-w-xl flex-col items-center text-center text-white">
-            <h1 className="text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+          <div className="mx-auto flex max-w-5xl flex-col items-center text-center text-white">
+            <h1 className="whitespace-nowrap text-3xl leading-[1.05] sm:text-5xl lg:text-7xl">
               O vestido certo para cada momento
             </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-white/85">
+            <p className="mt-5 max-w-lg text-2xl leading-snug text-white/85 sm:text-[2rem]">
               Porque cada ocasião pede uma nova forma de expressar sua personalidade
             </p>
 
