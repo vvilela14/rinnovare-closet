@@ -28,12 +28,6 @@ export function Header() {
           <img src={logoUrl} alt="Rinnovare Closet — Aluguel de vestidos" className="h-10 w-auto" />
         </Link>
 
-        <nav className="hidden items-center gap-10 text-sm tracking-wide text-foreground/80 md:flex">
-          <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-          <Link to="/" hash="categorias" className="hover:text-foreground transition-colors">Categorias</Link>
-          <Link to="/" hash="sobre" className="hover:text-foreground transition-colors">Sobre</Link>
-        </nav>
-
         <div className="flex items-center gap-1">
           {user && (
             <Link to="/favoritos" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Favoritos">
