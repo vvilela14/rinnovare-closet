@@ -98,7 +98,7 @@ function Home() {
         />
         <div className="absolute inset-0 bg-black/35" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-32">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 pt-28 sm:pt-36 lg:pt-48">
           <div className="mx-auto flex max-w-5xl flex-col items-center text-center text-white">
             <h1 className="whitespace-nowrap text-3xl leading-[1.05] sm:text-5xl lg:text-7xl">
               O vestido certo para cada momento

@@ -26,6 +26,7 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [signupDone, setSignupDone] = useState(false);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/" });
@@ -45,13 +46,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Conta criada! Bem-vinda à Rinnovare.");
+        setSignupDone(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Bem-vinda de volta!");
+        navigate({ to: "/" });
       }
-      navigate({ to: "/" });
     } catch (err: any) {
       toast.error(err.message ?? "Algo deu errado");
     } finally {
@@ -77,61 +78,91 @@ function AuthPage() {
           <Link to="/" className="mb-10 inline-block lg:hidden">
             <img src={logoUrl} alt="Rinnovare" className="h-10" />
           </Link>
-          <h1 className="text-3xl">{mode === "login" ? "Entrar" : "Criar conta"}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {mode === "login" ? "Acesse para favoritar e alugar." : "Cadastre-se e renove seu closet."}
-          </p>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-            {mode === "signup" && (
-              <Field label="Nome completo">
-                <input required value={name} onChange={(e) => setName(e.target.value)} className="input" />
-              </Field>
-            )}
-            <Field label="E-mail">
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="input" />
-            </Field>
-            <Field label="Senha">
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input pr-11"
-                />
+          {signupDone ? (
+            <div className="text-center">
+              <h1 className="text-3xl">Quase lá! ✅</h1>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                Uma mensagem de confirmação foi enviada ao e-mail cadastrado. Clique no link para acessar sua conta! ✅
+              </p>
+              <Link
+                to="/auth"
+                onClick={() => { setSignupDone(false); setMode("login"); }}
+                className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-border py-3.5 text-xs uppercase tracking-[0.2em] transition hover:bg-muted"
+              >
+                Voltar para o login
+              </Link>
+            </div>
+          ) : (
+            <>
+              <h1 className="text-3xl">{mode === "login" ? "Entrar" : "Criar conta"}</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {mode === "login" ? "Acesse para favoritar e alugar." : "Cadastre-se e renove seu closet."}
+              </p>
+
+              <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+                {mode === "signup" && (
+                  <Field label="Nome completo">
+                    <input required value={name} onChange={(e) => setName(e.target.value)} className="input" />
+                  </Field>
+                )}
+                <Field label="E-mail">
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="input" />
+                </Field>
+                <Field label="Senha">
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="input pr-11"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </Field>
+                {mode === "login" && (
+                  <Link to="/esqueci-senha" className="block text-right text-xs text-muted-foreground hover:text-foreground">
+                    Esqueci minha senha
+                  </Link>
+                )}
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full rounded-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+                >
+                  {busy ? "..." : mode === "login" ? "Entrar" : "Criar conta"}
+                </button>
+                {mode === "login" && (
+                  <button
+                    type="button"
+                    onClick={() => setMode("signup")}
+                    className="w-full rounded-full border border-border bg-white py-3.5 text-xs uppercase tracking-[0.2em] text-foreground transition hover:bg-muted"
+                  >
+                    Criar Conta
+                  </button>
+                )}
+              </form>
+
+              {mode === "signup" && (
                 <button
                   type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setMode("login")}
+                  className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  Já tem conta? Entrar
                 </button>
-              </div>
-            </Field>
-            {mode === "login" && (
-              <Link to="/esqueci-senha" className="block text-right text-xs text-muted-foreground hover:text-foreground">
-                Esqueci minha senha
-              </Link>
-            )}
-            <button
-              type="submit"
-              disabled={busy}
-              className="w-full rounded-full bg-primary py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
-            >
-              {busy ? "..." : mode === "login" ? "Entrar" : "Criar conta"}
-            </button>
-          </form>
-
-          <button
-            type="button"
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground"
-          >
-            {mode === "login" ? "Não tem conta? Criar agora" : "Já tem conta? Entrar"}
-          </button>
+              )}
+            </>
+          )}
         </div>
       </div>
       <style>{`

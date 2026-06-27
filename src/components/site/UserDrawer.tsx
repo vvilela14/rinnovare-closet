@@ -26,6 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/lib/auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORY_OPTIONS } from "@/lib/catalog-constants";
 import { cn } from "@/lib/utils";
@@ -74,6 +75,7 @@ export function UserDrawer() {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
@@ -117,9 +119,13 @@ export function UserDrawer() {
   });
 
   useEffect(() => {
+    if (isMobile) {
+      document.body.classList.remove("has-side-menu-bar");
+      return;
+    }
     document.body.classList.add("has-side-menu-bar");
     return () => document.body.classList.remove("has-side-menu-bar");
-  }, []);
+  }, [isMobile]);
 
   const close = () => setOpen(false);
 
@@ -138,28 +144,51 @@ export function UserDrawer() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="fixed inset-y-0 left-0 z-[60] flex w-14 flex-col items-center justify-start gap-3 border-r border-border bg-background/95 pt-5 shadow-lg backdrop-blur transition hover:shadow-xl"
-        aria-label={open ? "Fechar menu" : "Abrir menu"}
-        aria-expanded={open}
-      >
-        <span className="relative">
-          <Avatar className="h-9 w-9 border border-border">
-            <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
-            <AvatarFallback className="text-xs">{user ? initialsOf(name, email) : "?"}</AvatarFallback>
-          </Avatar>
-          {pendingCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white ring-2 ring-background">
-              {pendingCount > 9 ? "9+" : pendingCount}
-            </span>
-          )}
-        </span>
-        <MenuIcon className={`h-5 w-5 text-foreground/80 transition-transform duration-300 ${open ? "rotate-90" : ""}`} />
-      </button>
+      {isMobile ? (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="fixed right-4 top-4 z-[60] flex items-center gap-2 rounded-full border border-border bg-background/95 p-2 shadow-lg backdrop-blur transition hover:shadow-xl"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={open}
+        >
+          <span className="relative">
+            <Avatar className="h-8 w-8 border border-border">
+              <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
+              <AvatarFallback className="text-xs">{user ? initialsOf(name, email) : "?"}</AvatarFallback>
+            </Avatar>
+            {pendingCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white ring-2 ring-background">
+                {pendingCount > 9 ? "9+" : pendingCount}
+              </span>
+            )}
+          </span>
+          <MenuIcon className={`h-5 w-5 text-foreground/80 transition-transform duration-300 ${open ? "rotate-90" : ""}`} />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="fixed inset-y-0 left-0 z-[60] flex w-14 flex-col items-center justify-start gap-3 border-r border-border bg-background/95 pt-5 shadow-lg backdrop-blur transition hover:shadow-xl"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={open}
+        >
+          <span className="relative">
+            <Avatar className="h-9 w-9 border border-border">
+              <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
+              <AvatarFallback className="text-xs">{user ? initialsOf(name, email) : "?"}</AvatarFallback>
+            </Avatar>
+            {pendingCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white ring-2 ring-background">
+                {pendingCount > 9 ? "9+" : pendingCount}
+              </span>
+            )}
+          </span>
+          <MenuIcon className={`h-5 w-5 text-foreground/80 transition-transform duration-300 ${open ? "rotate-90" : ""}`} />
+        </button>
+      )}
       <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side="left" className="w-full max-w-sm p-0 pl-14 flex flex-col">
+      <SheetContent side={isMobile ? "right" : "left"} className={cn("w-full max-w-sm p-0 flex flex-col", !isMobile && "pl-14")}>
         <SheetHeader className="px-5 pt-6 pb-4 border-b">
           <SheetTitle className="sr-only">Menu</SheetTitle>
           {user ? (
@@ -179,20 +208,20 @@ export function UserDrawer() {
           ) : (
             <div>
               <div className="text-base font-medium">Bem-vinda à Rinnovare</div>
-              <div className="mt-3 flex gap-2">
+              <div className="mt-3 flex flex-col gap-2">
                 <Link
                   to="/auth"
                   onClick={close}
-                  className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-widest text-primary-foreground transition hover:opacity-90"
+                  className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-widest text-primary-foreground transition hover:opacity-90"
                 >
                   Entrar
                 </Link>
                 <Link
                   to="/auth"
                   onClick={close}
-                  className="inline-flex flex-1 items-center justify-center rounded-full border border-border px-4 py-2 text-xs uppercase tracking-widest transition hover:bg-muted"
+                  className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-xs uppercase tracking-widest text-foreground transition hover:bg-muted"
                 >
-                  Criar conta
+                  Criar Conta
                 </Link>
               </div>
             </div>
