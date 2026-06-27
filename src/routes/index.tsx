@@ -99,20 +99,15 @@ function Home() {
         <div className="absolute inset-0 bg-black/45" />
 
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-32">
-          <div className="flex max-w-xl flex-col text-white">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/40 px-4 py-1.5 text-[11px] uppercase tracking-[0.25em]">
-              <Sparkles className="h-3 w-3 text-white" />
-              Para todas as ocasiões
-            </div>
-
-            <h1 className="mt-8 text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+          <div className="mx-auto flex max-w-xl flex-col items-center text-center text-white">
+            <h1 className="text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
               O vestido certo para cada momento
             </h1>
             <p className="mt-5 max-w-md text-base leading-relaxed text-white/85">
               Porque cada ocasião pede uma nova forma de expressar sua personalidade
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-4">
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <a
                 href="#vitrine"
                 className="inline-flex items-center rounded-none bg-primary px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
@@ -126,21 +121,6 @@ function Home() {
                 Categorias
               </a>
             </div>
-
-            <dl className="mt-14 grid grid-cols-3 gap-6 border-t border-white/30 pt-8 text-xs">
-              <div>
-                <dt className="text-white/70 uppercase tracking-widest">Curadoria</dt>
-                <dd className="mt-1 text-sm">+200 peças</dd>
-              </div>
-              <div>
-                <dt className="text-white/70 uppercase tracking-widest">Entrega</dt>
-                <dd className="mt-1 text-sm">Em até 3 dias</dd>
-              </div>
-              <div>
-                <dt className="text-white/70 uppercase tracking-widest">Pagamento</dt>
-                <dd className="mt-1 text-sm">12x sem juros</dd>
-              </div>
-            </dl>
           </div>
         </div>
       </section>
