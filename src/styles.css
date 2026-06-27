@@ -81,6 +81,11 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss01", "cv11";
   }
+  /* Reserve space for the fixed full-height menu bar (UserDrawer trigger).
+     Only applied on pages that actually render the Header/UserDrawer. */
+  body.has-side-menu-bar {
+    padding-left: 3.5rem;
+  }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 400;

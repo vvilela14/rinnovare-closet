@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -15,6 +15,7 @@ import {
   Menu as MenuIcon,
   Home,
   Info,
+  ChevronDown,
 } from "lucide-react";
 import {
   Sheet,
@@ -74,6 +75,7 @@ export function UserDrawer() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["drawer-profile", user?.id],
@@ -114,6 +116,11 @@ export function UserDrawer() {
     },
   });
 
+  useEffect(() => {
+    document.body.classList.add("has-side-menu-bar");
+    return () => document.body.classList.remove("has-side-menu-bar");
+  }, []);
+
   const close = () => setOpen(false);
 
   async function handleSignOut() {
@@ -134,7 +141,7 @@ export function UserDrawer() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="fixed left-4 top-1/2 z-[60] flex -translate-y-1/2 flex-col items-center gap-2 rounded-full border border-border bg-background/95 p-2.5 shadow-lg backdrop-blur transition hover:shadow-xl"
+        className="fixed inset-y-0 left-0 z-[60] flex w-14 flex-col items-center justify-center gap-3 border-r border-border bg-background/95 shadow-lg backdrop-blur transition hover:shadow-xl"
         aria-label={open ? "Fechar menu" : "Abrir menu"}
         aria-expanded={open}
       >
@@ -210,29 +217,41 @@ export function UserDrawer() {
 
           <Separator className="my-2" />
 
-          <div className="px-5 pt-2 pb-1 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-            Categorias em destaque
-          </div>
           <nav className="px-2">
-            {CATEGORY_OPTIONS.map((cat) => (
-              <a
-                key={cat}
-                href={`/?cat=${encodeURIComponent(cat)}#categorias`}
-                onClick={close}
-                className="block"
-              >
-                <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/60 transition rounded-lg">
-                  <span className="flex-1 text-sm">{cat}</span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </a>
-            ))}
-            <Link to="/" hash="categorias" onClick={close} className="block">
-              <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/60 transition rounded-lg">
-                <span className="flex-1 text-sm font-medium text-primary">Todas as Categorias</span>
-                <ChevronRight className="h-4 w-4 text-primary" />
+            <button
+              type="button"
+              onClick={() => setCategoriesOpen((o) => !o)}
+              aria-expanded={categoriesOpen}
+              className="flex w-full items-center gap-3 px-4 py-3 hover:bg-muted/60 transition rounded-lg"
+            >
+              <span className="flex-1 text-left text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+                Categorias em destaque
+              </span>
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${categoriesOpen ? "rotate-180" : ""}`} />
+            </button>
+            {categoriesOpen && (
+              <div className="pb-1">
+                {CATEGORY_OPTIONS.map((cat) => (
+                  <a
+                    key={cat}
+                    href={`/?cat=${encodeURIComponent(cat)}#categorias`}
+                    onClick={close}
+                    className="block"
+                  >
+                    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/60 transition rounded-lg">
+                      <span className="flex-1 text-sm">{cat}</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </a>
+                ))}
+                <Link to="/" hash="categorias" onClick={close} className="block">
+                  <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/60 transition rounded-lg">
+                    <span className="flex-1 text-sm font-medium text-primary">Todas as Categorias</span>
+                    <ChevronRight className="h-4 w-4 text-primary" />
+                  </div>
+                </Link>
               </div>
-            </Link>
+            )}
           </nav>
 
           <Separator className="my-2" />
