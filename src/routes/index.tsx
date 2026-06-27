@@ -91,7 +91,7 @@ function Home() {
 
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-border/60">
-        <div className="mx-auto grid max-w-7xl items-stretch gap-12 px-6 py-16 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:py-24">
+        <div className="mx-auto grid max-w-7xl items-stretch gap-12 px-6 pb-16 pt-6 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:pb-24 lg:pt-10">
           <div className="flex flex-col justify-center">
             <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border px-4 py-1.5 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
               <Sparkles className="h-3 w-3" style={{ color: "var(--lilac)" }} />
