@@ -32,12 +32,12 @@ export function Header() {
           <div className="flex items-center gap-1">
             {user && (
               <Link to="/favoritos" className="rounded-full p-2.5 hover:bg-muted transition" aria-label="Favoritos">
-                <Heart className="h-5 w-5" style={{ color: "var(--lilac)" }} />
+                <Heart className="h-5 w-5" style={{ color: "black" }} />
               </Link>
             )}
             {user && (
               <Link to="/carrinho" className="relative rounded-full p-2.5 hover:bg-muted transition" aria-label="Carrinho">
-                <ShoppingBag className="h-5 w-5" style={{ color: "var(--lilac)" }} />
+                <ShoppingBag className="h-5 w-5" style={{ color: "black" }} />
                 {cartCount > 0 && (
                   <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
                     {cartCount}

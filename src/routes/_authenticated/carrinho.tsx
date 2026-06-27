@@ -116,7 +116,7 @@ function CartPage() {
                     <p className="mt-1 text-xs text-muted-foreground">Tam. {row.product?.size} · Entrega em {row.product?.delivery_days} dias</p>
                     <p className="mt-1 text-xs text-muted-foreground">{row.product?.payment_terms}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                      <CalendarCheck className="h-3.5 w-3.5" style={{ color: "var(--lilac)" }} />
+                      <CalendarCheck className="h-3.5 w-3.5" style={{ color: "black" }} />
                       {row.start_date && row.period_days ? (
                         <span className="text-foreground">
                           {parseISODate(row.start_date).toLocaleDateString("pt-BR")} —{" "}

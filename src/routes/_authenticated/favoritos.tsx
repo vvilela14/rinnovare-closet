@@ -31,7 +31,7 @@ function FavoritesPage() {
       <Header />
       <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10">
         <div className="flex items-center gap-3">
-          <Heart className="h-5 w-5" style={{ color: "var(--lilac)" }} fill="var(--lilac)" />
+          <Heart className="h-5 w-5" style={{ color: "black" }} fill="black" />
           <span className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Seu closet</span>
         </div>
         <h1 className="mt-3 text-4xl sm:text-5xl">Vestidos favoritos</h1>

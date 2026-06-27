@@ -166,9 +166,9 @@ function ProductPage() {
               </div>
 
               <ul className="mt-8 grid grid-cols-1 gap-3 border-y border-border py-6 text-sm sm:grid-cols-3">
-                <li className="flex items-center gap-2"><Ruler className="h-4 w-4" style={{ color: "var(--lilac)" }} /> Tamanho {product.size}</li>
-                <li className="flex items-center gap-2"><Truck className="h-4 w-4" style={{ color: "var(--lilac)" }} /> Entrega em {product.delivery_days} dias</li>
-                <li className="flex items-center gap-2"><CreditCard className="h-4 w-4" style={{ color: "var(--lilac)" }} /> {product.payment_terms}</li>
+                <li className="flex items-center gap-2"><Ruler className="h-4 w-4" style={{ color: "black" }} /> Tamanho {product.size}</li>
+                <li className="flex items-center gap-2"><Truck className="h-4 w-4" style={{ color: "black" }} /> Entrega em {product.delivery_days} dias</li>
+                <li className="flex items-center gap-2"><CreditCard className="h-4 w-4" style={{ color: "black" }} /> {product.payment_terms}</li>
               </ul>
 
               <PeriodAvailability
@@ -194,7 +194,7 @@ function ProductPage() {
                   className="inline-flex items-center justify-center gap-2 rounded-none border border-border px-5 py-3 text-[10px] uppercase tracking-[0.2em] transition hover:bg-muted"
                   aria-label="Favoritar"
                 >
-                  <Heart className="h-4 w-4" style={{ color: "var(--lilac)" }} fill={isFavorite ? "var(--lilac)" : "transparent"} />
+                  <Heart className="h-4 w-4" style={{ color: "black" }} fill={isFavorite ? "black" : "transparent"} />
                   {isFavorite ? "Salvo" : "Salvar"}
                 </button>
               </div>

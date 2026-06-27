@@ -94,13 +94,16 @@ function Home() {
         <div className="mx-auto grid max-w-7xl items-stretch gap-12 px-6 pb-16 pt-6 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:pb-24 lg:pt-10">
           <div className="flex flex-col justify-center">
             <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border px-4 py-1.5 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-              <Sparkles className="h-3 w-3" style={{ color: "var(--lilac)" }} />
+              <Sparkles className="h-3 w-3" style={{ color: "black" }} />
               Para todas as ocasiões
             </div>
 
             <h1 className="mt-8 text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
-              Seu <em className="font-script not-italic" style={{ color: "var(--lilac)" }}>look exclusivo</em> para cada ocasião
+              O vestido certo para cada momento
             </h1>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground">
+              Porque cada ocasião pede uma nova forma de expressar sua personalidade
+            </p>
 
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -157,7 +160,7 @@ function Home() {
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="flex items-start gap-4">
               <div className="rounded-full border border-border p-3">
-                <Icon className="h-5 w-5" style={{ color: "var(--lilac)" }} />
+                <Icon className="h-5 w-5" style={{ color: "black" }} />
               </div>
               <div>
                 <h3 className="text-lg">{title}</h3>

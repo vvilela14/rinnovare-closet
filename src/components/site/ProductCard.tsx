@@ -102,8 +102,8 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
         >
           <Heart
             className="h-4 w-4 transition"
-            style={{ color: "var(--lilac)" }}
-            fill={isFavorite ? "var(--lilac)" : "transparent"}
+            style={{ color: "black" }}
+            fill={isFavorite ? "black" : "transparent"}
           />
         </button>
       </Link>
