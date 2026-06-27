@@ -103,7 +103,7 @@ function Home() {
             <h1 className="whitespace-nowrap text-3xl leading-[1.05] sm:text-5xl lg:text-7xl">
               O vestido certo para cada momento
             </h1>
-            <p className="mt-5 max-w-lg text-2xl leading-snug text-white/85 sm:text-[2rem]">
+            <p className="mt-5 whitespace-nowrap text-lg leading-snug text-white/85 sm:text-xl lg:text-2xl">
               Porque cada ocasião pede uma nova forma de expressar sua personalidade
             </p>
 
