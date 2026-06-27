@@ -117,7 +117,7 @@ export type Database = {
           name: string
           parent_product_id?: string | null
           payment_terms?: string
-          price: number
+          price?: number
           price_12_days?: number | null
           price_4_days?: number | null
           price_7_days?: number | null
@@ -271,14 +271,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "rental_credits_rental_request_id_fkey"
+            foreignKeyName: "rental_credits_source_rental_request_id_fkey"
             columns: ["rental_request_id"]
             isOneToOne: false
             referencedRelation: "rental_requests"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rental_credits_rental_request_id_fkey"
+            foreignKeyName: "rental_credits_source_rental_request_id_fkey"
             columns: ["rental_request_id"]
             isOneToOne: false
             referencedRelation: "rental_requests_effective"
