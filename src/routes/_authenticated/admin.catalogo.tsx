@@ -3,8 +3,9 @@ import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff, GripVertical } from "lucide-react";
+import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff, GripVertical, List, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ProductCard } from "@/components/site/ProductCard";
 
 export const Route = createFileRoute("/_authenticated/admin/catalogo")({
   head: () => ({ meta: [{ title: "Catálogo — Admin Rinnovare" }] }),
@@ -66,6 +67,7 @@ function AdminCatalogo() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<ProductRow | null>(null);
   const [open, setOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "preview">("table");
   const [orderedProducts, setOrderedProducts] = useState<ProductRow[]>([]);
   const dragIndexRef = useRef<number | null>(null);
 
@@ -147,11 +149,22 @@ function AdminCatalogo() {
             <h1 className="mt-3 text-4xl sm:text-5xl">Catálogo</h1>
             <p className="mt-2 text-sm text-muted-foreground">Gerencie todos os vestidos da vitrine Rinnovare.</p>
           </div>
-          <button onClick={startCreate} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground hover:opacity-90">
-            <Plus className="h-4 w-4" /> Novo vestido
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setViewMode((m) => (m === "table" ? "preview" : "table"))}
+              className="inline-flex items-center justify-center rounded-full border border-border p-3 text-foreground hover:bg-muted"
+              aria-label={viewMode === "table" ? "Ver como na vitrine" : "Ver como tabela"}
+              title={viewMode === "table" ? "Ver como na vitrine" : "Ver como tabela"}
+            >
+              {viewMode === "table" ? <Eye className="h-4 w-4" /> : <List className="h-4 w-4" />}
+            </button>
+            <button onClick={startCreate} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground hover:opacity-90">
+              <Plus className="h-4 w-4" /> Novo vestido
+            </button>
+          </div>
         </div>
 
+        {viewMode === "table" && (
         <div className="mt-10 overflow-x-auto border border-border">
           <table className="min-w-full text-sm">
             <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -211,6 +224,20 @@ function AdminCatalogo() {
             </tbody>
           </table>
         </div>
+        )}
+
+        {viewMode === "preview" && (
+          <div className="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-3">
+            {orderedProducts.length === 0 && (
+              <p className="col-span-full text-center text-muted-foreground">Nenhum vestido cadastrado.</p>
+            )}
+            {orderedProducts.map((p) => (
+              <div key={p.id} className="mx-auto w-[83%] sm:w-[83%]">
+                <ProductCard product={p as any} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {open && <ProductFormModal initial={editing} onClose={() => setOpen(false)} />}
