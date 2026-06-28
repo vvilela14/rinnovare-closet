@@ -6,7 +6,7 @@ import { LayoutDashboard, Package, Users, ShoppingBag, Heart, CalendarDays, LogO
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import logoAsset from "@/assets/rinnovare-logo-admin.png.asset.json";
+import logoUrl from "@/assets/rinnovare-logo-admin.png";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Painel Administrativo — Rinnovare" }] }),
@@ -142,7 +142,7 @@ function AdminLayout() {
         <aside className={`hidden shrink-0 flex-col border-r border-white/10 bg-[#0a0716] px-3 py-5 md:flex transition-all ${collapsed ? "w-16" : "w-52"}`}>
           <div className="mb-6 flex items-center justify-between gap-2">
             <Link to="/" className="flex items-center gap-2 overflow-hidden">
-              <img src={logoAsset.url} alt="Rinnovare Closet" className={`h-10 w-auto ${collapsed ? "hidden" : ""}`} />
+              <img src={logoUrl} alt="Rinnovare Closet" className={`h-10 w-auto ${collapsed ? "hidden" : ""}`} />
             </Link>
             <button
               onClick={() => setCollapsed((c) => !c)}
@@ -199,7 +199,7 @@ function AdminLayout() {
           {/* top bar */}
           <div className="flex items-center justify-between border-b border-border bg-[#0a0716] px-5 py-3 text-white">
             <div className="md:hidden">
-              <img src={logoAsset.url} alt="Rinnovare Closet" className="h-9 w-auto" />
+              <img src={logoUrl} alt="Rinnovare Closet" className="h-9 w-auto" />
             </div>
             <div className="hidden md:block text-xs uppercase tracking-[0.3em] text-white/40">
               Painel administrativo
