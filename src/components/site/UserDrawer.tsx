@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -126,6 +126,25 @@ export function UserDrawer() {
 
   const close = () => setOpen(false);
 
+  // Swipe left-to-right to close the mobile drawer (it opens from the right,
+  // so dragging toward the right edge mimics pushing it back out).
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  function handleTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    touchStartRef.current = { x: t.clientX, y: t.clientY };
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (dx > 60 && Math.abs(dy) < 60) close();
+  }
+
   async function handleSignOut() {
     close();
     await qc.cancelQueries();
@@ -145,7 +164,7 @@ export function UserDrawer() {
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className={`fixed right-4 top-4 z-[60] flex items-center gap-2 rounded-full border border-border bg-background/95 p-2 shadow-lg backdrop-blur transition-all duration-200 hover:shadow-xl active:scale-90 ${open ? "scale-90 opacity-80" : "scale-100"}`}
+          className={`fixed right-4 top-16 z-[60] flex items-center gap-2 rounded-full border border-border bg-background/95 p-2 shadow-lg backdrop-blur transition-all duration-200 hover:shadow-xl active:scale-90 ${open ? "scale-90 opacity-80" : "scale-100"}`}
           aria-label={open ? "Fechar menu" : "Abrir menu"}
           aria-expanded={open}
         >
@@ -185,7 +204,12 @@ export function UserDrawer() {
         </button>
       )}
       <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side={isMobile ? "right" : "left"} className={cn("w-full max-w-sm p-0 flex flex-col", !isMobile && "pl-14")}>
+      <SheetContent
+        side={isMobile ? "right" : "left"}
+        className={cn("w-full max-w-sm p-0 flex flex-col", !isMobile && "pl-14")}
+        onTouchStart={isMobile ? handleTouchStart : undefined}
+        onTouchEnd={isMobile ? handleTouchEnd : undefined}
+      >
         <SheetHeader className="px-5 pt-6 pb-4 border-b">
           <SheetTitle className="sr-only">Menu</SheetTitle>
           {user ? (
