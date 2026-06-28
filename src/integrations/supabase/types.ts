@@ -100,6 +100,7 @@ export type Database = {
           price_4_days: number | null
           price_7_days: number | null
           size: string
+          sort_order: number
           updated_at: string
         }
         Insert: {
@@ -120,6 +121,7 @@ export type Database = {
           price_4_days?: number | null
           price_7_days?: number | null
           size: string
+          sort_order?: number
           updated_at?: string
         }
         Update: {
@@ -140,6 +142,7 @@ export type Database = {
           price_4_days?: number | null
           price_7_days?: number | null
           size?: string
+          sort_order?: number
           updated_at?: string
         }
         Relationships: [

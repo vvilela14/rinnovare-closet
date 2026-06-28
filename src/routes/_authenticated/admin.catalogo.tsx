@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff } from "lucide-react";
+import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/catalogo")({
@@ -59,21 +59,60 @@ type ProductRow = {
   price_7_days: number | null;
   price_12_days: number | null;
   installments: number | null;
+  sort_order: number;
 };
 
 function AdminCatalogo() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<ProductRow | null>(null);
   const [open, setOpen] = useState(false);
+  const [orderedProducts, setOrderedProducts] = useState<ProductRow[]>([]);
+  const dragIndexRef = useRef<number | null>(null);
 
   const { data: products = [], isLoading } = useQuery<ProductRow[]>({
     queryKey: ["admin-products"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("products").select("*").order("sort_order", { ascending: true });
       if (error) throw error;
       return data as ProductRow[];
     },
   });
+
+  useEffect(() => {
+    setOrderedProducts(products);
+  }, [products]);
+
+  const reorder = useMutation({
+    mutationFn: async (rows: ProductRow[]) => {
+      await Promise.all(
+        rows.map((p, i) => supabase.from("products").update({ sort_order: i }).eq("id", p.id))
+      );
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-products"] });
+      qc.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  function handleDragStart(index: number) {
+    dragIndexRef.current = index;
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+  }
+
+  function handleDrop(index: number) {
+    const from = dragIndexRef.current;
+    dragIndexRef.current = null;
+    if (from === null || from === index) return;
+    const next = [...orderedProducts];
+    const [moved] = next.splice(from, 1);
+    next.splice(index, 0, moved);
+    setOrderedProducts(next);
+    reorder.mutate(next);
+  }
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -117,6 +156,7 @@ function AdminCatalogo() {
           <table className="min-w-full text-sm">
             <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-widest text-muted-foreground">
               <tr>
+                <th className="px-2 py-3 w-8"></th>
                 <th className="px-4 py-3">Vestido</th>
                 <th className="px-4 py-3">Tamanho</th>
                 <th className="px-4 py-3">Valores</th>
@@ -126,12 +166,22 @@ function AdminCatalogo() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {isLoading && (<tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">Carregando...</td></tr>)}
-              {!isLoading && products.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">Nenhum vestido cadastrado.</td></tr>
+              {isLoading && (<tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">Carregando...</td></tr>)}
+              {!isLoading && orderedProducts.length === 0 && (
+                <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">Nenhum vestido cadastrado.</td></tr>
               )}
-              {products.map((p) => (
-                <tr key={p.id} className="hover:bg-muted/30">
+              {orderedProducts.map((p, index) => (
+                <tr
+                  key={p.id}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop(index)}
+                  className="hover:bg-muted/30 cursor-default"
+                >
+                  <td className="px-2 py-3 cursor-grab active:cursor-grabbing text-muted-foreground" title="Arraste para reordenar">
+                    <GripVertical className="h-4 w-4" />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {p.image_url && <img src={p.image_url} alt="" className="h-12 w-10 object-cover" />}
