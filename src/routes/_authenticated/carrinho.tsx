@@ -159,7 +159,7 @@ function CartPage() {
                 <span>Total</span>
                 <span className="font-medium">R$ {(total + 36.9).toFixed(2).replace(".", ",")}</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Em até 12x sem juros no cartão</p>
+              <p className="mt-1 text-xs text-muted-foreground">Em até 12x no cartão de crédito</p>
               <button
                 onClick={() => submitRental.mutate()}
                 disabled={submitRental.isPending}

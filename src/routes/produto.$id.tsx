@@ -19,7 +19,7 @@ export const Route = createFileRoute("/produto/$id")({
   head: ({ params }) => ({
     meta: [
       { title: "Detalhes do vestido — Rinnovare Closet" },
-      { name: "description", content: "Alugue este vestido de festa. Curadoria Rinnovare, parcelamento em até 12x sem juros." },
+      { name: "description", content: "Alugue este vestido de festa. Curadoria Rinnovare, parcelamento em até 12x no cartão de crédito." },
       { property: "og:url", content: `/produto/${params.id}` },
     ],
     links: [{ rel: "canonical", href: `/produto/${params.id}` }],

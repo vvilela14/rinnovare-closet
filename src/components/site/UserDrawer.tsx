@@ -145,7 +145,7 @@ export function UserDrawer() {
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="fixed right-4 top-4 z-[60] flex items-center gap-2 rounded-full border border-border bg-background/95 p-2 shadow-lg backdrop-blur transition hover:shadow-xl"
+          className={`fixed right-4 top-4 z-[60] flex items-center gap-2 rounded-full border border-border bg-background/95 p-2 shadow-lg backdrop-blur transition-all duration-200 hover:shadow-xl active:scale-90 ${open ? "scale-90 opacity-80" : "scale-100"}`}
           aria-label={open ? "Fechar menu" : "Abrir menu"}
           aria-expanded={open}
         >

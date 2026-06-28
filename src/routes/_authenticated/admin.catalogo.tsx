@@ -301,7 +301,7 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
         size: form.size,
         delivery_days: defaultDays,
         price: defaultPrice,
-        payment_terms: `${form.installments}x sem juros`,
+        payment_terms: `${form.installments}x no cartão de crédito`,
         installments: Number(form.installments),
         price_4_days: p4,
         price_7_days: p7,

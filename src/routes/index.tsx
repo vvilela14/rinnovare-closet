@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Rinnovare Closet — Aluguel de Vestidos para Festas, Casamentos e Madrinhas" },
-      { name: "description", content: "Alugue vestidos exclusivos para casamentos, madrinhas, formaturas e festas. Curadoria de moda, entrega rápida e parcelamento em até 12x sem juros." },
+      { name: "description", content: "Alugue vestidos exclusivos para casamentos, madrinhas, formaturas e festas. Curadoria de moda, entrega rápida e parcelamento em até 12x no cartão de crédito." },
       { property: "og:title", content: "Rinnovare Closet — Aluguel de Vestidos" },
       { property: "og:description", content: "Vestidos de festa para alugar com curadoria, entrega rápida e parcelamento facilitado." },
       { property: "og:type", content: "website" },
@@ -240,9 +240,9 @@ function Home() {
           </div>
         </div>
 
-        <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2">
+        <div id="categorias" className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-3">
           {filtered.map((p) => (
-            <div key={p.id} className="mx-auto w-[64%]">
+            <div key={p.id} className="mx-auto w-[83%] sm:w-[64%]">
               <ProductCard product={p} isReserved={reservedSet.has(p.id)} />
             </div>
           ))}
