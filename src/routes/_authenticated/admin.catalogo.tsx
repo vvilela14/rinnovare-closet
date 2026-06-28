@@ -15,16 +15,6 @@ const SIZE_OPTIONS = ["34-36", "36-38", "38-40", "40-42", "42-44", "44-46", "46-
 const INSTALLMENT_OPTIONS = [1, 2, 3, 4, 5, 6];
 const MAX_PHOTOS = 6;
 
-const CATEGORY_OPTIONS = [
-  "Casamento à noite",
-  "Casamento na praia",
-  "Casamento no campo",
-  "Festa de formatura",
-  "Aniversário",
-  "Noiva",
-  "Outro",
-];
-
 const COLOR_PALETTE: { name: string; hex: string; border?: boolean }[] = [
   { name: "Amarelo", hex: "#FFF24D" },
   { name: "Azul", hex: "#2A1FE0" },
@@ -61,7 +51,6 @@ type ProductRow = {
   price: number;
   payment_terms: string;
   image_url: string | null;
-  category: string | null;
   is_active: boolean;
   images: string[] | null;
   color: string | null;
@@ -148,7 +137,6 @@ function AdminCatalogo() {
                       {p.image_url && <img src={p.image_url} alt="" className="h-12 w-10 object-cover" />}
                       <div>
                         <div>{p.name}</div>
-                        {p.category && <div className="text-xs text-muted-foreground">{p.category}</div>}
                       </div>
                     </div>
                   </td>
@@ -204,7 +192,6 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
     price_12_days: initial?.price_12_days ?? ("" as number | ""),
     installments: initial?.installments ?? 1,
     description: initial?.description ?? "",
-    category: initial?.category ?? "",
     color: initial?.color ?? "",
     parent_product_id: initial?.parent_product_id ?? "",
     is_active: initial?.is_active ?? true,
@@ -240,7 +227,6 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
       parent_product_id: parentId,
       name: parent.name,
       description: parent.description ?? "",
-      category: parent.category ?? "",
       price_4_days: parent.price_4_days ?? "",
       price_7_days: parent.price_7_days ?? "",
       price_12_days: parent.price_12_days ?? "",
@@ -321,7 +307,6 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
         price_7_days: p7,
         price_12_days: p12,
         description: form.description || null,
-        category: form.category || null,
         image_url: mainUrl,
         images: additional,
         color: form.color || null,
@@ -424,10 +409,6 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
               ))}
             </select>
           </AdminField>
-          <AdminField label="Categoria">
-            <CategoryPicker value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
-          </AdminField>
-
           <AdminField label={`Fotos (até ${MAX_PHOTOS}) — clique na estrela para definir como principal`} className="sm:col-span-2">
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -536,47 +517,6 @@ function AdminField({ label, children, className = "" }: { label: string; childr
       <span className="mb-1.5 block text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
       {children}
     </label>
-  );
-}
-
-function CategoryPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const isCustom = value !== "" && !CATEGORY_OPTIONS.filter((c) => c !== "Outro").includes(value);
-  const [mode, setMode] = useState<"preset" | "outro">(isCustom ? "outro" : "preset");
-  const selectValue = mode === "outro" ? "Outro" : value;
-
-  return (
-    <div className="space-y-2">
-      <select
-        value={selectValue}
-        onChange={(e) => {
-          const v = e.target.value;
-          if (v === "Outro") {
-            setMode("outro");
-            onChange("");
-          } else {
-            setMode("preset");
-            onChange(v);
-          }
-        }}
-        className="admin-input"
-        required
-      >
-        <option value="">— Selecione uma categoria —</option>
-        {CATEGORY_OPTIONS.map((c) => (
-          <option key={c} value={c}>{c}</option>
-        ))}
-      </select>
-      {mode === "outro" && (
-        <input
-          autoFocus
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="admin-input"
-          placeholder="Descreva a categoria"
-          required
-        />
-      )}
-    </div>
   );
 }
 

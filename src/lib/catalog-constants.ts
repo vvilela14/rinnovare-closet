@@ -1,13 +1,3 @@
-export const CATEGORY_OPTIONS = [
-  "Casamento à noite",
-  "Casamento na praia",
-  "Casamento no campo",
-  "Festa de formatura",
-  "Aniversário",
-  "Noiva",
-  "Outro",
-];
-
 export const COLOR_PALETTE: { name: string; hex: string; border?: boolean }[] = [
   { name: "Amarelo", hex: "#FFF24D" },
   { name: "Azul", hex: "#2A1FE0" },

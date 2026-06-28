@@ -8,6 +8,13 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { RENTAL_PERIODS, addDays, fmtISODate, parseISODate } from "@/lib/catalog-constants";
 
+function priceForPeriod(product: any, period: number): number {
+  if (period === 7 && product.price_7_days != null) return Number(product.price_7_days);
+  if (period === 12 && product.price_12_days != null) return Number(product.price_12_days);
+  if (period === 4 && product.price_4_days != null) return Number(product.price_4_days);
+  return Number(product.price);
+}
+
 export const Route = createFileRoute("/produto/$id")({
   head: ({ params }) => ({
     meta: [
@@ -154,16 +161,14 @@ function ProductPage() {
             </div>
 
             <div className="flex flex-col">
-              {product.category && (
-                <span className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">{product.category}</span>
-              )}
               <h1 className="mt-3 text-4xl sm:text-5xl">{product.name}</h1>
               <p className="mt-6 text-base leading-relaxed text-muted-foreground">{product.description}</p>
 
               <div className="mt-8 flex items-baseline gap-3">
-                <span className="text-3xl font-medium">R$ {Number(product.price).toFixed(2).replace(".", ",")}</span>
+                <span className="text-3xl font-medium">R$ {priceForPeriod(product, period).toFixed(2).replace(".", ",")}</span>
                 <span className="text-sm text-muted-foreground">· {product.payment_terms}</span>
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">Valor para {period} dias de locação</p>
 
               <ul className="mt-8 grid grid-cols-1 gap-3 border-y border-border py-6 text-sm sm:grid-cols-3">
                 <li className="flex items-center gap-2"><Ruler className="h-4 w-4" style={{ color: "black" }} /> Tamanho {product.size}</li>

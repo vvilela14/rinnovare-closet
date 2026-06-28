@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Sparkles, Truck, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { ProductCard, type Product } from "@/components/site/ProductCard";
-import { CATEGORY_OPTIONS, COLOR_PALETTE, fmtISODate, parseISODate, rangesOverlap } from "@/lib/catalog-constants";
+import { COLOR_PALETTE, fmtISODate, parseISODate, rangesOverlap } from "@/lib/catalog-constants";
 import heroImage from "@/assets/hero-dress.jpg";
 
 export const Route = createFileRoute("/")({
@@ -24,15 +24,11 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const [category, setCategory] = useState<string>("");
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const cat = new URLSearchParams(window.location.search).get("cat");
-    if (cat) setCategory(cat);
-  }, []);
   const [eventDate, setEventDate] = useState<string>("");
   const [periodDays, setPeriodDays] = useState<string>("4");
   const [color, setColor] = useState<string>("");
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
   const [checkedAvailability, setCheckedAvailability] = useState(false);
 
   const { data: products = [] } = useQuery<Product[]>({
@@ -65,8 +61,9 @@ function Home() {
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
-      if (category && p.category !== category) return false;
       if (color && (p as any).color !== color) return false;
+      if (minPrice && Number(p.price) < Number(minPrice)) return false;
+      if (maxPrice && Number(p.price) > Number(maxPrice)) return false;
       if (checkedAvailability && eventDate) {
         const start = parseISODate(eventDate);
         const end = new Date(start);
@@ -80,9 +77,9 @@ function Home() {
       }
       return true;
     });
-  }, [products, category, color, eventDate, periodDays, checkedAvailability, confirmedRentals]);
+  }, [products, color, minPrice, maxPrice, eventDate, periodDays, checkedAvailability, confirmedRentals]);
 
-  const hasFilters = category || color || (checkedAvailability && eventDate);
+  const hasFilters = color || minPrice || maxPrice || (checkedAvailability && eventDate);
 
 
   return (
@@ -100,10 +97,10 @@ function Home() {
 
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 pt-28 sm:pt-36 lg:pt-48">
           <div className="mx-auto flex max-w-5xl flex-col items-center text-center text-white">
-            <h1 className="whitespace-nowrap text-3xl leading-[1.05] sm:text-5xl lg:text-7xl">
+            <h1 className="max-w-[17rem] text-3xl leading-[1.15] sm:max-w-none sm:whitespace-nowrap sm:text-5xl sm:leading-[1.05] lg:text-7xl">
               O vestido certo para cada momento
             </h1>
-            <p className="mt-5 whitespace-nowrap text-lg leading-snug text-white/85 sm:text-xl lg:text-2xl">
+            <p className="mt-5 max-w-[19rem] text-lg leading-snug text-white/85 sm:max-w-none sm:whitespace-nowrap sm:text-xl lg:text-2xl">
               Porque cada ocasião pede uma nova forma de expressar sua personalidade
             </p>
 
@@ -162,20 +159,6 @@ function Home() {
         <div className="mt-10 rounded-2xl border border-border bg-muted/20 p-5">
           <div className="flex flex-wrap items-end gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Categoria</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="min-w-[180px] rounded-none border border-border bg-background px-4 py-2 text-sm"
-              >
-                <option value="">Todas</option>
-                {CATEGORY_OPTIONS.filter((c) => c !== "Outro").map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
               <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Data do evento</label>
               <input
                 type="date"
@@ -213,6 +196,29 @@ function Home() {
               </select>
             </div>
 
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Preço</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="De"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  className="w-24 rounded-none border border-border bg-background px-3 py-2 text-sm"
+                />
+                <span className="text-muted-foreground">–</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="Até"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  className="w-24 rounded-none border border-border bg-background px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+
             <button
               type="button"
               disabled={!eventDate || !periodDays}
@@ -225,7 +231,7 @@ function Home() {
             {hasFilters && (
               <button
                 type="button"
-                onClick={() => { setCategory(""); setEventDate(""); setColor(""); setCheckedAvailability(false); }}
+                onClick={() => { setEventDate(""); setColor(""); setMinPrice(""); setMaxPrice(""); setCheckedAvailability(false); }}
                 className="rounded-none border border-border px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-background"
               >
                 Limpar filtros

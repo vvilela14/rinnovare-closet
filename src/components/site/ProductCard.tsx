@@ -14,7 +14,6 @@ export type Product = {
   price: number;
   payment_terms: string;
   image_url: string | null;
-  category: string | null;
   color?: string | null;
 };
 
@@ -82,7 +81,7 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
         {product.image_url ? (
           <img
             src={product.image_url}
-            alt={`Alugar ${product.name} — vestido para ${product.category ?? "festa"}`}
+            alt={`Alugar ${product.name} — vestido de festa`}
             loading="lazy"
             className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
           />
@@ -109,9 +108,6 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
       </Link>
 
       <div className="mt-4 flex flex-1 flex-col">
-        {product.category && (
-          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{product.category}</span>
-        )}
         <Link to="/produto/$id" params={{ id: product.id }} className="mt-1">
           <h3 className="text-lg leading-tight">{product.name}</h3>
         </Link>
