@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff, GripVertical, List, Eye } from "lucide-react";
+import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff, GripVertical, List, Grid2x2Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "@/components/site/ProductCard";
 
@@ -156,7 +156,7 @@ function AdminCatalogo() {
               aria-label={viewMode === "table" ? "Ver como na vitrine" : "Ver como tabela"}
               title={viewMode === "table" ? "Ver como na vitrine" : "Ver como tabela"}
             >
-              {viewMode === "table" ? <Eye className="h-4 w-4" /> : <List className="h-4 w-4" />}
+              {viewMode === "table" ? <Grid2x2Plus className="h-4 w-4" /> : <List className="h-4 w-4" />}
             </button>
             <button onClick={startCreate} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground hover:opacity-90">
               <Plus className="h-4 w-4" /> Novo vestido
@@ -231,8 +231,18 @@ function AdminCatalogo() {
             {orderedProducts.length === 0 && (
               <p className="col-span-full text-center text-muted-foreground">Nenhum vestido cadastrado.</p>
             )}
-            {orderedProducts.map((p) => (
-              <div key={p.id} className="mx-auto w-[83%] sm:w-[83%]">
+            {orderedProducts.map((p, index) => (
+              <div
+                key={p.id}
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(index)}
+                className="relative mx-auto w-[83%] cursor-grab active:cursor-grabbing sm:w-[83%]"
+              >
+                <span className="absolute left-2 top-2 z-10 rounded-full bg-background/90 p-1.5 text-muted-foreground shadow" title="Arraste para reordenar">
+                  <GripVertical className="h-4 w-4" />
+                </span>
                 <ProductCard product={p as any} />
               </div>
             ))}

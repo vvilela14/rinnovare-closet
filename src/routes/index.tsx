@@ -87,7 +87,7 @@ function Home() {
       <Header />
 
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-border/60 min-h-[480px] lg:min-h-[620px]">
+      <section className="relative overflow-hidden border-b border-border/60 min-h-[576px] lg:min-h-[744px]">
         <img
           src={heroImage}
           alt="Grupo de madrinhas com vestidos de festa Rinnovare"
@@ -104,18 +104,12 @@ function Home() {
               Porque cada ocasião pede uma nova forma de expressar sua personalidade
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-10 flex justify-center">
               <a
                 href="#vitrine"
                 className="inline-flex items-center rounded-none bg-primary px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
               >
                 Ver vitrine
-              </a>
-              <a
-                href="#categorias"
-                className="inline-flex items-center rounded-none border border-white px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-foreground"
-              >
-                Categorias
               </a>
             </div>
           </div>
