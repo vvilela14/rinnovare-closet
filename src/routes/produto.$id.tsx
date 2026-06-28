@@ -165,10 +165,10 @@ function ProductPage() {
               <p className="mt-6 text-base leading-relaxed text-muted-foreground">{product.description}</p>
 
               <div className="mt-8 flex items-baseline gap-3">
-                <span className="text-3xl font-medium">R$ {priceForPeriod(product, period).toFixed(2).replace(".", ",")}</span>
+                <span className="text-3xl font-medium">R$ {priceForPeriod(product, 4).toFixed(2).replace(".", ",")}</span>
                 <span className="text-sm text-muted-foreground">· {product.payment_terms}</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Valor para {period} dias de locação</p>
+              <p className="mt-1 text-xs text-muted-foreground">Valor para 4 dias de locação</p>
 
               <ul className="mt-8 grid grid-cols-1 gap-3 border-y border-border py-6 text-sm sm:grid-cols-3">
                 <li className="flex items-center gap-2"><Ruler className="h-4 w-4" style={{ color: "black" }} /> Tamanho {product.size}</li>

@@ -12,6 +12,7 @@ export type Product = {
   size: string;
   delivery_days: number;
   price: number;
+  price_4_days?: number | null;
   payment_terms: string;
   image_url: string | null;
   color?: string | null;
@@ -112,7 +113,7 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
           <h3 className="text-lg leading-tight">{product.name}</h3>
         </Link>
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-base font-medium">R$ {Number(product.price).toFixed(2).replace(".", ",")}</span>
+          <span className="text-base font-medium">R$ {Number(product.price_4_days ?? product.price).toFixed(2).replace(".", ",")}</span>
           <span className="text-xs text-muted-foreground">· {product.payment_terms}</span>
         </div>
         <div className="mt-1 text-xs text-muted-foreground">
