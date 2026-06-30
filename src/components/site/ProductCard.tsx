@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart } from "lucide-react";
+import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +31,25 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
   }, [product.image_url, product.images]);
 
   const [active, setActive] = useState(0);
+  const [hoverSide, setHoverSide] = useState<"left" | "right" | null>(null);
+
+  function handleHoverMove(e: React.MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    setHoverSide(x < rect.width / 2 ? "left" : "right");
+  }
+
+  function goPrev(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setActive((i) => (i - 1 + gallery.length) % gallery.length);
+  }
+
+  function goNext(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setActive((i) => (i + 1) % gallery.length);
+  }
 
   // Swipe left/right to switch photos (mirrors the mobile menu drawer's swipe gesture).
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -116,6 +135,8 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
         className="relative block overflow-hidden bg-muted aspect-[2/3]"
         onTouchStart={gallery.length > 1 ? handleSwipeStart : undefined}
         onTouchEnd={gallery.length > 1 ? handleSwipeEnd : undefined}
+        onMouseMove={gallery.length > 1 ? handleHoverMove : undefined}
+        onMouseLeave={() => setHoverSide(null)}
       >
         {gallery[active] ? (
           <img
@@ -128,14 +149,32 @@ export function ProductCard({ product, isReserved = false }: { product: Product;
           <div className="h-full w-full" />
         )}
         {gallery.length > 1 && (
-          <div className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1">
-            {gallery.map((_, i) => (
-              <span
-                key={i}
-                className={`h-1.5 w-1.5 rounded-full transition ${i === active ? "bg-white" : "bg-white/40"}`}
-              />
-            ))}
-          </div>
+          <>
+            <div className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1">
+              {gallery.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition ${i === active ? "bg-white" : "bg-white/40"}`}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={goPrev}
+              className={`absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur transition-opacity duration-300 hover:bg-background ${hoverSide === "left" ? "opacity-100" : "opacity-0"}`}
+              aria-label="Foto anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur transition-opacity duration-300 hover:bg-background ${hoverSide === "right" ? "opacity-100" : "opacity-0"}`}
+              aria-label="Próxima foto"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </>
         )}
         {isReserved && (
           <span className="absolute left-3 top-3 rounded-full bg-[#260d58] px-3 py-1 text-[10px] uppercase tracking-widest text-white">

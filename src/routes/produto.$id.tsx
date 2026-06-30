@@ -57,6 +57,14 @@ function ProductPage() {
 
   useEffect(() => { setActive(0); }, [id]);
 
+  const [hoverSide, setHoverSide] = useState<"left" | "right" | null>(null);
+
+  function handleHoverMove(e: React.MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    setHoverSide(x < rect.width / 2 ? "left" : "right");
+  }
+
   // Swipe left/right to switch photos (mirrors the mobile menu drawer's swipe gesture).
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -152,28 +160,54 @@ function ProductPage() {
         ) : (
           <div className="mt-8 grid gap-12 lg:grid-cols-2">
             <div className="lg:max-w-[80%]">
-              <button
-                type="button"
-                onClick={() => gallery.length > 0 && setZoomIndex(active)}
-                onTouchStart={gallery.length > 1 ? handleSwipeStart : undefined}
-                onTouchEnd={
-                  gallery.length > 1
-                    ? makeSwipeEnd(
-                        () => setActive((i) => (i - 1 + gallery.length) % gallery.length),
-                        () => setActive((i) => (i + 1) % gallery.length)
-                      )
-                    : undefined
-                }
-                className="group relative block aspect-[3/4] w-full overflow-hidden bg-muted cursor-zoom-in"
-                aria-label="Ampliar foto"
+              <div
+                className="group relative aspect-[3/4] w-full overflow-hidden bg-muted"
+                onMouseMove={gallery.length > 1 ? handleHoverMove : undefined}
+                onMouseLeave={() => setHoverSide(null)}
               >
-                {gallery[active] && (
-                  <img src={gallery[active]} alt={`Alugar vestido ${product.name}`} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                <button
+                  type="button"
+                  onClick={() => gallery.length > 0 && setZoomIndex(active)}
+                  onTouchStart={gallery.length > 1 ? handleSwipeStart : undefined}
+                  onTouchEnd={
+                    gallery.length > 1
+                      ? makeSwipeEnd(
+                          () => setActive((i) => (i - 1 + gallery.length) % gallery.length),
+                          () => setActive((i) => (i + 1) % gallery.length)
+                        )
+                      : undefined
+                  }
+                  className="block h-full w-full cursor-zoom-in"
+                  aria-label="Ampliar foto"
+                >
+                  {gallery[active] && (
+                    <img src={gallery[active]} alt={`Alugar vestido ${product.name}`} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                  )}
+                  <span className="absolute bottom-3 right-3 rounded-full bg-background/85 px-3 py-1 text-[10px] uppercase tracking-widest text-foreground opacity-0 transition group-hover:opacity-100">
+                    Clique para ampliar
+                  </span>
+                </button>
+                {gallery.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActive((i) => (i - 1 + gallery.length) % gallery.length); }}
+                      className={`absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-background/85 p-2 text-foreground backdrop-blur transition-opacity duration-300 hover:bg-background ${hoverSide === "left" ? "opacity-100" : "opacity-0"}`}
+                      aria-label="Foto anterior"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActive((i) => (i + 1) % gallery.length); }}
+                      className={`absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/85 p-2 text-foreground backdrop-blur transition-opacity duration-300 hover:bg-background ${hoverSide === "right" ? "opacity-100" : "opacity-0"}`}
+                      aria-label="Próxima foto"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </>
                 )}
-                <span className="absolute bottom-3 right-3 rounded-full bg-background/85 px-3 py-1 text-[10px] uppercase tracking-widest text-foreground opacity-0 transition group-hover:opacity-100">
-                  Clique para ampliar
-                </span>
-              </button>
+              </div>
 
               {gallery.length > 1 && (
                 <div className="mt-4 grid grid-cols-5 gap-2">
