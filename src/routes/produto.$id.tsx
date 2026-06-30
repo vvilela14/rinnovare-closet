@@ -312,9 +312,6 @@ function ProductPage() {
             onPrev={gallery.length > 1 ? () => setZoomIndex((i) => (i === null ? null : (i - 1 + gallery.length) % gallery.length)) : undefined}
             onNext={gallery.length > 1 ? () => setZoomIndex((i) => (i === null ? null : (i + 1) % gallery.length)) : undefined}
           />
-          <p className="pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-[10px] uppercase tracking-widest text-white/80">
-            Toque com 2 dedos para ampliar · arraste para explorar
-          </p>
         </div>
       )}
     </div>
@@ -377,7 +374,7 @@ function ZoomImage({ src, onPrev, onNext }: { src: string; onPrev?: () => void; 
   function handleClick(e: React.MouseEvent) {
     e.stopPropagation();
     if (scale > 1) { setScale(1); setTx(0); setTy(0); }
-    else setScale(2.6);
+    else setScale(3.5);
   }
 
   const isZoomed = scale > 1;
