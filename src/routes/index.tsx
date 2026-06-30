@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Sparkles, Truck, ShieldCheck } from "lucide-react";
+import { Sparkles, Truck, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { ProductCard, type Product } from "@/components/site/ProductCard";
@@ -80,7 +80,13 @@ function Home() {
   }, [products, color, minPrice, maxPrice, eventDate, periodDays, checkedAvailability, confirmedRentals]);
 
   const hasFilters = color || minPrice || maxPrice || (checkedAvailability && eventDate);
+  const activeFilterCount = [color, minPrice || maxPrice, checkedAvailability && eventDate].filter(Boolean).length;
 
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  function clearFilters() {
+    setEventDate(""); setColor(""); setMinPrice(""); setMaxPrice(""); setCheckedAvailability(false);
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -149,88 +155,165 @@ function Home() {
           </p>
         </div>
 
-        {/* FILTROS */}
-        <div className="mt-10 rounded-2xl border border-border bg-muted/20 p-5">
-          <div className="flex flex-wrap items-end gap-5">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Data do evento</label>
-              <input
-                type="date"
-                value={eventDate}
-                min={fmtISODate(new Date())}
-                onChange={(e) => { setEventDate(e.target.value); setCheckedAvailability(false); }}
-                className="rounded-none border border-border bg-background px-4 py-2 text-sm"
-              />
-            </div>
+        {/* FILTROS — mobile: botão único que expande; desktop: inline */}
+        <div className="mt-10">
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período <span className="text-destructive">*</span></label>
-              <select
-                value={periodDays}
-                onChange={(e) => { setPeriodDays(e.target.value); setCheckedAvailability(false); }}
-                className="min-w-[140px] rounded-none border border-border bg-background px-4 py-2 text-sm"
-              >
-                <option value="4">4 dias</option>
-                <option value="7">7 dias</option>
-                <option value="12">12 dias</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Cor</label>
-              <select
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                className="min-w-[180px] rounded-none border border-border bg-background px-4 py-2 text-sm"
-              >
-                <option value="">Todas</option>
-                {COLOR_PALETTE.map((c) => (
-                  <option key={c.name} value={c.name}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Preço</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="De"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-24 rounded-none border border-border bg-background px-3 py-2 text-sm"
-                />
-                <span className="text-muted-foreground">–</span>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="Até"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-24 rounded-none border border-border bg-background px-3 py-2 text-sm"
-                />
-              </div>
-            </div>
-
+          {/* Botão "Filtros" — visível apenas em mobile */}
+          <div className="flex items-center gap-3 sm:hidden">
             <button
               type="button"
-              disabled={!eventDate || !periodDays}
-              onClick={() => setCheckedAvailability(true)}
-              className="rounded-none bg-primary px-5 py-2 text-[10px] uppercase tracking-widest text-primary-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+              onClick={() => setFilterOpen((o) => !o)}
+              className="flex items-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm shadow-sm transition hover:bg-muted"
             >
-              Verificar Disponibilidade
+              <SlidersHorizontal className="h-4 w-4" />
+              Filtros
+              {activeFilterCount > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
-
             {hasFilters && (
               <button
                 type="button"
-                onClick={() => { setEventDate(""); setColor(""); setMinPrice(""); setMaxPrice(""); setCheckedAvailability(false); }}
-                className="rounded-none border border-border px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-background"
+                onClick={clearFilters}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition"
               >
-                Limpar filtros
+                <X className="h-3.5 w-3.5" /> Limpar
               </button>
             )}
+          </div>
+
+          {/* Painel expandido no mobile */}
+          {filterOpen && (
+            <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-border bg-muted/20 p-5 sm:hidden">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Data do evento</label>
+                <input
+                  type="date"
+                  value={eventDate}
+                  min={fmtISODate(new Date())}
+                  onChange={(e) => { setEventDate(e.target.value); setCheckedAvailability(false); }}
+                  className="rounded-none border border-border bg-background px-4 py-2 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período</label>
+                <select
+                  value={periodDays}
+                  onChange={(e) => { setPeriodDays(e.target.value); setCheckedAvailability(false); }}
+                  className="rounded-none border border-border bg-background px-4 py-2 text-sm"
+                >
+                  <option value="4">4 dias</option>
+                  <option value="7">7 dias</option>
+                  <option value="12">12 dias</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Cor</label>
+                <select
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="rounded-none border border-border bg-background px-4 py-2 text-sm"
+                >
+                  <option value="">Todas</option>
+                  {COLOR_PALETTE.map((c) => (
+                    <option key={c.name} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Preço</label>
+                <div className="flex items-center gap-2">
+                  <input type="number" min={0} placeholder="De" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="flex-1 rounded-none border border-border bg-background px-3 py-2 text-sm" />
+                  <span className="text-muted-foreground">–</span>
+                  <input type="number" min={0} placeholder="Até" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="flex-1 rounded-none border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  disabled={!eventDate || !periodDays}
+                  onClick={() => { setCheckedAvailability(true); setFilterOpen(false); }}
+                  className="flex-1 rounded-none bg-primary py-2.5 text-[10px] uppercase tracking-widest text-primary-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Verificar disponibilidade
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterOpen(false)}
+                  className="rounded-none border border-border px-4 py-2.5 text-[10px] uppercase tracking-widest hover:bg-background"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Layout inline — visível apenas em sm+ (desktop) */}
+          <div className="hidden sm:block rounded-2xl border border-border bg-muted/20 p-5">
+            <div className="flex flex-wrap items-end gap-5">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Data do evento</label>
+                <input
+                  type="date"
+                  value={eventDate}
+                  min={fmtISODate(new Date())}
+                  onChange={(e) => { setEventDate(e.target.value); setCheckedAvailability(false); }}
+                  className="rounded-none border border-border bg-background px-4 py-2 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Período <span className="text-destructive">*</span></label>
+                <select
+                  value={periodDays}
+                  onChange={(e) => { setPeriodDays(e.target.value); setCheckedAvailability(false); }}
+                  className="min-w-[140px] rounded-none border border-border bg-background px-4 py-2 text-sm"
+                >
+                  <option value="4">4 dias</option>
+                  <option value="7">7 dias</option>
+                  <option value="12">12 dias</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Cor</label>
+                <select
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="min-w-[180px] rounded-none border border-border bg-background px-4 py-2 text-sm"
+                >
+                  <option value="">Todas</option>
+                  {COLOR_PALETTE.map((c) => (
+                    <option key={c.name} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Preço</label>
+                <div className="flex items-center gap-2">
+                  <input type="number" min={0} placeholder="De" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-24 rounded-none border border-border bg-background px-3 py-2 text-sm" />
+                  <span className="text-muted-foreground">–</span>
+                  <input type="number" min={0} placeholder="Até" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-24 rounded-none border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={!eventDate || !periodDays}
+                onClick={() => setCheckedAvailability(true)}
+                className="rounded-none bg-primary px-5 py-2 text-[10px] uppercase tracking-widest text-primary-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Verificar Disponibilidade
+              </button>
+              {hasFilters && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="rounded-none border border-border px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-background"
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
