@@ -227,25 +227,7 @@ export function UserDrawer() {
               </div>
             </div>
           ) : (
-            <div>
-              <div className="text-base font-medium">Bem-vinda à Rinnovare</div>
-              <div className="mt-3 flex flex-col gap-2">
-                <Link
-                  to="/auth"
-                  onClick={close}
-                  className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-widest text-primary-foreground transition hover:opacity-90"
-                >
-                  Entrar
-                </Link>
-                <Link
-                  to="/auth"
-                  onClick={close}
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-xs uppercase tracking-widest text-foreground transition hover:bg-muted"
-                >
-                  Criar Conta
-                </Link>
-              </div>
-            </div>
+            <div className="text-base font-medium">Bem-vinda à Rinnovare</div>
           )}
         </SheetHeader>
 
@@ -286,8 +268,8 @@ export function UserDrawer() {
           </nav>
         </div>
 
-        {user && (
-          <div className="border-t p-3">
+        <div className="border-t p-3">
+          {user ? (
             <button
               type="button"
               onClick={handleSignOut}
@@ -298,8 +280,25 @@ export function UserDrawer() {
             >
               <LogOut className="h-4 w-4" /> Sair
             </button>
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Link
+                to="/auth"
+                onClick={close}
+                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-widest text-primary-foreground transition hover:opacity-90"
+              >
+                Entrar
+              </Link>
+              <Link
+                to="/auth"
+                onClick={close}
+                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-xs uppercase tracking-widest text-foreground transition hover:bg-muted"
+              >
+                Criar Conta
+              </Link>
+            </div>
+          )}
+        </div>
       </SheetContent>
       </Sheet>
     </>

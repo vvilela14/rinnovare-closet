@@ -327,85 +327,41 @@ function ZoomImage({ src, onPrev, onNext }: { src: string; onPrev?: () => void; 
   const [ty, setTy] = useState(0);
   const [origin, setOrigin] = useState({ x: 50, y: 50 });
 
-  const touchRef = useRef<{
-    startDist: number; startScale: number;
-    startMidX: number; startMidY: number;
-    startTx: number; startTy: number;
-    t1x: number; t1y: number;
-    isPinching: boolean;
-  } | null>(null);
+  const touchRef = useRef<{ t1x: number; t1y: number; startTx: number; startTy: number; } | null>(null);
 
   useEffect(() => { setScale(1); setTx(0); setTy(0); }, [src]);
 
-  function dist(t: React.TouchList) {
-    return Math.hypot(t[1].clientX - t[0].clientX, t[1].clientY - t[0].clientY);
-  }
-
   function handleTouchStart(e: React.TouchEvent) {
     e.stopPropagation();
-    if (e.touches.length === 2) {
-      e.preventDefault();
+    if (e.touches.length === 1) {
       touchRef.current = {
-        startDist: dist(e.touches), startScale: scale,
-        startMidX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-        startMidY: (e.touches[0].clientY + e.touches[1].clientY) / 2,
-        startTx: tx, startTy: ty,
-        t1x: 0, t1y: 0,
-        isPinching: true,
-      };
-    } else if (e.touches.length === 1) {
-      touchRef.current = {
-        startDist: 0, startScale: scale,
-        startMidX: 0, startMidY: 0,
-        startTx: tx, startTy: ty,
         t1x: e.touches[0].clientX, t1y: e.touches[0].clientY,
-        isPinching: false,
+        startTx: tx, startTy: ty,
       };
     }
   }
 
   function handleTouchMove(e: React.TouchEvent) {
     e.stopPropagation();
-    if (!touchRef.current) return;
-    if (e.touches.length === 2 && touchRef.current.isPinching) {
-      e.preventDefault();
-      const r = touchRef.current;
-      const newScale = Math.min(5, Math.max(1, r.startScale * (dist(e.touches) / r.startDist)));
-      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-      setScale(newScale);
-      if (newScale > 1) {
-        setTx(r.startTx + (midX - r.startMidX));
-        setTy(r.startTy + (midY - r.startMidY));
-      } else {
-        setTx(0); setTy(0);
-      }
-    } else if (e.touches.length === 1 && !touchRef.current.isPinching && scale > 1) {
-      e.preventDefault();
-      const r = touchRef.current;
-      setTx(r.startTx + (e.touches[0].clientX - r.t1x));
-      setTy(r.startTy + (e.touches[0].clientY - r.t1y));
-    }
+    if (!touchRef.current || e.touches.length !== 1 || scale <= 1) return;
+    e.preventDefault();
+    const r = touchRef.current;
+    setTx(r.startTx + (e.touches[0].clientX - r.t1x));
+    setTy(r.startTy + (e.touches[0].clientY - r.t1y));
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
     e.stopPropagation();
     const r = touchRef.current;
-    if (!r) return;
-    setScale((s) => {
-      if (s < 1.15) { setTx(0); setTy(0); return 1; }
-      return s;
-    });
-    if (!r.isPinching && scale <= 1 && e.changedTouches.length === 1) {
+    touchRef.current = null;
+    if (!r || e.changedTouches.length !== 1) return;
+    if (scale <= 1) {
       const dx = e.changedTouches[0].clientX - r.t1x;
       const dy = e.changedTouches[0].clientY - r.t1y;
       if (Math.abs(dx) > 60 && Math.abs(dy) < 60) {
         if (dx > 0) onPrev?.();
         else onNext?.();
       }
-    }
-    if (e.touches.length < 2) {
-      if (touchRef.current) touchRef.current.isPinching = false;
     }
   }
 
