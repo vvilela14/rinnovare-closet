@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Heart, ArrowLeft, Truck, Ruler, CreditCard, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
@@ -56,6 +56,29 @@ function ProductPage() {
   }, [product]);
 
   useEffect(() => { setActive(0); }, [id]);
+
+  // Swipe left/right to switch photos (mirrors the mobile menu drawer's swipe gesture).
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  function handleSwipeStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    swipeStartRef.current = { x: t.clientX, y: t.clientY };
+  }
+
+  function makeSwipeEnd(onPrev: () => void, onNext: () => void) {
+    return (e: React.TouchEvent) => {
+      const start = swipeStartRef.current;
+      swipeStartRef.current = null;
+      if (!start) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - start.x;
+      const dy = t.clientY - start.y;
+      if (Math.abs(dx) > 60 && Math.abs(dy) < 60) {
+        if (dx > 0) onPrev();
+        else onNext();
+      }
+    };
+  }
 
   useEffect(() => {
     if (zoomIndex === null) return;
@@ -132,6 +155,15 @@ function ProductPage() {
               <button
                 type="button"
                 onClick={() => gallery.length > 0 && setZoomIndex(active)}
+                onTouchStart={gallery.length > 1 ? handleSwipeStart : undefined}
+                onTouchEnd={
+                  gallery.length > 1
+                    ? makeSwipeEnd(
+                        () => setActive((i) => (i - 1 + gallery.length) % gallery.length),
+                        () => setActive((i) => (i + 1) % gallery.length)
+                      )
+                    : undefined
+                }
                 className="group relative block aspect-[3/4] w-full overflow-hidden bg-muted cursor-zoom-in"
                 aria-label="Ampliar foto"
               >
@@ -212,6 +244,15 @@ function ProductPage() {
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-4 animate-fade-in"
           onClick={() => setZoomIndex(null)}
+          onTouchStart={gallery.length > 1 ? handleSwipeStart : undefined}
+          onTouchEnd={
+            gallery.length > 1
+              ? makeSwipeEnd(
+                  () => setZoomIndex((i) => (i === null ? null : (i - 1 + gallery.length) % gallery.length)),
+                  () => setZoomIndex((i) => (i === null ? null : (i + 1) % gallery.length))
+                )
+              : undefined
+          }
         >
           <button
             type="button"
