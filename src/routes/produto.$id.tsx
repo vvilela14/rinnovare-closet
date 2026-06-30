@@ -278,15 +278,6 @@ function ProductPage() {
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-4 animate-fade-in"
           onClick={() => setZoomIndex(null)}
-          onTouchStart={gallery.length > 1 ? handleSwipeStart : undefined}
-          onTouchEnd={
-            gallery.length > 1
-              ? makeSwipeEnd(
-                  () => setZoomIndex((i) => (i === null ? null : (i - 1 + gallery.length) % gallery.length)),
-                  () => setZoomIndex((i) => (i === null ? null : (i + 1) % gallery.length))
-                )
-              : undefined
-          }
         >
           <button
             type="button"
@@ -316,9 +307,13 @@ function ProductPage() {
               </button>
             </>
           )}
-          <ZoomImage src={gallery[zoomIndex]} />
+          <ZoomImage
+            src={gallery[zoomIndex]}
+            onPrev={gallery.length > 1 ? () => setZoomIndex((i) => (i === null ? null : (i - 1 + gallery.length) % gallery.length)) : undefined}
+            onNext={gallery.length > 1 ? () => setZoomIndex((i) => (i === null ? null : (i + 1) % gallery.length)) : undefined}
+          />
           <p className="pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-[10px] uppercase tracking-widest text-white/80">
-            Clique na foto para ampliar o tecido · mova o mouse para explorar
+            Toque com 2 dedos para ampliar · arraste para explorar
           </p>
         </div>
       )}
@@ -326,35 +321,140 @@ function ProductPage() {
   );
 }
 
-function ZoomImage({ src }: { src: string }) {
-  const [zoomed, setZoomed] = useState(false);
+function ZoomImage({ src, onPrev, onNext }: { src: string; onPrev?: () => void; onNext?: () => void }) {
+  const [scale, setScale] = useState(1);
+  const [tx, setTx] = useState(0);
+  const [ty, setTy] = useState(0);
+  // mouse-hover origin (desktop only, when scale > 1 from click)
   const [origin, setOrigin] = useState({ x: 50, y: 50 });
 
-  function handleMove(e: React.MouseEvent<HTMLDivElement>) {
-    if (!zoomed) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setOrigin({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+  const touchRef = useRef<{
+    // pinch
+    startDist: number; startScale: number;
+    startMidX: number; startMidY: number;
+    startTx: number; startTy: number;
+    // single-touch pan / swipe
+    t1x: number; t1y: number;
+    isPinching: boolean;
+  } | null>(null);
+
+  // Reset when image changes
+  useEffect(() => {
+    setScale(1); setTx(0); setTy(0);
+  }, [src]);
+
+  function dist(t: React.TouchList) {
+    return Math.hypot(t[1].clientX - t[0].clientX, t[1].clientY - t[0].clientY);
   }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    e.stopPropagation();
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      touchRef.current = {
+        startDist: dist(e.touches), startScale: scale,
+        startMidX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        startMidY: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+        startTx: tx, startTy: ty,
+        t1x: 0, t1y: 0,
+        isPinching: true,
+      };
+    } else if (e.touches.length === 1) {
+      touchRef.current = {
+        startDist: 0, startScale: scale,
+        startMidX: 0, startMidY: 0,
+        startTx: tx, startTy: ty,
+        t1x: e.touches[0].clientX, t1y: e.touches[0].clientY,
+        isPinching: false,
+      };
+    }
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    e.stopPropagation();
+    if (!touchRef.current) return;
+    if (e.touches.length === 2 && touchRef.current.isPinching) {
+      e.preventDefault();
+      const r = touchRef.current;
+      const newScale = Math.min(5, Math.max(1, r.startScale * (dist(e.touches) / r.startDist)));
+      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      setScale(newScale);
+      if (newScale > 1) {
+        setTx(r.startTx + (midX - r.startMidX));
+        setTy(r.startTy + (midY - r.startMidY));
+      } else {
+        setTx(0); setTy(0);
+      }
+    } else if (e.touches.length === 1 && !touchRef.current.isPinching && scale > 1) {
+      // single-finger pan when zoomed
+      e.preventDefault();
+      const r = touchRef.current;
+      setTx(r.startTx + (e.touches[0].clientX - r.t1x));
+      setTy(r.startTy + (e.touches[0].clientY - r.t1y));
+    }
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    e.stopPropagation();
+    const r = touchRef.current;
+    if (!r) return;
+    // Snap back to scale=1 if barely pinched
+    setScale((s) => {
+      if (s < 1.15) { setTx(0); setTy(0); return 1; }
+      return s;
+    });
+    // Single-tap or swipe when not zoomed
+    if (!r.isPinching && scale <= 1 && e.changedTouches.length === 1) {
+      const dx = e.changedTouches[0].clientX - r.t1x;
+      const dy = e.changedTouches[0].clientY - r.t1y;
+      if (Math.abs(dx) > 60 && Math.abs(dy) < 60) {
+        if (dx > 0) onPrev?.();
+        else onNext?.();
+      }
+    }
+    if (e.touches.length < 2) {
+      if (touchRef.current) touchRef.current.isPinching = false;
+    }
+  }
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (scale <= 1) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    setOrigin({
+      x: Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100)),
+      y: Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100)),
+    });
+  }
+
+  function handleClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (scale > 1) { setScale(1); setTx(0); setTy(0); }
+    else setScale(2.6);
+  }
+
+  const isZoomed = scale > 1;
+  const imgStyle: React.CSSProperties = isZoomed
+    ? { transform: `translate(${tx}px, ${ty}px) scale(${scale})`, transformOrigin: "center", transition: "none" }
+    : { transform: "scale(1)", transformOrigin: `${origin.x}% ${origin.y}%`, transition: "transform 0.2s ease-out" };
 
   return (
     <div
-      onClick={(e) => { e.stopPropagation(); setZoomed((z) => !z); }}
-      onMouseMove={handleMove}
+      onClick={handleClick}
+      onMouseMove={handleMouseMove}
       onMouseLeave={() => setOrigin({ x: 50, y: 50 })}
-      className={`relative flex max-h-[92vh] max-w-[92vw] items-center justify-center overflow-hidden ${zoomed ? "cursor-zoom-out" : "cursor-zoom-in"}`}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className={`relative flex max-h-[92vh] max-w-[92vw] items-center justify-center overflow-hidden ${isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"}`}
       style={{ touchAction: "none" }}
     >
       <img
         src={src}
         alt="Vestido ampliado"
         draggable={false}
-        className="max-h-[92vh] max-w-[92vw] object-contain animate-scale-in transition-transform duration-200 ease-out select-none"
-        style={{
-          transform: zoomed ? "scale(2.6)" : "scale(1)",
-          transformOrigin: `${origin.x}% ${origin.y}%`,
-        }}
+        className="max-h-[92vh] max-w-[92vw] object-contain animate-scale-in select-none"
+        style={imgStyle}
       />
     </div>
   );

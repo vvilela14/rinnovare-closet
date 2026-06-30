@@ -336,28 +336,35 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
     }
     const toUpload = arr.slice(0, remaining);
     setUploading(true);
-    try {
-      const uploaded: string[] = [];
-      for (const file of toUpload) {
-        const ext = file.name.split(".").pop() || "jpg";
-        const path = `${crypto.randomUUID()}.${ext}`;
+    const uploaded: string[] = [];
+    let failCount = 0;
+    for (const file of toUpload) {
+      try {
+        const ext = (file.name.includes(".") ? file.name.split(".").pop() : null) || "jpg";
+        const path = `${crypto.randomUUID()}.${ext.toLowerCase()}`;
         const { error: upErr } = await supabase.storage.from("products").upload(path, file, {
-          contentType: file.type,
+          contentType: file.type || "image/jpeg",
           upsert: false,
         });
         if (upErr) throw upErr;
-        const { data: signed, error: sErr } = await supabase.storage
-          .from("products")
-          .createSignedUrl(path, 60 * 60 * 24 * 365 * 10); // 10 years
-        if (sErr) throw sErr;
-        uploaded.push(signed.signedUrl);
+        // Bucket is public — getPublicUrl is instant (no API call) and never expires.
+        const { data: pub } = supabase.storage.from("products").getPublicUrl(path);
+        uploaded.push(pub.publicUrl);
+      } catch (e: any) {
+        failCount++;
+        console.error("Upload failed for", file.name, e);
       }
+    }
+    setUploading(false);
+    if (uploaded.length) {
       setPhotos((prev) => [...prev, ...uploaded].slice(0, MAX_PHOTOS));
-      if (arr.length > remaining) toast.warning(`Apenas ${remaining} foto(s) adicionadas (limite ${MAX_PHOTOS}).`);
-    } catch (e: any) {
-      toast.error("Erro ao enviar imagem: " + e.message);
-    } finally {
-      setUploading(false);
+    }
+    if (arr.length > remaining) {
+      toast.warning(`Apenas ${remaining} foto(s) adicionadas (limite ${MAX_PHOTOS}).`);
+    } else if (failCount > 0 && uploaded.length > 0) {
+      toast.warning(`${uploaded.length} foto(s) enviada(s); ${failCount} falhou(aram). Tente novamente.`);
+    } else if (failCount > 0) {
+      toast.error(`Falha ao enviar ${failCount} foto(s). Verifique a conexão e tente novamente.`);
     }
   }
 
