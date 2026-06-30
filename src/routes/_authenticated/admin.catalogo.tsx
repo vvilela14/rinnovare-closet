@@ -287,6 +287,7 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
   const [photos, setPhotos] = useState<string[]>(initialPhotos);
   const [mainIndex, setMainIndex] = useState<number>(0);
   const [uploading, setUploading] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -327,7 +328,12 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
   }
 
   async function handleFiles(files: FileList | File[]) {
-    const arr = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    const IMAGE_EXTS = /\.(jpe?g|png|gif|webp|heic|heif|bmp|tiff?|avif|svg)$/i;
+    // Accept files that declare an image MIME type OR have a known image extension.
+    // iOS often sends file.type = "" for camera photos — the extension check catches those.
+    const arr = Array.from(files).filter(
+      (f) => f.type.startsWith("image/") || IMAGE_EXTS.test(f.name)
+    );
     if (!arr.length) return;
     const remaining = MAX_PHOTOS - photos.length;
     if (remaining <= 0) {
@@ -336,6 +342,7 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
     }
     const toUpload = arr.slice(0, remaining);
     setUploading(true);
+    setPendingCount(toUpload.length);
     const uploaded: string[] = [];
     let failCount = 0;
     for (const file of toUpload) {
@@ -353,6 +360,8 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
       } catch (e: any) {
         failCount++;
         console.error("Upload failed for", file.name, e);
+      } finally {
+        setPendingCount((n) => Math.max(0, n - 1));
       }
     }
     setUploading(false);
@@ -515,9 +524,20 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
               onClick={() => fileInputRef.current?.click()}
               className={`flex flex-col items-center justify-center gap-2 cursor-pointer border-2 border-dashed rounded-md p-6 text-center transition-colors ${dragOver ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"} ${photos.length >= MAX_PHOTOS ? "opacity-50 pointer-events-none" : ""}`}
             >
-              <Upload className="h-6 w-6 text-muted-foreground" />
+              {uploading ? (
+                <svg className="h-6 w-6 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                </svg>
+              ) : (
+                <Upload className="h-6 w-6 text-muted-foreground" />
+              )}
               <div className="text-sm">
-                {uploading ? "Enviando..." : photos.length >= MAX_PHOTOS ? "Limite atingido" : "Arraste imagens ou clique para selecionar"}
+                {uploading
+                  ? `Enviando ${pendingCount} foto${pendingCount !== 1 ? "s" : ""}…`
+                  : photos.length >= MAX_PHOTOS
+                  ? "Limite atingido"
+                  : "Arraste imagens ou clique para selecionar"}
               </div>
               <div className="text-[11px] text-muted-foreground">
                 {photos.length}/{MAX_PHOTOS} foto(s)
@@ -532,7 +552,7 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
               />
             </div>
 
-            {photos.length > 0 && (
+            {(photos.length > 0 || pendingCount > 0) && (
               <div className="mt-3 grid grid-cols-3 sm:grid-cols-6 gap-2">
                 {photos.map((url, i) => (
                   <div key={url + i} className={`relative aspect-[3/4] overflow-hidden rounded border ${i === mainIndex ? "border-primary ring-2 ring-primary/30" : "border-border"}`}>
@@ -558,6 +578,15 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
                         Principal
                       </span>
                     )}
+                  </div>
+                ))}
+                {/* Skeleton cards for photos being uploaded */}
+                {Array.from({ length: pendingCount }).map((_, i) => (
+                  <div key={`pending-${i}`} className="relative aspect-[3/4] overflow-hidden rounded border border-border bg-muted animate-pulse flex items-center justify-center">
+                    <svg className="h-5 w-5 animate-spin text-muted-foreground" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
                   </div>
                 ))}
               </div>
