@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff, GripVertical, List, Grid2x2Plus } from "lucide-react";
+import { Plus, Trash2, Pencil, X, LayoutGrid, Upload, Star, StarOff, GripVertical, List, Grid2x2Plus, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "@/components/site/ProductCard";
 
@@ -290,6 +290,10 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
   const [pendingCount, setPendingCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const MAX_FILE_SIZE_MB = 15;
+  const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const { data: catalog = [] } = useQuery<ProductRow[]>({
     queryKey: ["admin-products-options"],
@@ -328,19 +332,34 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
   }
 
   async function handleFiles(files: FileList | File[]) {
+    setUploadError(null);
     const IMAGE_EXTS = /\.(jpe?g|png|gif|webp|heic|heif|bmp|tiff?|avif|svg)$/i;
-    // Accept files that declare an image MIME type OR have a known image extension.
-    // iOS often sends file.type = "" for camera photos — the extension check catches those.
     const arr = Array.from(files).filter(
       (f) => f.type.startsWith("image/") || IMAGE_EXTS.test(f.name)
     );
-    if (!arr.length) return;
+    if (!arr.length) {
+      setUploadError("Formato não suportado. Use JPG, PNG, HEIC ou similar.");
+      return;
+    }
+
+    const oversized = arr.filter((f) => f.size > MAX_FILE_SIZE);
+    const valid = arr.filter((f) => f.size <= MAX_FILE_SIZE);
+    if (oversized.length > 0 && valid.length === 0) {
+      setUploadError(
+        `${oversized.length > 1 ? "As fotos estão" : "A foto está"} muito grande${oversized.length > 1 ? "s" : ""} — máximo ${MAX_FILE_SIZE_MB} MB por imagem. Compacte e tente novamente.`
+      );
+      return;
+    }
+    if (oversized.length > 0) {
+      setUploadError(`${oversized.length} foto(s) ignorada(s) por exceder ${MAX_FILE_SIZE_MB} MB.`);
+    }
+
     const remaining = MAX_PHOTOS - photos.length;
     if (remaining <= 0) {
       toast.error(`Máximo de ${MAX_PHOTOS} fotos.`);
       return;
     }
-    const toUpload = arr.slice(0, remaining);
+    const toUpload = valid.slice(0, remaining);
     setUploading(true);
     setPendingCount(toUpload.length);
     const uploaded: string[] = [];
@@ -354,12 +373,12 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
           upsert: false,
         });
         if (upErr) throw upErr;
-        // Bucket is public — getPublicUrl is instant (no API call) and never expires.
         const { data: pub } = supabase.storage.from("products").getPublicUrl(path);
         uploaded.push(pub.publicUrl);
       } catch (e: any) {
         failCount++;
         console.error("Upload failed for", file.name, e);
+        setUploadError(`Falha ao enviar "${file.name}": ${e?.message ?? "erro desconhecido"}. Verifique a conexão.`);
       } finally {
         setPendingCount((n) => Math.max(0, n - 1));
       }
@@ -367,13 +386,10 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
     setUploading(false);
     if (uploaded.length) {
       setPhotos((prev) => [...prev, ...uploaded].slice(0, MAX_PHOTOS));
+      if (!oversized.length && !failCount) setUploadError(null);
     }
-    if (arr.length > remaining) {
+    if (valid.length > remaining) {
       toast.warning(`Apenas ${remaining} foto(s) adicionadas (limite ${MAX_PHOTOS}).`);
-    } else if (failCount > 0 && uploaded.length > 0) {
-      toast.warning(`${uploaded.length} foto(s) enviada(s); ${failCount} falhou(aram). Tente novamente.`);
-    } else if (failCount > 0) {
-      toast.error(`Falha ao enviar ${failCount} foto(s). Verifique a conexão e tente novamente.`);
     }
   }
 
@@ -521,8 +537,11 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
                 setDragOver(false);
                 if (e.dataTransfer.files?.length) handleFiles(e.dataTransfer.files);
               }}
-              onClick={() => fileInputRef.current?.click()}
-              className={`flex flex-col items-center justify-center gap-2 cursor-pointer border-2 border-dashed rounded-md p-6 text-center transition-colors ${dragOver ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"} ${photos.length >= MAX_PHOTOS ? "opacity-50 pointer-events-none" : ""}`}
+              className={cn(
+                "flex flex-col items-center justify-center gap-2 cursor-pointer border-2 border-dashed rounded-md p-6 text-center transition-colors",
+                uploadError ? "border-destructive bg-destructive/5" : dragOver ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
+                photos.length >= MAX_PHOTOS && "opacity-50 pointer-events-none"
+              )}
             >
               {uploading ? (
                 <svg className="h-6 w-6 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
@@ -551,6 +570,13 @@ function ProductFormModal({ initial, onClose }: { initial: ProductRow | null; on
                 onChange={(e) => { if (e.target.files) handleFiles(e.target.files); e.currentTarget.value = ""; }}
               />
             </div>
+
+            {uploadError && (
+              <p className="mt-2 flex items-start gap-1.5 text-xs text-destructive">
+                <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0" />
+                {uploadError}
+              </p>
+            )}
 
             {(photos.length > 0 || pendingCount > 0) && (
               <div className="mt-3 grid grid-cols-3 sm:grid-cols-6 gap-2">
